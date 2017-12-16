@@ -101,8 +101,8 @@ class UserController extends Controller
         }
 
         $userId = DB::table('users')->select('id')->where('secret',request('secret'))->value('id');
-        DB::table('standart_users')->where('id',$userId)->update([
-           'body_type' => request('body_tyoe'),
+        DB::table('standart_users')->where('user_id',$userId)->update([
+           'body_type' => request('body_type'),
            'body_style' => request('body_style'),
             'is_completed' => 1
         ]);

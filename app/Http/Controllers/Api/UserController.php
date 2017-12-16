@@ -4,13 +4,22 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Auth\InstagramController;
 use App\Http\Controllers\Controller;
-use App\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+    /**
+     * @api {post} /api/login Login User
+     * @apiName LoginUser
+     * @apiGroup User
+     *
+     * @apiParam {String} email User' email address.
+     * @apiParam {String} password User' password.
+     *
+     * @apiSuccess {String} secret Secret token to use in API calls.
+     * @apiError {String} error  Login error
+     */
     public function login(){
         if(!request()->has('email') && request()->has('password')){
             return response()->json([
@@ -42,6 +51,19 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @api {post} /api/register Register User
+     * @apiName RegisterUser
+     * @apiGroup User
+     *
+     * @apiParam {String} email User' email address.
+     * @apiParam {String} password User' password.
+     * @apiParam {String} name User' name.
+     *
+     * @apiSuccess {String} secret Secret token to use in API calls.
+     * @apiError {String} error  Register error
+     */
+
     public function register(){
         $this->validate(request(),[
             'name' => 'required|string|max:255',
@@ -67,6 +89,16 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * @api {post} /api/index Home Page
+     * @apiName HomePage
+     * @apiGroup Home
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} secret Homepage messages.
+     * @apiError {String} error  Secret key error
+     */
     public function index(){
         if(!request()->has('secret')){
             return response()->json([
@@ -93,6 +125,19 @@ class UserController extends Controller
 
     }
 
+    /**
+     * @api {post} /api/user/preferences Preferences Update
+     * @apiName UserPreferences
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {String} body_type User' body type.
+     * @apiParam {String} body_style User' body style.
+     *
+     * @apiSuccess {String} secret Update confirmation.
+     * @apiError {String} error  Secret key error
+     */
+
     public function preferences(){
         if(!request()->has('body_type') || !request()->has('body_style') || !request()->has('secret')){
             return response()->json([
@@ -112,12 +157,31 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * @api {get} /api/instagram/url Instagram Url
+     * @apiName InstagramUrl
+     * @apiGroup Instagram
+     *
+     * @apiSuccess {String} url Instagram url to oAuth.
+     */
+
     public function instagramUrl(){
         return response()->json([
            'url' => 'https://api.instagram.com/oauth/authorize/?client_id=' . env('INSTAGRAM_ID')
                . '&redirect_uri=' . env('INSTAGRAM_API_URI') . '&response_type=code'
         ]);
     }
+
+    /**
+     * @api {post} /api/instagram/oauth Register Instagram User
+     * @apiName InstagramOauth
+     * @apiGroup Instagram
+     *
+     * @apiParam {String} code User' instagram code(from callback).
+     *
+     * @apiSuccess {String} secret Secret token to use in API calls.
+     * @apiError {String} error  Secret or Code key error
+     */
 
     public function instagram(){
         if(!request()->has('code') || request()->has('error')){
@@ -179,6 +243,15 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @api {get} /api/logout Logout User
+     * @apiName LogoutUser
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} status Confirmation of logout.
+     */
     public function logout(){
         if(!request()->has('secret')){
             return response()->json([

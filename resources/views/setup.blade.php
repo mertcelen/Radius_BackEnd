@@ -26,7 +26,7 @@
             <tr>
                 <td>Style</td>
                 <td>
-                    <select class="custom-select" type="style">
+                    <select class="custom-select" name="style">
                         <option selected>Choose Style</option>
                         <option value="Athleisure">Athleisure</option>
                         <option value="Avant-garde">Avant-garde</option>

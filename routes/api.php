@@ -9,6 +9,8 @@ Route::post('index','Api\UserController@index');
 
 Route::post('user/preferences','Api\UserController@preferences');
 
+Route::post('logout','Api\UserController@logout');
+
 //Instagram Login API's
 Route::get('instagram/url','Api\UserController@instagramUrl');
 

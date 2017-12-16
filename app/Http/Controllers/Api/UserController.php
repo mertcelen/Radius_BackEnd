@@ -178,4 +178,18 @@ class UserController extends Controller
             ]);
         }
     }
+
+    public function logout(){
+        if(!request()->has('secret')){
+            return response()->json([
+                'error' => 'Missing token'
+            ]);
+        }
+        DB::table('users')->where('secret',request('secret'))->update([
+           'secret' => null
+        ]);
+        return response()->json([
+           'success' => 'User logged out'
+        ]);
+    }
 }

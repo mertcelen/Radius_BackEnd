@@ -12,6 +12,11 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        'api/login',
+        'api/register',
+        'api/index',
+        'face',
+        'api/user/preferences',
+        'api/instagram/oauth'
     ];
 }

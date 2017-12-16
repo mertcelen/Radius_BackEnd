@@ -1,13 +1,18 @@
 <?php
 
+//Standart login API's
+Route::post('login','Api\UserController@login');
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+Route::post('register','Api\UserController@register');
+
+Route::post('index','Api\UserController@index');
+
+Route::post('user/preferences','Api\UserController@preferences');
+
+//Instagram Login API's
+Route::get('instagram/url','Api\UserController@instagramUrl');
+
+Route::post('instagram/oauth','Api\UserController@instagram');
+
+//Face Recognition API
+Route::get('face/','Api\FaceDetectionController@main');

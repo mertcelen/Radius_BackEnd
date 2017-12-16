@@ -16,11 +16,12 @@ class FaceRecognitionController extends Controller
 
     public function apiCall(){
         if(Auth::check() == false){
-            return response()->json([
-               'error' => 'Not authorized'
-            ]);
+            if(!request()->has('secret')){
+                return response()->json([
+                    'error' => 'Not authorized'
+                ]);
+            }
         }
-
 //        if(!request()->has('url') || request()->has('id')){
 //            echo "URL : " . request('url') . "<br>";
 //            echo "ID : " . request('id');

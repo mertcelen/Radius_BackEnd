@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('instagram_id')->unique()->nullable();
             //0 => unconfirmed, 1 => confirmed, 2 =>banned, 3=> admin
             $table->integer('status')->default(0);
+            $table->string('secret')->unique()->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -23,7 +23,7 @@ class InstagramController extends Controller
 
         //Request permanent token from instagram using that 1 time code.
 
-        list($error, $user) =  $this->getToken(request('code'));
+        list($error, $user) =  $this->getToken(request('code'),env('INSTAGRAM_URI'));
         if($error) return redirect('/');
 
         //Now check if user is actually exist or not.
@@ -53,12 +53,12 @@ class InstagramController extends Controller
         return redirect('/');
     }
 
-    public function getToken($code){
+    public static function getToken($code,$uri){
         $response = Curl::to('https://api.instagram.com/oauth/access_token')->withData(array(
             'client_id' => env('INSTAGRAM_ID'),
             'client_secret' => env('INSTAGRAM_SECRET'),
             'grant_type' => 'authorization_code',
-            'redirect_uri' => env('INSTAGRAM_URI'),
+            'redirect_uri' => $uri,
             'code' => $code
         ))->asJsonResponse()->post();
         if(isset($response->access_token)){

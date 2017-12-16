@@ -5,6 +5,8 @@ Auth::routes();
 
 Route::get('/user/setup','UserController@setup');
 
+Route::post('/user/setup','UserController@save');
+
 //Instagram Auth routes
 Route::get('/login/instagram','Auth\InstagramController@index');
 

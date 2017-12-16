@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -63,6 +64,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+
         $id = DB::table('users')->insertGetId([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -71,5 +73,6 @@ class RegisterController extends Controller
         DB::table('standart_users')->insert([
             'user_id' => $id
         ]);
+        Auth::loginUsingId($id);
     }
 }

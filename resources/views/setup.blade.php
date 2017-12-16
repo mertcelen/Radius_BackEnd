@@ -15,19 +15,19 @@
             <tr>
                 <td>Body Type</td>
                 <td>
-                    <select class="custom-select">
+                    <select class="custom-select" name="body_type">
                         <option selected>Choose your body type</option>
-                        <option value="1">Curved</option>
-                        <option value="2">Petite</option>
-                        <option value="3">Tall</option>
+                        <option value="Curved">Curved</option>
+                        <option value="Petite">Petite</option>
+                        <option value="Tall">Tall</option>
                     </select>
                 </td>
             </tr>
             <tr>
                 <td>Style</td>
                 <td>
-                    <select class="custom-select">
-                        <option selected>Choose your body type</option>
+                    <select class="custom-select" type="style">
+                        <option selected>Choose Style</option>
                         <option value="Athleisure">Athleisure</option>
                         <option value="Avant-garde">Avant-garde</option>
                         <option value="Bohemian">Bohemian</option>

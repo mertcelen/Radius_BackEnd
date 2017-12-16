@@ -34,7 +34,7 @@ class HomeController extends Controller
                 'status' => $status
             ]);
         }else{
-            $setup = DB::table('standart_users')->select('is_completed')->where('id',Auth::id())->value('is_completed');
+            $setup = DB::table('standart_users')->select('is_completed')->where('user_id',Auth::id())->value('is_completed');
             if($setup == 0){
                 return redirect('/user/setup');
             }

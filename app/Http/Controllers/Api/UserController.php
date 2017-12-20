@@ -268,7 +268,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} /api/logout Logout User
+     * @api {post} /api/logout Logout User
      * @apiName LogoutUser
      * @apiGroup User
      *

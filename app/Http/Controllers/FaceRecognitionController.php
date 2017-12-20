@@ -14,6 +14,19 @@ class FaceRecognitionController extends Controller
         $this->face_detect = new FaceDetector('detection.dat');
     }
 
+
+    /**
+     * @api {post} /face/ FaceRecognition
+     * @apiName LogoutUser
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {String} url Image Url.
+     * @apiParam {String} id Image id.
+     *
+     * @apiSuccess {String} result Plain text OK(No JSON).
+     * @apiError {String} result  Plain text NO(No JSON)
+     */
     public function apiCall(){
         if(Auth::check() == false){
             if(!request()->has('secret')){

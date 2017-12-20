@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\InstagramController;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Ixudra\Curl\Facades\Curl;
 
 class UserController extends Controller
 {
@@ -97,6 +98,7 @@ class UserController extends Controller
      * @apiParam {String} secret User' secret key.
      *
      * @apiSuccess {String} secret Homepage messages.
+     * @apiSuccess {String} instagram If user is Instagram User or not.
      * @apiError {String} error  Secret key error
      */
     public function index(){
@@ -112,17 +114,39 @@ class UserController extends Controller
             ]);
         }
 
-        $flag = DB::table('standart_users')->select('is_completed')->where('user_id',$userId)->value('is_completed');
-        if($flag == 1){
-            return response()->json([
-                'success' => 'Welcome back'
-            ]);
+        $userType = DB::table('users')->select('isInstagram')->where('secret',request('secret'))->value('isInstagram');
+        if($userType==0){
+            $flag = DB::table('standart_users')->select('is_completed')->where('user_id',$userId)->value('is_completed');
+            if($flag == 1){
+                return response()->json([
+                    'instagram' => 0,
+                    'success' => 'Welcome back'
+                ]);
+            }else{
+                return response()->json([
+                    'error' => 'Missing preferences'
+                ]);
+            }
         }else{
+//            if instagram account
+            $token = DB::table('instagram-users')->where('user_id',$userId)->value('access_token');
+            $rawData = Curl::to('https://api.instagram.com/v1/users/self/media/recent/?access_token=' . $token)->asJsonResponse()->get();
+            $data = array();
+            for($i=0;$i < count($rawData->data);$i++){
+                $flag = DB::table('images')->where('imageId',$rawData->data[$i]->id)->value('hasFace');
+                if($flag == 1 || $flag === null){
+                    $data[] = [
+                        'image' => $rawData->data[$i]->images->standard_resolution->url,
+                        'id' => $rawData->data[$i]->id
+                    ];
+                }else if($flag == 0){
+                }
+            };
             return response()->json([
-                'error' => 'Missing preferences'
+                'instagram' => 1,
+                'images' => $data
             ]);
         }
-
     }
 
     /**
@@ -168,7 +192,7 @@ class UserController extends Controller
     public function instagramUrl(){
         return response()->json([
            'url' => 'https://api.instagram.com/oauth/authorize/?client_id=' . env('INSTAGRAM_ID')
-               . '&redirect_uri=' . env('INSTAGRAM_API_URI') . '&response_type=code'
+               . '&redirect_uri=' . env('INSTAGRAM_URI') . '&response_type=code'
         ]);
     }
 
@@ -189,7 +213,7 @@ class UserController extends Controller
                 'error' => 'Missing information'
             ]);
         }
-        list($error, $user) =  InstagramController::getToken(request('code'),env('INSTAGRAM_API_URI'));
+        list($error, $user) =  InstagramController::getToken(request('code'),env('INSTAGRAM_URI'));
         if($error){
             return response()->json([
                'error' => 'Error retrieving instagram token'

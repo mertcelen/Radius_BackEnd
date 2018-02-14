@@ -289,4 +289,59 @@ class UserController extends Controller
            'success' => 'User logged out'
         ]);
     }
+
+    /**
+     * @api {post} /api/user/favorites Update User Favorites
+     * @apiName UpdateFavorites
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} success Confirmation of favorites update.
+     */
+    public function addFavorites(){
+        if(!request()->has('secret')){
+            return response()->json([
+                'error' => 'Missing token'
+            ]);
+        }else if(!request()->has('favoriteList')){
+            return response()->json([
+                'error' => 'Missing favorite list'
+            ]);
+        }
+
+        //Let's add favorites to database.
+
+        DB::table('users')->where('secret',request('secret'))->update([
+            'favoriteList' => request('favoriteList')
+        ]);
+
+        return response()->json([
+           'success' => 'Favorites added'
+        ]);
+    }
+
+    /**
+     * @api {get} /api/user/favorites Update User Favorites
+     * @apiName GetFavorites
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} success Confirmation of favorites request.
+     * @apiSuccess {String} favoritesList List of Favorites
+     */
+    public function getFavorites(){
+        if(!request()->has('secret')){
+            return response()->json([
+                'error' => 'Missing token'
+            ]);
+        }
+        //Simply get user list from users table.
+        $favoriteList = DB::table('users')->select('favoriteList')->where('secret',request('secret'))->value('favoriteList');
+        return response()->json([
+            'success' => 'Favorites received',
+            'favoriteList' => $favoriteList
+        ]);
+    }
 }

@@ -155,7 +155,7 @@ class FaceDetector {
                 $stats = $this->get_img_stats($this->canvas);
                 $this->face = $this->do_detect_greedy_big_to_small($stats['ii'], $stats['ii2'], $stats['width'], $stats['height']);
             }
-          unlink(storage_path('images\\' . basename($file)));
+          unlink(storage_path('images' . DS . basename($file)));
             return $this->face['w'] > 0;
         }
 

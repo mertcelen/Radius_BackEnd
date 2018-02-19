@@ -291,36 +291,63 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /api/user/favorites Update User Favorites
+     * @api {post} /api/user/favorites/add Update User Favorites
      * @apiName UpdateFavorites
      * @apiGroup User
      *
      * @apiParam {String} secret User' secret key.
+     * @apiParam {String} imageID Image ID to add.
      *
      * @apiSuccess {String} success Confirmation of favorites update.
      */
-    public function addFavorites(){
+    public function addFavorite(){
         if(!request()->has('secret')){
             return response()->json([
                 'error' => 'Missing token'
             ]);
-        }else if(!request()->has('favoriteList')){
+        }else if(!request()->has('imageID')){
             return response()->json([
-                'error' => 'Missing favorite list'
+                'error' => 'Missing image id'
             ]);
         }
-
+        //Get User id from database
+        $userId = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
         //Let's add favorites to database.
-
-        DB::table('users')->where('secret',request('secret'))->update([
-            'favoriteList' => request('favoriteList')
+        DB::table('favorites')->insert([
+            'userID' => $userId,
+            'imageID' => request('imageID')
         ]);
-
         return response()->json([
            'success' => 'Favorites added'
         ]);
     }
+    /**
+     * @api {get} /api/user/favorites/remove Remove User Favorites
+     * @apiName RemoveFavorites
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {String} imageID Image ID to add.
+     *
+     * @apiSuccess {String} success Confirmation of delete request.
+     */
+    public function removeFavorite(){
+        if(!request()->has('secret')){
+            return response()->json([
+                'error' => 'Missing token'
+            ]);
+        }else if(!request()->has('imageID')){
+            return response()->json([
+                'error' => 'Missing image id'
+            ]);
+        }
+        $userId = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
+        DB::table('favorites')->where('userID',$userId)->where('imageID',request('imageID'))->delete();
 
+        return response()->json([
+            'success' => 'Image removed from favorites'
+        ]);
+    }
     /**
      * @api {get} /api/user/favorites Update User Favorites
      * @apiName GetFavorites
@@ -337,8 +364,8 @@ class UserController extends Controller
                 'error' => 'Missing token'
             ]);
         }
-        //Simply get user list from users table.
-        $favoriteList = DB::table('users')->select('favoriteList')->where('secret',request('secret'))->value('favoriteList');
+        $userId = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
+        $favoriteList = DB::table('users')->select('imageID')->where('userID',$userId)->get()->toArray();
         return response()->json([
             'success' => 'Favorites received',
             'favoriteList' => $favoriteList

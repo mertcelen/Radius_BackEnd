@@ -19,3 +19,9 @@ Route::post('instagram/oauth','Api\UserController@instagram');
 
 //Face Recognition API
 Route::get('face/','Api\FaceDetectionController@main');
+
+//Favorites API
+
+Route::post('user/favorites/add','Api\UserController@addFavorite');
+Route::post('user/favorites/remove','Api\UserController@removeFavorite');
+Route::post('user/favorites/list','Api\UserController@listFavorites');

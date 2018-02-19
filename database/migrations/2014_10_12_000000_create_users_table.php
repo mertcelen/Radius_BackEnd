@@ -25,7 +25,6 @@ class CreateUsersTable extends Migration
             $table->string('secret')->unique()->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->string('favoriteList')->nullable();
         });
     }
 

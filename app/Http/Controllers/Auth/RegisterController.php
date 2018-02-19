@@ -64,15 +64,15 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-
-        $id = DB::table('users')->insertGetId([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-        ]);
+        $user = new User;
+        $user->name = $data['name'];
+        $user->email = $data['password'];
+        $user->password = $data['password'];
+        $user->save();
+        $id = DB::table('users')->where('email',$user->email)->select('id')->value('id');
         DB::table('standart_users')->insert([
             'user_id' => $id
         ]);
-        Auth::loginUsingId($id);
+        return $user;
     }
 }

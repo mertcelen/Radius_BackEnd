@@ -66,7 +66,7 @@ class RegisterController extends Controller
     {
         $user = new User;
         $user->name = $data['name'];
-        $user->email = $data['password'];
+        $user->email = $data['email'];
         $user->password = bcrypt($data['password']);
         $user->save();
         $id = DB::table('users')->where('email',$user->email)->select('id')->value('id');

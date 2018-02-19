@@ -365,7 +365,7 @@ class UserController extends Controller
             ]);
         }
         $userId = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
-        $favoriteList = DB::table('users')->select('imageID')->where('userID',$userId)->get()->toArray();
+        $favoriteList = DB::table('favorites')->select('imageID')->where('userID',$userId)->get()->toArray();
         return response()->json([
             'success' => 'Favorites received',
             'favoriteList' => $favoriteList

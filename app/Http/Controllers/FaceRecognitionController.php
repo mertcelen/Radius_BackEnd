@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+define('DS', DIRECTORY_SEPARATOR);
 ini_set('display_errors',1);
 error_reporting(E_ALL ^ E_NOTICE);
 
@@ -13,7 +13,6 @@ class FaceRecognitionController extends Controller
     public function __construct(){
         $this->face_detect = new FaceDetector('detection.dat');
     }
-
 
     /**
      * @api {post} /face/ FaceRecognition
@@ -77,13 +76,13 @@ class FaceRecognitionController extends Controller
     private function hasFace($fileUrl){
 //        TODO implement better way to join path
         $this->downloadFile($fileUrl);
-        return $this->face_detect->check(storage_path('images\\' . basename($fileUrl)));
+        return $this->face_detect->check(storage_path('images' . DS . basename($fileUrl)));
     }
 
     private function downloadFile($file_source) {
-        if(file_exists(storage_path('images\\' . basename($file_source)))) return true;
+        if(file_exists(storage_path('images' . DS . basename($file_source)))) return true;
         $rh = fopen($file_source, 'rb');
-        $wh = fopen(storage_path('images\\' . basename($file_source)), 'w+b');
+        $wh = fopen(storage_path('images' . DS . basename($file_source)), 'w+b');
         if (!$rh || !$wh) {
             return false;
         }

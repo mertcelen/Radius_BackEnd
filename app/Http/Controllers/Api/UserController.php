@@ -322,7 +322,7 @@ class UserController extends Controller
         ]);
     }
     /**
-     * @api {get} /api/user/favorites/remove Remove User Favorites
+     * @api {post} /api/user/favorites/remove Remove User Favorites
      * @apiName RemoveFavorites
      * @apiGroup User
      *
@@ -349,7 +349,7 @@ class UserController extends Controller
         ]);
     }
     /**
-     * @api {get} /api/user/favorites/list List User Favorites
+     * @api {post} /api/user/favorites/list List User Favorites
      * @apiName GetFavorites
      * @apiGroup User
      *

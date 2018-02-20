@@ -291,7 +291,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /api/user/favorites/add Update User Favorites
+     * @api {post} /api/user/favorites/add Add User Favorites
      * @apiName UpdateFavorites
      * @apiGroup User
      *
@@ -349,7 +349,7 @@ class UserController extends Controller
         ]);
     }
     /**
-     * @api {get} /api/user/favorites Update User Favorites
+     * @api {get} /api/user/favorites/list List User Favorites
      * @apiName GetFavorites
      * @apiGroup User
      *

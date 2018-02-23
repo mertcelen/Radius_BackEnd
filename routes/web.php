@@ -22,3 +22,11 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::get('/admin','AdminController@index');
 
 Route::post('/user/status','AdminController@updateStatus');
+
+//My Photos
+
+Route::get('/photos','PhotosController@index');
+
+Route::post('/photos/upload','PhotosController@upload');
+
+Route::post('/photos/remove','PhotosController@remove');

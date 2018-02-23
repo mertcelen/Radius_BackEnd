@@ -39,8 +39,11 @@ class HomeController extends Controller
                 return redirect('/user/setup');
             }
             $status = DB::table('users')->select('status')->where('id',Auth::id())->value('status');
+
+            $images = DB::table('images')->select('imageId','type')->where('userId',Auth::id())->get()->toArray();
             return view('home',[
-                'status' => $status
+                'status' => $status,
+                'images' => $images
             ]);
         }
     }

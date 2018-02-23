@@ -25,3 +25,9 @@ Route::get('face/','Api\FaceDetectionController@main');
 Route::post('user/favorites/add','Api\UserController@addFavorite');
 Route::post('user/favorites/remove','Api\UserController@removeFavorite');
 Route::post('user/favorites/list','Api\UserController@getFavorites');
+
+//Photos API
+
+Route::post('images/get','Api\UserController@getImages');
+Route::post('images/add','Api\UserController@addImage');
+Route::post('images/remove','Api\UserController@removeImage');

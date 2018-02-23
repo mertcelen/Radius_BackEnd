@@ -51,6 +51,7 @@ class Handler extends ExceptionHandler
         if($this->isHttpException($exception)){
             return redirect('/');
         }
+
         return parent::render($request, $exception);
     }
 }

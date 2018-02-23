@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+define('DS', DIRECTORY_SEPARATOR);
 use App\Http\Controllers\Auth\InstagramController;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Ixudra\Curl\Facades\Curl;
@@ -369,6 +370,100 @@ class UserController extends Controller
         return response()->json([
             'success' => 'Favorites received',
             'favoriteList' => $favoriteList
+        ]);
+    }
+    /**
+     * @api {post} /api/images/get List User Images
+     * @apiName GetImages
+     * @apiGroup Images
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} success Confirmation of images request.
+     * @apiSuccess {String} images List of images
+     */
+    public function getImages(){
+        if(!request()->has('secret')){
+            return response()->json([
+                'error' => 'Missing token'
+            ]);
+        }
+        $userId = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
+        $images = DB::table('images')->select('imageId','type')->where('userId',$userId)->get()->toArray();
+        return response()->json([
+            "success" => "Imaged retrieved",
+            "images" => $images
+        ]);
+    }
+    /**
+     * @api {post} /api/images/add Add User Image
+     * @apiName AddImage
+     * @apiGroup Images
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {File} photo Photo of the User.
+     *
+     * @apiSuccess {String} success Confirmation.
+     * @apiSuccess {String} imageId Added Image Id
+     */
+    public function addImage(Request $request){
+        if(!request()->has('secret')){
+            return response()->json([
+                'error' => 'Missing token'
+            ]);
+        }
+        if(!$request->hasFile('photo') || !$request->file('photo')->isValid()){
+            return response()->json([
+                'error' => 'Invalid photo'
+            ]);
+        }
+        $file_name = str_random(32);
+        //Making sure id not exist in db.
+        while(DB::table('images')->where('imageId',$file_name)->exists() == true){
+            $file_name = str_random(64);
+        }
+        $user_id = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
+        $file = $request->file('photo');
+        //Write image information to database
+        DB::table('images')->insert([
+            "userId" => $user_id,
+            "imageId" => $file_name,
+            "type" => $file->getClientOriginalExtension()
+        ]);
+        //Finally save file into the disk.
+        $file->move(public_path('images'),$file_name . "." . $file->getClientOriginalExtension());
+        return response()->json([
+           "success" => "Image Added",
+           "imageId" => $file_name
+        ]);
+    }
+    /**
+     * @api {post} /api/images/remove Remove User Image
+     * @apiName RemoveImage
+     * @apiGroup Images
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {String} imageId Requested Image Id.
+     *
+     * @apiSuccess {String} success Confirmation of remove request.
+     */
+    public function removeImage(){
+        if(!request()->has('secret')){
+            return response()->json([
+                'error' => 'Missing token'
+            ]);
+        }
+        if(!request()->has('imageId')){
+            return response()->json([
+                'error' => 'Missing Image ID'
+            ]);
+        }
+        $user_id = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
+        $type = DB::table('images')->select('type')->where('imageId',request('imageId'))->value('type');
+        DB::table('images')->select('userId',$user_id)->select('imageId',request('imageId'))->delete();
+        unlink(public_path('images') . DS . request('imageId') . "." . $type);
+        return response()->json([
+           "success" => "File deleted"
         ]);
     }
 }

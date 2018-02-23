@@ -460,7 +460,7 @@ class UserController extends Controller
         }
         $user_id = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
         $type = DB::table('images')->select('type')->where('imageId',request('imageId'))->value('type');
-        DB::table('images')->select('userId',$user_id)->select('imageId',request('imageId'))->delete();
+        DB::table('images')->where('imageId',request('imageId'))->where('userId',$user_id)->delete();
         unlink(public_path('images') . DS . request('imageId') . "." . $type);
         return response()->json([
            "success" => "File deleted"

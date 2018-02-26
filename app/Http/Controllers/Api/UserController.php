@@ -103,18 +103,7 @@ class UserController extends Controller
      * @apiError {String} error  Secret key error
      */
     public function index(){
-        if(!request()->has('secret')){
-            return response()->json([
-                'error' => 'Missing token'
-            ]);
-        }
         $userId = DB::table('users')->select('id')->where('secret',request('secret'))->value('id');
-        if($userId == null){
-            return response()->json([
-               'error' => 'Wrong token'
-            ]);
-        }
-
         $userType = DB::table('users')->select('isInstagram')->where('secret',request('secret'))->value('isInstagram');
         if($userType==0){
             $flag = DB::table('standart_users')->select('is_completed')->where('user_id',$userId)->value('is_completed');
@@ -164,12 +153,11 @@ class UserController extends Controller
      */
 
     public function preferences(){
-        if(!request()->has('body_type') || !request()->has('body_style') || !request()->has('secret')){
+        if(!request()->has('body_type') || !request()->has('body_style')){
             return response()->json([
                 'error' => 'Missing information'
             ]);
         }
-
         $userId = DB::table('users')->select('id')->where('secret',request('secret'))->value('id');
         DB::table('standart_users')->where('user_id',$userId)->update([
            'body_type' => request('body_type'),
@@ -278,11 +266,6 @@ class UserController extends Controller
      * @apiSuccess {String} status Confirmation of logout.
      */
     public function logout(){
-        if(!request()->has('secret')){
-            return response()->json([
-                'error' => 'Missing token'
-            ]);
-        }
         DB::table('users')->where('secret',request('secret'))->update([
            'secret' => null
         ]);
@@ -302,11 +285,7 @@ class UserController extends Controller
      * @apiSuccess {String} success Confirmation of favorites update.
      */
     public function addFavorite(){
-        if(!request()->has('secret')){
-            return response()->json([
-                'error' => 'Missing token'
-            ]);
-        }else if(!request()->has('imageID')){
+        if(!request()->has('imageID')){
             return response()->json([
                 'error' => 'Missing image id'
             ]);
@@ -333,11 +312,7 @@ class UserController extends Controller
      * @apiSuccess {String} success Confirmation of delete request.
      */
     public function removeFavorite(){
-        if(!request()->has('secret')){
-            return response()->json([
-                'error' => 'Missing token'
-            ]);
-        }else if(!request()->has('imageID')){
+        if(!request()->has('imageID')){
             return response()->json([
                 'error' => 'Missing image id'
             ]);
@@ -360,11 +335,6 @@ class UserController extends Controller
      * @apiSuccess {String} favoritesList List of Favorites
      */
     public function getFavorites(){
-        if(!request()->has('secret')){
-            return response()->json([
-                'error' => 'Missing token'
-            ]);
-        }
         $userId = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
         $favoriteList = DB::table('favorites')->select('imageID')->where('userID',$userId)->get()->toArray();
         return response()->json([
@@ -383,15 +353,10 @@ class UserController extends Controller
      * @apiSuccess {String} images List of images
      */
     public function getImages(){
-        if(!request()->has('secret')){
-            return response()->json([
-                'error' => 'Missing token'
-            ]);
-        }
         $userId = DB::table('users')->where('secret',request('secret'))->select('id')->value('id');
         $images = DB::table('images')->select('imageId','type')->where('userId',$userId)->get()->toArray();
         return response()->json([
-            "success" => "Imaged retrieved",
+            "success" => "Images retrieved",
             "images" => $images
         ]);
     }
@@ -407,11 +372,6 @@ class UserController extends Controller
      * @apiSuccess {String} imageId Added Image Id
      */
     public function addImage(Request $request){
-        if(!request()->has('secret')){
-            return response()->json([
-                'error' => 'Missing token'
-            ]);
-        }
         if(!$request->hasFile('photo') || !$request->file('photo')->isValid()){
             return response()->json([
                 'error' => 'Invalid photo'
@@ -448,11 +408,6 @@ class UserController extends Controller
      * @apiSuccess {String} success Confirmation of remove request.
      */
     public function removeImage(){
-        if(!request()->has('secret')){
-            return response()->json([
-                'error' => 'Missing token'
-            ]);
-        }
         if(!request()->has('imageId')){
             return response()->json([
                 'error' => 'Missing Image ID'

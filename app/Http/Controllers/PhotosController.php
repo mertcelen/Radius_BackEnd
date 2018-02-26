@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-define('DS', DIRECTORY_SEPARATOR);
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

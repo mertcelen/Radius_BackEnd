@@ -11,6 +11,9 @@ class InstagramController extends Controller
     public static function getUserMedia(){
         $token = InstagramController::getUserToken();
         $rawData = Curl::to('https://api.instagram.com/v1/users/self/media/recent/?access_token=' . $token)->asJsonResponse()->get();
+        if($rawData->meta->code != 200){
+          return null;
+        }
         $data = array();
         for($i=0;$i < count($rawData->data);$i++){
             $flag = DB::table('images')->where('imageId',$rawData->data[$i]->id)->value('hasFace');

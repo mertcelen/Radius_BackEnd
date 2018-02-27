@@ -15,7 +15,6 @@ class AdminController extends Controller
     }
 
     public function updateStatus(){
-        if(Auth::check() == false) return 0;
         if(DB::table('users')->select('status')->where('id',Auth::id())->value('status') != 3) return 0;
         DB::table('users')->where('id',request('id'))->update([
             'status'=> request('status')

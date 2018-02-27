@@ -26,9 +26,10 @@ class HomeController extends Controller
     {
         if(Auth::user()->isInstagram == 1){
             $arr = InstagramController::getUserMedia();
-            $face = new FaceRecognitionController();
+            if($arr == null){
+              return redirect('/login/instagram');
+            }
             $status = DB::table('users')->select('status')->where('id',Auth::id())->value('status');
-//            $arr = $face->detectArr($arr);
             return view('instagram',[
                 'images' => $arr,
                 'status' => $status

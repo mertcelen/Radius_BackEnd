@@ -48,6 +48,11 @@ class InstagramController extends Controller
                     'instagram_id' => $user->user->id
                 ]);
             }
+        }else{
+          //Update the token of the existing user once again.
+          DB::table('instagram-users')->where('instagram_id',$user->user->id)->update([
+            'access_token' => $user->access_token
+          ]);
         }
         Auth::loginUsingId(DB::table('users')->where('instagram_id',$user->user->id)->value('id'));
         return redirect('/');

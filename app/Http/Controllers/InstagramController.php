@@ -17,12 +17,11 @@ class InstagramController extends Controller
         $data = array();
         for($i=0;$i < count($rawData->data);$i++){
             $flag = DB::table('images')->where('imageId',$rawData->data[$i]->id)->value('hasFace');
-            if($flag == 1 || $flag === null){
+            if($flag >= 0){
                 $data[] = [
                     'image' => $rawData->data[$i]->images->standard_resolution->url,
                     'id' => $rawData->data[$i]->id
                 ];
-            }else if($flag == 0){
             }
         };
         return $data;

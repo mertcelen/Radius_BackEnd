@@ -9,7 +9,9 @@ Route::group(['middleware' => ['token']], function () {
     Route::post('images/get','Api\UserController@getImages');
     Route::post('images/add','Api\UserController@addImage');
     Route::post('images/remove','Api\UserController@removeImage');
+    Route::post('face','Api\FaceController@face');
 });
+Route::get('codes','Api\ErrorController@main');
 
 //Instagram Login API's
 Route::post('instagram/oauth','Api\UserController@instagram');

@@ -18,7 +18,7 @@ class CreateImagesTable extends Migration
             $table->string('imageId')->unique();
             $table->string('userId')->nullable();
             $table->string('type')->nullable();
-            $table->boolean('hasFace')->default(false);
+            $table->integer('hasFace')->nullable()->default(NULL);
             $table->timestamps();
         });
     }

@@ -12,7 +12,8 @@ Route::group(['middleware' => ['token']], function () {
     Route::post('face','Api\FaceController@face');
 });
 Route::get('codes','Api\ErrorController@main');
-
+Route::get('/instagram/user','Api\FakeDataController@user');
+Route::get('/instagram/image','Api\FakeDataController@image');
 //Instagram Login API's
 Route::post('instagram/oauth','Api\UserController@instagram');
 Route::get('instagram/url','Api\UserController@instagramUrl');

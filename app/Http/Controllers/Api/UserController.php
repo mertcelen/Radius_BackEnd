@@ -31,7 +31,7 @@ class UserController extends Controller
 
         //Now that api is done, let's check user
 
-        $flag = Auth::attempt([
+        $flag = Auth::validate([
             'email' => request('email'),
             'password' => request('password')
         ]);

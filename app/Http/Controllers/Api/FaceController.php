@@ -102,6 +102,12 @@ class FaceController extends Controller
         $maxY = 0;
         $minX = 0;
         $minY = 0;
+        if(count($faces) != 1){
+            return response()->json([
+                "labels" => "Not allowed",
+                "colors" => "Face count is " . count($faces)
+            ]);
+        }
         foreach ($faces[0]->getBoundingPoly()->getVertices() as $vertex) {
             if($maxX < $vertex->getX()){
                 $minX = $maxX;
@@ -161,7 +167,7 @@ class FaceController extends Controller
         );
         $labels = $response->getLabelAnnotations();
         $ignoredWords = [
-            "black","fashion","button","outwear","clothing","design","shoulder","neck","joint","sleeve","formal wear","collar"
+            "black","fashion","button","outwear","clothing","design","shoulder","neck","joint","sleeve","formal wear","collar","fashion model"
         ];
         $counter = 0;
         $temp = [];

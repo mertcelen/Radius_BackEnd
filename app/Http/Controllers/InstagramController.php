@@ -18,9 +18,13 @@ class InstagramController extends Controller
         for($i=0;$i < count($rawData->data);$i++){
             $flag = DB::table('images')->where('imageId',$rawData->data[$i]->id)->value('hasFace');
             if($flag >= 0){
+                if(!file_exists(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg")){
+                    $temp = file_get_contents($rawData->data[$i]->images->standard_resolution->url);
+                    file_put_contents(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg",$temp);
+                }
                 $data[] = [
-                    'image' => $rawData->data[$i]->images->standard_resolution->url,
-                    'id' => $rawData->data[$i]->id
+                    'imageId' => $rawData->data[$i]->id,
+                    'type' => 'jpg'
                 ];
             }
         };

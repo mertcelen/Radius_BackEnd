@@ -1,0 +1,9 @@
+tr .big{
+    width: 200px;
+    height: 200px;
+
+}
+
+td .big{
+    line-height: 200px;
+}

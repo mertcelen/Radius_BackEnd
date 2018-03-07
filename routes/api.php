@@ -22,3 +22,4 @@ Route::get('instagram/url','Api\UserController@instagramUrl');
 Route::post('login','Api\UserController@login');
 Route::post('register','Api\UserController@register');
 
+Route::post('test','Api\FaceController@test');

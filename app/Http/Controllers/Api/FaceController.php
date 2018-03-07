@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Google\Cloud\Vision\VisionClient;
+use function Sodium\add;
+use Vision\Vision;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class FaceController extends Controller
 {
@@ -73,5 +76,105 @@ class FaceController extends Controller
             ]
             ]);
         }
+    }
+
+    public function test(){
+        $imageAddress = request('imageId') . "." . request('type');
+
+        //Detect Face
+        $vision = new Vision(
+            env('CLOUD_VISION_KEY'),
+            [
+                // See a list of all features in the table below
+                // Feature, Limit
+                new \Vision\Feature(\Vision\Feature::FACE_DETECTION, 100),
+            ]
+        );
+
+        $imagePath = public_path('images') . DIRECTORY_SEPARATOR . $imageAddress;
+        $response = $vision->request(
+        // See a list of all image loaders in the table below
+            new \Vision\Request\Image\LocalImage($imagePath)
+        );
+
+        $faces = $response->getFaceAnnotations();
+        $maxX = 0;
+        $maxY = 0;
+        $minX = 0;
+        $minY = 0;
+        foreach ($faces[0]->getBoundingPoly()->getVertices() as $vertex) {
+            if($maxX < $vertex->getX()){
+                $minX = $maxX;
+                $maxX = $vertex->getX();
+            }
+            if($maxY < $vertex->getY()){
+                $minY = $maxY;
+                $maxY = $vertex->getY();
+            }
+        }
+
+        $width = ($maxX-$minX) * 2;
+        $startX = floor($minX - $width /4);
+        $startY = $maxY;
+        $height = ($maxY-$minY) * 2;
+        $image_height = Image::make(public_path('images') . DIRECTORY_SEPARATOR . $imageAddress)->height();
+        $image_width = Image::make(public_path('images') . DIRECTORY_SEPARATOR . $imageAddress)->width();
+        if($startX < 0 ) {$startX = 0;};
+        if($height > $image_height - $maxY){
+            $height = $image_height - $maxY;
+        }
+        if($width > $image_width - $minX){
+            $width = $image_width - $minX /2 ;
+        }
+        $image = Image::make(public_path('images') . DIRECTORY_SEPARATOR . $imageAddress)->crop(floor($width),floor($height),floor($startX),floor($startY));
+        $fileName = str_random(10) . ".jpg";
+        $image->save(storage_path('images') . DIRECTORY_SEPARATOR . $fileName);
+        $vision = new Vision(
+            env('CLOUD_VISION_KEY'),
+            [
+                // See a list of all features in the table below
+                // Feature, Limit
+                new \Vision\Feature(\Vision\Feature::IMAGE_PROPERTIES, 100),
+            ]
+        );
+        $imagePath = storage_path('images') . DIRECTORY_SEPARATOR . $fileName;
+        $response = $vision->request(
+        // See a list of all image loaders in the table below
+            new \Vision\Request\Image\LocalImage($imagePath)
+        );
+        $colors = $response->getImagePropertiesAnnotation()->getDominantColors();
+        $red = $colors[0]->getColor()->getRed();
+        $green = $colors[0]->getColor()->getGreen();
+        $blue = $colors[0]->getColor()->getBlue();
+        $vision = new Vision(
+            env('CLOUD_VISION_KEY'),
+            [
+                // See a list of all features in the table below
+                // Feature, Limit
+                new \Vision\Feature(\Vision\Feature::LABEL_DETECTION, 100),
+            ]
+        );
+        $imagePath = storage_path('images') . DIRECTORY_SEPARATOR . $fileName;
+        $response = $vision->request(
+        // See a list of all image loaders in the table below
+            new \Vision\Request\Image\LocalImage($imagePath)
+        );
+        $labels = $response->getLabelAnnotations();
+        $ignoredWords = [
+            "black","fashion","button","outwear","clothing","design","shoulder","neck","joint","sleeve","formal wear","collar"
+        ];
+        $counter = 0;
+        $temp = [];
+        foreach ($labels as $label){
+            if(!in_array($label->getDescription(),$ignoredWords) && $counter < 3){
+                array_push($temp,$label->getDescription());
+                $counter++;
+            }
+        }
+        unlink($imagePath);
+        return response()->json([
+            "labels" => $temp,
+            "colors" => "rgb($red, $green, $blue)"
+        ]);
     }
 }

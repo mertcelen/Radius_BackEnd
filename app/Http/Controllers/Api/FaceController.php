@@ -133,8 +133,8 @@ class FaceController extends Controller
             $width = $image_width - $minX /2 ;
         }
         $image = Image::make(public_path('images') . DIRECTORY_SEPARATOR . $imageAddress)->crop(floor($width),floor($height),floor($startX),floor($startY));
-        $fileName = str_random(10) . ".jpg";
-        $image->save(storage_path('images') . DIRECTORY_SEPARATOR . $fileName);
+        $fileName = request('imageId') . ".jpg";
+        $image->save(public_path('cropped') . DIRECTORY_SEPARATOR . $fileName);
         $vision = new Vision(
             env('CLOUD_VISION_KEY'),
             [
@@ -143,7 +143,7 @@ class FaceController extends Controller
                 new \Vision\Feature(\Vision\Feature::IMAGE_PROPERTIES, 100),
             ]
         );
-        $imagePath = storage_path('images') . DIRECTORY_SEPARATOR . $fileName;
+        $imagePath = public_path('cropped') . DIRECTORY_SEPARATOR . $fileName;
         $response = $vision->request(
         // See a list of all image loaders in the table below
             new \Vision\Request\Image\LocalImage($imagePath)
@@ -160,7 +160,7 @@ class FaceController extends Controller
                 new \Vision\Feature(\Vision\Feature::LABEL_DETECTION, 100),
             ]
         );
-        $imagePath = storage_path('images') . DIRECTORY_SEPARATOR . $fileName;
+        $imagePath = public_path('cropped') . DIRECTORY_SEPARATOR . $fileName;
         $response = $vision->request(
         // See a list of all image loaders in the table below
             new \Vision\Request\Image\LocalImage($imagePath)
@@ -177,7 +177,6 @@ class FaceController extends Controller
                 $counter++;
             }
         }
-        unlink($imagePath);
         return response()->json([
             "labels" => $temp,
             "colors" => "rgb($red, $green, $blue)"

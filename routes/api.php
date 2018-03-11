@@ -1,25 +1,32 @@
 <?php
-Route::group(['middleware' => ['token']], function () {
-    Route::post('index','Api\UserController@index');
-    Route::post('user/preferences','Api\UserController@preferences');
-    Route::post('logout','Api\UserController@logout');
-    Route::post('user/favorites/add','Api\UserController@addFavorite');
-    Route::post('user/favorites/remove','Api\UserController@removeFavorite');
-    Route::post('user/favorites/list','Api\UserController@getFavorites');
-    Route::post('images/get','Api\UserController@getImages');
-    Route::post('images/add','Api\UserController@addImage');
-    Route::post('images/remove','Api\UserController@removeImage');
-    Route::post('face','Api\FaceController@face');
-});
-Route::get('codes','Api\ErrorController@main');
-Route::get('/instagram/user','Api\FakeDataController@user');
-Route::get('/instagram/image','Api\FakeDataController@image');
-//Instagram Login API's
-Route::post('instagram/oauth','Api\UserController@instagram');
-Route::get('instagram/url','Api\UserController@instagramUrl');
 
-//Standart login API's
+//User Controller
+Route::post('index','Api\UserController@index')->middleware('api');
+Route::post('user/preferences','Api\UserController@preferences')->middleware('api:body_type,body_style');
 Route::post('login','Api\UserController@login');
 Route::post('register','Api\UserController@register');
+Route::post('logout','Api\UserController@logout')->middleware('api');
 
+//Image Controller
+Route::post('user/favorites/add','Api\ImageController@addFavorite')->middleware('api:imageId');
+Route::post('user/favorites/remove','Api\ImageController@removeFavorite')->middleware('api:imageId');
+Route::post('user/favorites/list','Api\ImageController@getFavorites')->middleware('api');
+Route::post('images/get','Api\ImageController@getImages')->middleware('api');
+Route::post('images/add','Api\ImageController@addImage')->middleware('api');
+Route::post('images/remove','Api\ImageController@removeImage')->middleware('api:imageId');
+
+//Instagram Controller
+Route::post('instagram/oauth','Api\InstagramController@create');
+Route::get('instagram/url','Api\InstagramController@instagramUrl');
+Route::get('instagram/retrieve','Api\InstagramController@retrieve')->middleware('api');
+
+//FaceController
+Route::post('face','Api\FaceController@face');
 Route::post('test','Api\FaceController@test');
+
+//Error Controller
+Route::get('codes','Api\ErrorController@main');
+
+//Admin Controller
+Route::post('admin','Api\AdminController@index')->middleware(['api','admin']);
+//Route::post('admin','Api\AdminController@index')->middleware(['api','admin']);

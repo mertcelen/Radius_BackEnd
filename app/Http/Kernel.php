@@ -2,7 +2,7 @@
 
 namespace App\Http;
 
-use App\Http\Middleware\Token;
+use App\Http\Middleware\Api;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -43,7 +43,6 @@ class Kernel extends HttpKernel
             'bindings',
         ],
     ];
-
     /**
      * The application's route middleware.
      *
@@ -58,6 +57,8 @@ class Kernel extends HttpKernel
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'token' => \App\Http\Middleware\Token::class
+        'api' => \App\Http\Middleware\Api::class,
+        'admin' => \App\Http\Middleware\Admin::class,
+        'session' => \App\Http\Middleware\SessionToToken::class
     ];
 }

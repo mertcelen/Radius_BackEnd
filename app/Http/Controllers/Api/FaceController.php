@@ -80,7 +80,14 @@ class FaceController extends Controller
 
     public function test(){
         $imageAddress = request('imageId') . "." . request('type');
-
+        if(!file_exists(public_path('images') . DIRECTORY_SEPARATOR . $imageAddress)){
+            return response()->json([
+                "error" => [
+                    "message" => "Image not found",
+                    "code" => 3
+                ]
+            ]);
+        }
         //Detect Face
         $vision = new Vision(
             env('CLOUD_VISION_KEY'),

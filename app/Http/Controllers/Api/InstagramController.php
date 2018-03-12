@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Ixudra\Curl\Facades\Curl;
 
 class InstagramController extends Controller
@@ -48,27 +49,70 @@ class InstagramController extends Controller
             'secret' => $token
         ]);
         return [
-            'success' => 'ok',
+            'success' => [
+                "message" => 'User logged in.',
+                "code" => 5
+            ],
             'secret' => $token
         ];
     }
 
-    public function getImages(){
-        $token = DB::table('instagram-users')->where('user_id',request('userId'))->value('access_token');
+    public static function retrieve($userId = null){
+        if(request('userId') && empty($userId)){
+            $userId = request('userId');
+        }
+        if(DB::table('users')->where('id',$userId)->select('isInstagram')->value('isInstagram') != 1){
+            return [
+                'error' => [
+                    "message" => 'User is not instagram user.',
+                    "code" => 4
+                ]
+            ];
+        }
+        $start = time();
+        $token = DB::table('instagram-users')->where('user_id',$userId)->value('access_token');
         $rawData = Curl::to('https://api.instagram.com/v1/users/self/media/recent/?access_token=' . $token)->asJsonResponse()->get();
+        if($rawData->meta->code != 200){
+            return [
+                'error' => [
+                    "message" => 'Instagram token expired, please login again.',
+                    "code" => 6
+                ]
+            ];
+        }
         $data = array();
         for($i=0;$i < count($rawData->data);$i++){
-            $flag = DB::table('images')->where('imageId',$rawData->data[$i]->id)->value('hasFace');
-            if($flag == 1 || $flag === null){
-                $data[] = [
-                    'image' => $rawData->data[$i]->images->standard_resolution->url,
-                    'id' => $rawData->data[$i]->id
-                ];
+            $error = false;
+            try{
+                DB::table('images')->insert([
+                   "userId" => $userId,
+                   "imageId" =>  $rawData->data[$i]->id,
+                    "type" => "jpg"
+                ]);
+            }catch (\Exception $e){
+                $error = true;
             }
+            if(!$error || !file_exists(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg")){
+                $temp = file_get_contents($rawData->data[$i]->images->standard_resolution->url);
+                file_put_contents(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg",$temp);
+            }
+            array_push($data,[
+                'imageId' => $rawData->data[$i]->id,
+                'type' => 'jpg'
+            ]);
         };
+        $end = time();
         return [
+            'success' => [
+                "message" => 'Images retrieved.',
+                "code" => 5
+            ],
             'instagram' => 1,
-            'images' => $data
+            'images' => $data,
+            'times' => [
+                'start_time' => $start,
+                'end_time' => $end
+            ]
         ];
     }
 

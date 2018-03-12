@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 
 class SessionToToken
 {
@@ -15,6 +16,7 @@ class SessionToToken
      */
     public function handle($request, Closure $next)
     {
+
         $request->request->add(['userId' => \Auth::id()]);
         return $next($request);
     }

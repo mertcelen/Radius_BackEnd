@@ -20,8 +20,8 @@ class ImageController extends Controller
     public function addFavorite(){
         try{
             DB::table('favorites')->insert([
-                'userID' => request('userId'),
-                'imageID' => request('imageID')
+                'userId' => request('userId'),
+                'imageId' => request('imageId')
             ]);
         }catch(\Exception $e){
             return [
@@ -50,7 +50,7 @@ class ImageController extends Controller
      */
     public function removeFavorite(){
         try{
-            DB::table('favorites')->where('userID',request('userId'))->where('imageID',request('imageID'))->delete();
+            DB::table('favorites')->where('userId',request('userId'))->where('imageId',request('imageId'))->delete();
         }catch(\Exception $e){
             return [
                 'error' => [
@@ -77,7 +77,7 @@ class ImageController extends Controller
      * @apiSuccess {String} favoritesList List of Favorites
      */
     public function getFavorites(){
-        $favoriteList = DB::table('favorites')->select('imageID')->where('userID',request('userId'))->get()->toArray();
+        $favoriteList = DB::table('favorites')->select('imageID')->where('userId',request('userId'))->get()->toArray();
         return [
             'success' => [
                 "message" => 'Favorite images retrieved.',
@@ -118,14 +118,6 @@ class ImageController extends Controller
      * @apiSuccess {String} imageId Added Image Id
      */
     public function addImage(){
-        if(request()->hasFile('photo') || request()->file('photo')->isValid()){
-            return [
-                'error' => [
-                    "message" => 'Invalid photo.',
-                    "code" => 4
-                ]
-            ];
-        }
         $file_name = str_random(32);
         //Making sure id not exist in db.
         while(DB::table('images')->where('imageId',$file_name)->exists() == true){
@@ -163,16 +155,17 @@ class ImageController extends Controller
         if($type == null){
             return [
                 'error' => [
-                    "message" => 'Photo not found.',
+                    "message" => 'Image not found.',
                     "code" => 3
                 ]
             ];
         }
-        DB::table('images')->where('imageId',request('imageId'))->where('userId',request('imageId'))->delete();
-        unlink(public_path('images') . DS . request('imageId') . "." . $type);
+
+        DB::table('images')->where('imageId',request('imageId'))->where('userId',request('userId'))->delete();
+        unlink(public_path('images') . DIRECTORY_SEPARATOR . request('imageId') . "." . $type);
         return [
             'success' => [
-                "message" => 'Images removed.',
+                "message" => 'Image removed.',
                 "code" => 5
             ]
         ];

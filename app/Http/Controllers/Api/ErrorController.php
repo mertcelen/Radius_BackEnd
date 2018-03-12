@@ -13,7 +13,8 @@ class ErrorController extends Controller
                 2 => "Wrong parameter(s)",
                 3 => "Resource not found",
                 4 => "False",
-                5 => "True"
+                5 => "True",
+                6 => "Expired"
             ]
         ];
     }

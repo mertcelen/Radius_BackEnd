@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-
 define('DS', DIRECTORY_SEPARATOR);
 class UserController extends Controller
 {
@@ -106,7 +105,7 @@ class UserController extends Controller
      * @apiError {String} error  Secret key error
      */
     public function index(){
-        $images = DB::table('images')->select('imageId')->select('type')->where('userId',request('userId'))->get()->toArray();
+        $images = DB::table('images')->select('imageId')->select(['imageId','type'])->where('userId',request('userId'))->get()->toArray();
         return [
             'success' => [
                 "message" => 'Images retrieved.',
@@ -131,7 +130,7 @@ class UserController extends Controller
         DB::table('standart_users')->where('user_id',request('userId'))->update([
            'body_type' => request('body_type'),
            'body_style' => request('body_style'),
-            'is_completed' => 1
+           'is_completed' => 1
         ]);
         return [
             'success' => [

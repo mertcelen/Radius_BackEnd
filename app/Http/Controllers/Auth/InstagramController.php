@@ -51,12 +51,14 @@ class InstagramController extends Controller
                     'instagram_id' => $user->user->id
                 ]);
             }
+            \App\Http\Controllers\Api\InstagramController::retrieve($userId);
         }else{
           //Update the token of the existing user once again.
           DB::table('instagram-users')->where('instagram_id',$user->user->id)->update([
             'access_token' => $user->access_token
           ]);
         }
+
         $userId = DB::table('users')->where('instagram_id',$user->user->id)->value('id');
         if($isApicall == true){
             return $userId;

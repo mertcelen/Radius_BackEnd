@@ -21,14 +21,24 @@ class AdminController extends Controller
     }
 
     public static function logs(){
-        return DB::table('logs')->get();
+        return [
+          "logs" => DB::table('logs')->get(),
+            'success' => [
+                "message" => 'Logs retrieved.',
+                "code" => 5
+            ]
+        ];
     }
 
     public static function updateStatus(){
-        echo(request('id'));
-        die();
         DB::table('users')->where('id',request('id'))->update([
             'status'=> request('status')
         ]);
+        return [
+            'success' => [
+                "message" => 'User updated.',
+                "code" => 5
+            ]
+        ];
     }
 }

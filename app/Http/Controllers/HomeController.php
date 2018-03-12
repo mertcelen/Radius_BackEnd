@@ -24,28 +24,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if(Auth::user()->isInstagram == 1){
-            $arr = InstagramController::getUserMedia();
-            if($arr == null){
-              return redirect('/login/instagram');
-            }
-            $status = DB::table('users')->select('status')->where('id',Auth::id())->value('status');
-            return view('instagram',[
-                'images' => $arr,
-                'status' => $status
-            ]);
-        }else{
-            $setup = DB::table('standart_users')->select('is_completed')->where('user_id',Auth::id())->value('is_completed');
-            if($setup == 0){
-                return redirect('/user/setup');
-            }
-            $status = DB::table('users')->select('status')->where('id',Auth::id())->value('status');
-
             $images = DB::table('images')->select('imageId','type')->where('userId',Auth::id())->get()->toArray();
             return view('home',[
-                'status' => $status,
                 'images' => $images
             ]);
-        }
     }
 }

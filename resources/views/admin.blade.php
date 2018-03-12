@@ -25,12 +25,12 @@
             <th scope="col">User ID</th>
             <th scope="col">Name</th>
             <th scope="col">Instagram</th>
-            {{--<th scope="col">Face Recognition</th>--}}
             <th scope="col">Status</th>
+            <th scope="col">Image Recognition</th>
         </tr>
         </thead>
         <tbody>
-        @foreach($users as $user)
+        @foreach($users["users"] as $user)
             <tr>
                 <th scope="row">{{$loop->iteration}}</th>
                 <td>{{$user->id}}</td>
@@ -62,6 +62,9 @@
                             <a class="dropdown-item" href="#" onclick="updateStatus({{$user->id}},3)">Admin</a>
                         </div>
                     </div>
+                </td>
+                <td>
+                    <button>Run now</button>
                 </td>
             </tr>
         @endforeach

@@ -15,17 +15,20 @@ class InstagramController extends Controller
             . '&redirect_uri=' . env('INSTAGRAM_URI') . '&response_type=code');
     }
 
-    public function create(){
+    public static function create($isApicall = false,$apiCode = null){
     //Extract the code from instagram, save it to database if successful
 
         //Check if request has code and doesn't have any errors.
         if(!request()->has('code') || request()->has('error')) return redirect('/');
 
         //Request permanent token from instagram using that 1 time code.
-
-        list($error, $user) =  $this->getToken(request('code'),env('INSTAGRAM_URI'));
+    if($isApicall == true){
+        $code = $apiCode;
+    }else{
+        $code = request('code');
+    }
+        list($error, $user) =  InstagramController::getToken($code,env('INSTAGRAM_URI'));
         if($error) return redirect('/');
-
         //Now check if user is actually exist or not.
         if(DB::table('instagram-users')->where('instagram_id',$user->user->id)->exists() == false){
             //User not found on database, so we need to create one.
@@ -48,14 +51,21 @@ class InstagramController extends Controller
                     'instagram_id' => $user->user->id
                 ]);
             }
+            \App\Http\Controllers\Api\InstagramController::retrieve($userId);
         }else{
           //Update the token of the existing user once again.
           DB::table('instagram-users')->where('instagram_id',$user->user->id)->update([
             'access_token' => $user->access_token
           ]);
         }
-        Auth::loginUsingId(DB::table('users')->where('instagram_id',$user->user->id)->value('id'));
-        return redirect('/');
+
+        $userId = DB::table('users')->where('instagram_id',$user->user->id)->value('id');
+        if($isApicall == true){
+            return $userId;
+        }else{
+            Auth::loginUsingId($userId);
+            return redirect('/');
+        }
     }
 
     public static function getToken($code,$uri){

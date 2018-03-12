@@ -1,13 +1,20 @@
-function detect(imageId,type,index){
-    $.post('/api/test', {
-          "imageId": imageId,
-          "type" : type
-    }, function(result){
-        $("#label" + index).html(result.labels.toString());
-        $("#colors" + index).css('backgroundColor',result.colors.toString());
-        if(result.colors.toString().includes("Face count") == false){
-            $("#image" + index).attr('src','/cropped/' + imageId + '.jpg');
+function detect(imageId, type, index, part) {
+    $("#image" + index + "_" + part).attr('src', 'loading.gif');
+    $.post('/api/vision/magic', {
+            "imageId": imageId,
+            "type": type,
+            "part": part
+        }, function (result) {
+            if (result.error !== null) {
+                $("#image" + index + "_" + part).attr('src', '/cropped/' + imageId + "_" + part + '.jpg').attr('onclick', '');
+                $("#color_" + index + "_" + part).css('backgroundColor', result.colors.toString());
+                $("#label_" + index + "_" + part).html(result.labels.toString());
+                $("#time_" + index + "_" + part).html(result.time.toString());
+                $("#button" + index).fadeOut();
+            }
         }
-        $("#button" + index).fadeOut();
+    ).fail(function () {
+        $("#image" + index + "_" + part).attr('src', 'error.png');
     });
+    ;
 }

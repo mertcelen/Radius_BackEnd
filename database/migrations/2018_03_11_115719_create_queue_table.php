@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateImagesTable extends Migration
+class CreateQueueTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,8 @@ class CreateImagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('images', function (Blueprint $table) {
+        Schema::create('queue', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('imageId')->unique();
-            $table->string('userId')->nullable();
-            $table->string('type')->nullable();
-            $table->boolean('isValid')->default(false);
             $table->timestamps();
         });
     }
@@ -30,6 +26,6 @@ class CreateImagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('images');
+        Schema::dropIfExists('queue');
     }
 }

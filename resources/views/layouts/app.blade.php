@@ -42,11 +42,6 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="photos">Upload Photos <span class="sr-only">(current)</span></a>
                             </li>
-                            @if(isset($status) && $status == 3)
-                                <li class="nav-item">
-                                    <a class="nav-link" href="admin">Admin Panel <span class="sr-only">(current)</span></a>
-                                </li>
-                            @endif
                         @endauth
                     </ul>
                     <ul class="nav navbar-nav navbar-right">

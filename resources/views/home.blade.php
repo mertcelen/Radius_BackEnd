@@ -9,9 +9,9 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Image</th>
-                    <th scope="col">Cropped Upper</th>
-                    <th scope="col">Cropped Lower</th>
-                    <th scope="col">Cropped Body</th>
+                    <th scope="col" onclick="detectAll('upper')"><u>Cropped Upper</u></th>
+                    <th scope="col" onclick="detectAll('lower')"><u>Cropped Lower</u></th>
+                    <th scope="col" onclick="detectAll('fullbody')"><u>Cropped Body</u></th>
                     <th scope="col">RGB</th>
                     <th scope="col">Labels</th>
                     <th scope="col">Timestamps</th>
@@ -27,15 +27,15 @@
                         </td>
                         <td>
                             <img id="image{{$loop->iteration}}_1" src="question_mark.jpg"
-                                 class="instagramImage rounded float-left" onclick="detect('{{$image->imageId}}','{{$image->type}}','{{$loop->iteration}}',1)">
+                                 class="instagramImage rounded float-left upper" onclick="detect('{{$image->imageId}}','{{$image->type}}','{{$loop->iteration}}',1)">
                         </td>
                         <td>
                             <img id="image{{$loop->iteration}}_2" src="question_mark.jpg"
-                                 class="instagramImage rounded float-left" onclick="detect('{{$image->imageId}}','{{$image->type}}','{{$loop->iteration}}',2)">
+                                 class="instagramImage rounded float-left lower" onclick="detect('{{$image->imageId}}','{{$image->type}}','{{$loop->iteration}}',2)">
                         </td>
                         <td>
                             <img id="image{{$loop->iteration}}_3" src="question_mark.jpg"
-                                 class="instagramImage rounded float-left" onclick="detect('{{$image->imageId}}','{{$image->type}}','{{$loop->iteration}}',3)">
+                                 class="instagramImage rounded float-left fullbody" onclick="detect('{{$image->imageId}}','{{$image->type}}','{{$loop->iteration}}',3)">
                         </td>
                         <td class="big instagramImage">
                             <table style="padding: 0px;">

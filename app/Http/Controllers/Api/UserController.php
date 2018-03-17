@@ -104,8 +104,8 @@ class UserController extends Controller
      * @apiSuccess {String} instagram If user is Instagram User or not.
      * @apiError {String} error  Secret key error
      */
-    public function index(){
-        $images = DB::table('images')->select('imageId')->select(['imageId','type'])->where('userId',request('userId'))->get()->toArray();
+    public static function index(){
+        $images = DB::table('images')->where('userId',request('userId'))->get()->toArray();
         return [
             'success' => [
                 "message" => 'Images retrieved.',

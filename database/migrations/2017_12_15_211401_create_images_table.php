@@ -15,11 +15,25 @@ class CreateImagesTable extends Migration
     {
         Schema::create('images', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('imageId')->unique();
+            $table->string('imageId');
             $table->string('userId')->nullable();
             $table->string('type')->nullable();
             $table->boolean('isValid')->default(false);
-            $table->timestamps();
+            $table->integer('red1')->nullable()->default(null);
+            $table->integer('green1')->nullable()->default(null);
+            $table->integer('blue1')->nullable()->default(null);
+            $table->integer('red2')->nullable()->default(null);
+            $table->integer('green2')->nullable()->default(null);
+            $table->integer('blue2')->nullable()->default(null);
+            $table->integer('red3')->nullable()->default(null);
+            $table->integer('green3')->nullable()->default(null);
+            $table->integer('blue3')->nullable()->default(null);
+            $table->string('labels1')->nullable()->default(null);
+            $table->string('labels2')->nullable()->default(null);
+            $table->string('labels3')->nullable()->default(null);
+            $table->float('time1')->nullable();
+            $table->float('time2')->nullable();
+            $table->float('time3')->nullable();
         });
     }
 

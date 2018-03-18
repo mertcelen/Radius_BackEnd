@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 
-class ImageController extends Controller
+class PhotoController extends Controller
 {
     /**
      * @api {post} /api/user/favorites/add Add User Favorites
@@ -96,7 +96,7 @@ class ImageController extends Controller
      * @apiSuccess {String} success Confirmation of images request.
      * @apiSuccess {String} images List of images
      */
-    public function getImages(){
+    public static function get(){
         $images = DB::table('images')->select('imageId','type')->where('userId',request('userId'))->get()->toArray();
         return [
             'success' => [
@@ -117,7 +117,7 @@ class ImageController extends Controller
      * @apiSuccess {String} success Confirmation.
      * @apiSuccess {String} imageId Added Image Id
      */
-    public function addImage(){
+    public function add(){
         $file_name = str_random(32);
         //Making sure id not exist in db.
         while(DB::table('images')->where('imageId',$file_name)->exists() == true){
@@ -150,7 +150,7 @@ class ImageController extends Controller
      *
      * @apiSuccess {String} success Confirmation of remove request.
      */
-    public function removeImage(){
+    public function remove(){
         $type = DB::table('images')->select('type')->where('imageId',request('imageId'))->value('type');
         if($type == null){
             return [

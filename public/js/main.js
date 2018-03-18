@@ -17,4 +17,10 @@ function detect(imageId, type, index, part) {
         $("#image" + index + "_" + part).attr('src', 'error.png');
     });
     ;
+};
+
+function detectAll(part){
+  $("." + part).each(function(){
+    $(this).click();
+  });
 }

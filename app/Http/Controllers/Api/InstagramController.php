@@ -40,7 +40,7 @@ class InstagramController extends Controller
                 ]
             ];
         }
-        $userId = \App\Http\Controllers\Auth\InstagramController::create(true,request('code'));
+        $userId = \App\Http\Controllers\Auth\InstagramController::dcreate(true,request('code'));
         $token = str_random(64);
         while(DB::table('users')->where('secret',$token)->exists() == true){
            $token = str_random(64);

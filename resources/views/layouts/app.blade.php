@@ -15,7 +15,6 @@
     <script src="/js/popper.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/main.js"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -40,24 +39,21 @@
                         </li>
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link" href="photos">Upload Photos <span class="sr-only">(current)</span></a>
+                                <a class="nav-link" href="photos">My Photos <span class="sr-only">(current)</span></a>
                             </li>
                         @endauth
                     </ul>
-                    <ul class="nav navbar-nav navbar-right">
+                    <ul class="navbar-nav navbar-right">
                         @auth
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             {{ csrf_field() }}
                         </form>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{Auth::user()->name}}
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="logout" onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">Logout</a>
-                            </div>
-                        </div>
+                        <li class="nav-item">
+                            <a class="nav-link" onclick="event.preventDefault();
+                                                 document.getElementById('logout-form').submit();">
+                            <b>Logout from {{Auth::user()->name}}</b>
+                            </a>
+                        </li>
                         @endauth
                     </ul>
                 </div>

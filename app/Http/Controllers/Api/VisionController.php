@@ -21,10 +21,36 @@ class VisionController extends Controller
                 ]
             ]);
         }
+        //Retrieving image details from the database.
+        $result = DB::table('images')->select([ 'red' .request('part') . " AS red", 'green' . request('part') . " AS green", 'blue' . request('part')
+            . " AS blue",  'labels'. request('part') ." AS labels", 'time' . request('part'). " AS time"])->where('imageId',request('imageId'))
+            ->where('isValid',true)->first();
+        // To specifically check if that part is checked before or not.
+        if (!empty($result) && $result->red != null) {
+          return [
+              'success' => [
+                  "message" => 'Image analyzed.',
+                  "code" => 5
+              ],
+              "labels" => $result->labels,
+              "colors" => "rgb($result->red, $result->green, $result->blue)",
+              "time" => $result->time
+          ];
+        }
+
         $vertexes = $this->detectFace($imagePath, request('imageId'));
         list($startX, $startY, $width, $height) = $this->calculate($vertexes, $imagePath, request('part'));
         list($labels, $red, $green, $blue) = $this->detectArea($imagePath, $width, $height, $startX, $startY, request('part'));
         $seconds = ($this->getTime() - $startTime) / 1000;
+        //Now that we have everything, we can update the image data in the database.
+        DB::table('images')->where('imageId',request('imageId'))->update([
+            'isValid' => true,
+            'red' . request('part') => $red,
+            'green'  . request('part') => $green,
+            'blue' . request('part') => $blue,
+            'labels' . request('part') => implode(',',$labels),
+            'time' . request('part') => $seconds
+        ]);
         return [
             'success' => [
                 "message" => 'Image analyzed.',
@@ -41,14 +67,12 @@ class VisionController extends Controller
         $image = Image::make($imagePath)->crop(floor($width), floor($height), floor($startX), floor($startY));
         $fileName = request('imageId') . '_' . $part . ".jpg";
         $image->save(public_path('cropped') . DIRECTORY_SEPARATOR . $fileName);
-
         //Second, detect image properties and detect labels
         $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::IMAGE_PROPERTIES, 100),
             new \Vision\Feature(\Vision\Feature::LABEL_DETECTION, 100)]);
         $imagePath = public_path('cropped') . DIRECTORY_SEPARATOR . $fileName;
         $response = $vision->request(new \Vision\Request\Image\LocalImage($imagePath));
         $colors = $response->getImagePropertiesAnnotation()->getDominantColors();
-
         $red = $colors[0]->getColor()->getRed();
         $green = $colors[0]->getColor()->getGreen();
         $blue = $colors[0]->getColor()->getBlue();
@@ -131,7 +155,7 @@ class VisionController extends Controller
                     "code" => 4
                 ]
             ];
-        } else {
+        }else{
             DB::table('images')->select('imageId', $imageId)->update([
                 'isValid' => true
             ]);

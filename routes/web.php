@@ -7,8 +7,8 @@ Route::group(['middleware' => ['auth']], function () {
 	// Route::get('/user/setup','UserController@setup');
 	// Route::post('/user/setup','UserController@save');
 	Route::get('/','RoutingController@home')->middleware('session');
-	Route::get('/photos','RoutingController@upload');
-	// Route::post('/photos/upload','Api\PhotosController@upload');
+	Route::get('/photos','RoutingController@photos')->middleware('session');
+	Route::post('/photos/upload','Api\PhotoController@add')->middleware('session');
 	// Route::post('/photos/remove','Api\PhotosController@remove');
 });
 

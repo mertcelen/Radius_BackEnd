@@ -15,7 +15,6 @@
     <script src="/js/popper.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/main.js"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -40,7 +39,7 @@
                         </li>
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link" href="photos">Upload Photos <span class="sr-only">(current)</span></a>
+                                <a class="nav-link" href="photos">My Photos <span class="sr-only">(current)</span></a>
                             </li>
                         @endauth
                     </ul>

@@ -67,14 +67,12 @@ class VisionController extends Controller
         $image = Image::make($imagePath)->crop(floor($width), floor($height), floor($startX), floor($startY));
         $fileName = request('imageId') . '_' . $part . ".jpg";
         $image->save(public_path('cropped') . DIRECTORY_SEPARATOR . $fileName);
-
         //Second, detect image properties and detect labels
         $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::IMAGE_PROPERTIES, 100),
             new \Vision\Feature(\Vision\Feature::LABEL_DETECTION, 100)]);
         $imagePath = public_path('cropped') . DIRECTORY_SEPARATOR . $fileName;
         $response = $vision->request(new \Vision\Request\Image\LocalImage($imagePath));
         $colors = $response->getImagePropertiesAnnotation()->getDominantColors();
-
         $red = $colors[0]->getColor()->getRed();
         $green = $colors[0]->getColor()->getGreen();
         $blue = $colors[0]->getColor()->getBlue();

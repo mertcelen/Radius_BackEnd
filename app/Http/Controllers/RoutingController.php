@@ -13,8 +13,11 @@ class RoutingController extends Controller
       ]);
     }
 
-    public function upload(){
-      return view('upload');
+    public function photos(){
+      $images = Api\PhotoController::get();
+      return view('upload',[
+        'images' => $images["images"]
+      ]);
     }
 
     public function admin(){

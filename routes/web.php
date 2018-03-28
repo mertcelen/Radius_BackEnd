@@ -1,7 +1,10 @@
 <?php
 
-//Manuel Login routes
-Auth::routes();
+Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
+Route::post('login', 'Auth\LoginController@login');
+Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+Route::get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+Route::post('register', 'Auth\RegisterController@register');
 
 Route::group(['middleware' => ['auth']], function () {
 	// Route::get('/user/setup','UserController@setup');
@@ -9,6 +12,8 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::get('/','RoutingController@home')->middleware('session');
 	Route::get('/photos','RoutingController@photos')->middleware('session');
 	Route::post('/photos/upload','Api\PhotoController@add')->middleware('session');
+	Route::post('/photos/remove','Api\PhotoController@remove')->middleware('session');
+	Route::get('/settings','RoutingController@settings');
 	// Route::post('/photos/remove','Api\PhotosController@remove');
 });
 
@@ -19,5 +24,5 @@ Route::group(['middleware' => ['auth','session','admin']] ,function(){
 });
 
 //Instagram Auth routes
-Route::get('/login/instagram','Auth\InstagramController@index');
-Route::get('/login/oauth','Auth\InstagramController@create');
+Route::get('/login/instagram','RoutingController@instagram');
+Route::get('/login/oauth','Auth\InstagramController@create')->middleware('parameters:code');

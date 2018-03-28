@@ -105,14 +105,7 @@ class UserController extends Controller
      * @apiError {String} error  Secret key error
      */
     public static function index(){
-        $images = DB::table('images')->where('userId',request('userId'))->get()->toArray();
-        return [
-            'success' => [
-                "message" => 'Images retrieved.',
-                "code" => 5
-            ],
-            "images" => $images
-        ];
+        return PhotoController::get();
     }
     /**
      * @api {post} /api/user/preferences Preferences Update
@@ -160,4 +153,32 @@ class UserController extends Controller
         ];
     }
 
+    public function password(){
+      $this->validate(request(),[
+          'old-password' => 'required|string|min:6',
+          'new-password' => 'required|string|min:6|confirmed',
+      ]);
+      DB::table('users')->where('id',request('userId'))->
+          where('password',bcrypt(request('old-password')))->update([
+          'password' => bcrypt(request('new-password')),
+          'secret' => null
+      ]);
+      return [
+        'success' => [
+            "message" => 'Password changed.',
+            "code" => 5
+        ],
+      ];
+    }
+
+    public static function settings(){
+        $isInstagram = DB::table('users')->select('isInstagram')->where('id',Auth::id())->value('isInstagram');
+        return [
+            'success' => [
+                "message" => 'Password changed.',
+                "code" => 5
+            ],
+            'instagram' => $isInstagram
+        ];
+    }
 }

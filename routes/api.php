@@ -11,11 +11,11 @@ Route::group(['middleware' => ['parameters:secret']], function () {
     Route::post('instagram/retrieve','Api\InstagramController@retrieve');
     Route::post('user/preferences','Api\UserController@preferences')->middleware('parameters:body_type,body_style');
 });
-
+Route::post('user/password','Api\UserController@password');
 Route::post('login','Api\UserController@login');
 Route::post('register','Api\UserController@register');
 
-Route::post('instagram/oauth','Api\InstagramController@create');
+Route::post('instagram/oauth','Api\InstagramController@create')->middleware('parameters:code,error');
 Route::get('instagram/url','Api\InstagramController@instagramUrl');
 
 Route::get('codes','Api\ErrorController@main');

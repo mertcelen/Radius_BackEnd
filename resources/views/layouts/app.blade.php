@@ -10,12 +10,7 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/css/styles.css">
-    <script src="/js/app.js"></script>
-    <script src="/js/jquery-3.2.1.min.js"></script>
-    <script src="/js/popper.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/main.js"></script>
-
+    <script src="/js/libraries/jquery-3.2.1.min.js"></script>
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -40,6 +35,9 @@
                         @auth
                             <li class="nav-item">
                                 <a class="nav-link" href="photos">My Photos <span class="sr-only">(current)</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="settings">Settings<span class="sr-only">(current)</span></a>
                             </li>
                         @endauth
                     </ul>

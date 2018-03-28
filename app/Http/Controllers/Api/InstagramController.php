@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\ImageManagerStatic as Image;
 use Ixudra\Curl\Facades\Curl;
 
 class InstagramController extends Controller
@@ -15,7 +16,7 @@ class InstagramController extends Controller
      *
      * @apiSuccess {String} url Instagram url to oAuth.
      */
-    public function instagramUrl(){
+    public static function instagramUrl(){
         return [
             'url' => 'https://api.instagram.com/oauth/authorize/?client_id=' . env('INSTAGRAM_ID')
                 . '&redirect_uri=' . env('INSTAGRAM_URI') . '&response_type=code'
@@ -40,7 +41,7 @@ class InstagramController extends Controller
                 ]
             ];
         }
-        $userId = \App\Http\Controllers\Auth\InstagramController::dcreate(true,request('code'));
+        $userId = \App\Http\Controllers\Auth\InstagramController::create(true,request('code'));
         $token = str_random(64);
         while(DB::table('users')->where('secret',$token)->exists() == true){
            $token = str_random(64);
@@ -57,8 +58,8 @@ class InstagramController extends Controller
         ];
     }
 
-    public static function retrieve($userId = null){
-        if(request('userId') && empty($userId)){
+    public static function get($userId){
+        if(request('userId') && strlen($userId) == 0){
             $userId = request('userId');
         }
         if(DB::table('users')->where('id',$userId)->select('isInstagram')->value('isInstagram') != 1){
@@ -93,12 +94,18 @@ class InstagramController extends Controller
                 $error = true;
             }
             if(!$error || !file_exists(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg")){
-                $temp = file_get_contents($rawData->data[$i]->images->standard_resolution->url);
-                file_put_contents(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg",$temp);
+
+                $image = Image::make($rawData->data[$i]->images->standard_resolution->url);
+                $image->save(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
+                $image->fit(170,170)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
             }
             array_push($data,[
                 'imageId' => $rawData->data[$i]->id,
                 'type' => 'jpg'
+            ]);
+            DB::table('images')->insert([
+                'imageId' => $rawData->data[$i]->id,
+                'userId' => $userId
             ]);
         };
         $end = time();

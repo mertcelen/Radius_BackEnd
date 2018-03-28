@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class RoutingController extends Controller
 {
     public function home(){
@@ -15,7 +13,7 @@ class RoutingController extends Controller
 
     public function photos(){
       $images = Api\PhotoController::get();
-      return view('upload',[
+      return view('photos',[
         'images' => $images["images"]
       ]);
     }
@@ -25,5 +23,17 @@ class RoutingController extends Controller
       return view('admin',[
           'users' => $users
       ]);
+    }
+
+    public function settings(){
+        $result = Api\UserController::settings();
+      return view('settings',[
+          'instagram' => $result["instagram"]
+      ]);
+    }
+
+    public function instagram(){
+        $link = Api\InstagramController::instagramUrl();
+        return redirect($link["url"]);
     }
 }

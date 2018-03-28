@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class PhotoController extends Controller
 {
@@ -97,7 +99,7 @@ class PhotoController extends Controller
      * @apiSuccess {String} images List of images
      */
     public static function get(){
-        $images = DB::table('images')->select('imageId','type')->where('userId',request('userId'))->get()->toArray();
+        $images = DB::table('images')->select('imageId')->where('userId',request('userId'))->get()->reverse()->toArray();
         return [
             'success' => [
                 "message" => 'Images retrieved.',
@@ -123,15 +125,16 @@ class PhotoController extends Controller
         while(DB::table('images')->where('imageId',$file_name)->exists() == true){
             $file_name = str_random(32);
         }
-        $file = request()->file('photo');
-        //Write image information to database
+        $image = Image::make(Input::file('photo'));
+        //Save original file
+        $image->save(public_path('images') . DIRECTORY_SEPARATOR . $file_name . ".jpg");
+        //Save thumbnail
+        $image->fit(170,170)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $file_name . ".jpg");
+        // Write image information to database
         DB::table('images')->insert([
             "userId" => request('userId'),
-            "imageId" => $file_name,
-            "type" => $file->getClientOriginalExtension()
+            "imageId" => $file_name
         ]);
-        //Finally save file into the disk.
-        $file->move(public_path('images'),$file_name . "." . $file->getClientOriginalExtension());
         return [
             'success' => [
                 "message" => 'Images added.',
@@ -151,8 +154,8 @@ class PhotoController extends Controller
      * @apiSuccess {String} success Confirmation of remove request.
      */
     public function remove(){
-        $type = DB::table('images')->select('type')->where('imageId',request('imageId'))->value('type');
-        if($type == null){
+        $image = DB::table('images')->select('imageId')->where('imageId',request('imageId'))->first();
+        if($image == null){
             return [
                 'error' => [
                     "message" => 'Image not found.',
@@ -160,9 +163,9 @@ class PhotoController extends Controller
                 ]
             ];
         }
-
         DB::table('images')->where('imageId',request('imageId'))->where('userId',request('userId'))->delete();
-        unlink(public_path('images') . DIRECTORY_SEPARATOR . request('imageId') . "." . $type);
+        unlink(public_path('images') . DIRECTORY_SEPARATOR . request('imageId') . ".jpg");
+        unlink(public_path('thumb') . DIRECTORY_SEPARATOR . request('imageId') . ".jpg");
         return [
             'success' => [
                 "message" => 'Image removed.',

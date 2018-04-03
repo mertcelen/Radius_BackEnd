@@ -9,18 +9,10 @@ use Ixudra\Curl\Facades\Curl;
 
 class InstagramController extends Controller
 {
-    public function index(){
-    //Redirect users to Instagram Login Page
-        return redirect('https://api.instagram.com/oauth/authorize/?client_id=' . env('INSTAGRAM_ID')
-            . '&redirect_uri=' . env('INSTAGRAM_URI') . '&response_type=code');
-    }
-
     public static function create($isApicall = false,$apiCode = null){
     //Extract the code from instagram, save it to database if successful
-
         //Check if request has code and doesn't have any errors.
         if(!request()->has('code') || request()->has('error')) return redirect('/');
-
         //Request permanent token from instagram using that 1 time code.
     if($isApicall == true){
         $code = $apiCode;
@@ -30,18 +22,26 @@ class InstagramController extends Controller
         list($error, $user) =  InstagramController::getToken($code,env('INSTAGRAM_URI'));
         if($error) return redirect('/');
         //Now check if user is actually exist or not.
-        if(DB::table('instagram-users')->where('instagram_id',$user->user->id)->exists() == false){
+        $userId = 0;
+        if(DB::table('instagram-users')->where('instagram_id',$user->user->id)->exists() == false) {
             //User not found on database, so we need to create one.
+            $token = str_random(64);
+            while(DB::table('users')->where('secret',$token)->exists() == true){
+                $token = str_random(64);
+            }
+            $avatarId = \App\Http\Controllers\Api\UserController::userAvatar($user->user->profile_picture)['id'];
             $userId = DB::table('users')->insertGetId([
                 'name' => $user->user->username,
                 'isInstagram' => true,
+                'secret' => $token,
                 'instagram_id' => $user->user->id,
-                'status' => 1
+                'status' => 1,
+                'avatar' => $avatarId
             ]);
             if(is_null($userId) == true){
                 return redirect('/');
             }else{
-                //Now add user to instagram table using that user id.
+               // Now add user to instagram table using that user id.
                 DB::table('instagram-users')->insert([
                     'user_id' => $userId,
                     'access_token' => $user->access_token,
@@ -51,14 +51,12 @@ class InstagramController extends Controller
                     'instagram_id' => $user->user->id
                 ]);
             }
-            \App\Http\Controllers\Api\InstagramController::retrieve($userId);
         }else{
           //Update the token of the existing user once again.
           DB::table('instagram-users')->where('instagram_id',$user->user->id)->update([
             'access_token' => $user->access_token
           ]);
         }
-
         $userId = DB::table('users')->where('instagram_id',$user->user->id)->value('id');
         if($isApicall == true){
             return $userId;

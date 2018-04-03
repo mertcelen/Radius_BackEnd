@@ -1,26 +1,21 @@
-tr .big{
-    width: 170px;
-    height: 170px;
-
+body{
+    background-image:url('/header.jpg');
 }
 
-.instagramImage{
-    width: 170px;
-    height: 170px;
-    /* padding: 10px; */
-    border: 1px solid black
+.navbar-custom {
+    background-color: #4285f4;
 }
-
-.liste{
-    line-height: 50px;
+/* change the brand and text color */
+.navbar-custom .navbar-brand,
+.navbar-custom .navbar-text {
+    color: rgba(255,255,255,.8);
 }
-
-.detailRow tr{
-  padding: 0px;
+/* change the link color */
+.navbar-custom .navbar-nav .nav-link {
+    color: rgba(255,255,255,.5);
 }
-
-.detailRow td{
-  padding: 0px;
-  height: 50px;
-  width: 50px;
+/* change the color of active or hovered links */
+.navbar-custom .nav-item.active .nav-link,
+.navbar-custom .nav-item:hover .nav-link {
+    color: #ffffff;
 }

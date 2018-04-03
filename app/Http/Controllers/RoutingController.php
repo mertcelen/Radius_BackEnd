@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoutingController extends Controller
 {
     public function home(){
-      $response = Api\UserController::index();
-      return view('home',[
-          'images' => $response["images"]
-      ]);
+      if(Auth::check()) {
+          $response = Api\UserController::index();
+          return view('home', [
+              'images' => $response["images"]
+          ]);
+      }else{
+          return view('welcome');
+      }
     }
 
     public function photos(){
       $images = Api\PhotoController::get();
-      return view('upload',[
+      return view('photos',[
         'images' => $images["images"]
       ]);
     }
@@ -25,5 +29,23 @@ class RoutingController extends Controller
       return view('admin',[
           'users' => $users
       ]);
+    }
+
+    public function settings(){
+        $result = Api\UserController::settings();
+      return view('settings',[
+          'instagram' => $result["instagram"],
+          'secret' => Auth::user()->getAttribute('secret')
+      ]);
+    }
+
+    public function instagram(){
+        $link = Api\InstagramController::instagramUrl();
+        return redirect($link["url"]);
+    }
+
+    public function updateInstagram(){
+        $result = Api\InstagramController::get(Auth::user()->getAttribute('id'));
+        return $result;
     }
 }

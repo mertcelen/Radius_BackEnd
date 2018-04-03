@@ -20,7 +20,7 @@ Route::post('user/avatar','Api\UserController@userAvatar')->middleware('session'
 
 Route::post('login','Api\UserController@login')->middleware('parameters:email,password');
 Route::post('register','Api\UserController@register')->middleware('parameters:email,name,password');
-Route::post('instagram/oauth','Api\InstagramController@create')->middleware('parameters:code,error');
+Route::post('instagram/oauth','Api\InstagramController@create')->middleware('parameters:code');
 
 Route::get('instagram/url','Api\InstagramController@instagramUrl');
 Route::get('codes','Api\ErrorController@main');

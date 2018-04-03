@@ -253,4 +253,25 @@ class UserController extends Controller
             'id' => $avatarId
         ];
     }
+    /**
+     * @api {post} /api/user/avatar/get Get Avatar
+     * @apiName GetAvatar
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} id Avatar id.
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public function getAvatar(){
+        $avatarId = DB::table('users')->select('avatar')->where('id',request('userId'))->value('avatar');
+        return [
+            'success' => [
+                "message" => 'Avatar id retrieved.',
+                "code" => 5
+            ],
+            'id' => $avatarId
+        ];
+    }
 }

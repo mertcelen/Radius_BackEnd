@@ -15,8 +15,9 @@ Route::group(['middleware' => ['parameters:secret']], function () {
     Route::post('admin','Api\AdminController@index')->middleware('admin');
     Route::post('admin/user/status','Api\AdminController@updateStatus')->middleware(['admin','parameters:status,id']);
     Route::post('admin/logs','Api\AdminController@logs')->middleware('admin');
+    Route::post('user/avatar/get','Api\UserController@getAvatar');
 });
-Route::post('user/avatar','Api\UserController@userAvatar')->middleware('session')->middleware('parameters:secret,photo');
+Route::post('user/avatar','Api\UserController@userAvatar')->middleware('parameters:secret,photo');
 
 Route::post('login','Api\UserController@login')->middleware('parameters:email,password');
 Route::post('register','Api\UserController@register')->middleware('parameters:email,name,password');

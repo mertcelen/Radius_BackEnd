@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
+use Intervention\Image\ImageManagerStatic as Image;
 
 define('DS', DIRECTORY_SEPARATOR);
 class UserController extends Controller
@@ -18,22 +20,11 @@ class UserController extends Controller
      * @apiParam {String} password User' password.
      *
      * @apiSuccess {String} secret Secret token to use in API calls.
-     * @apiError {String} error  Login error
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
      */
     public function login(){
-        if(!request()->has('email') && request()->has('password')){
-            return [
-                'error' => [
-                    "message" => 'Missing parameter(s).',
-                    "code" => 1
-                ]
-            ];
-        }
-        $flag = Auth::validate([
-            'email' => request('email'),
-            'password' => request('password')
-        ]);
-        if($flag == false){
+        if(!Auth::validate(['email' => request('email'),'password' => request('password')])){
             return [
                 'error' => [
                     "message" => 'Wrong parameter(s).',
@@ -46,6 +37,13 @@ class UserController extends Controller
             $token = str_random(64);
         }
         DB::table('users')->where('email',request('email'))->update(['secret' => $token]);
+        //Lastly check if request needs to start session
+        if(request()->has('session') && request('session') == true){
+            Auth::attempt([
+                "email" => request('email'),
+                "password" => request('password')
+            ]);
+        }
         return [
             'success' => [
                 "message" => 'User logged in.',
@@ -64,7 +62,8 @@ class UserController extends Controller
      * @apiParam {String} name User' name.
      *
      * @apiSuccess {String} secret Secret token to use in API calls.
-     * @apiError {String} error  Register error
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
      */
     public function register(){
         $this->validate(request(),[
@@ -100,9 +99,9 @@ class UserController extends Controller
      *
      * @apiParam {String} secret User' secret key.
      *
-     * @apiSuccess {String} secret Homepage messages.
-     * @apiSuccess {String} instagram If user is Instagram User or not.
-     * @apiError {String} error  Secret key error
+     * @apiSuccess {Array} images User' Recommended Images (Currently all available images).
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
      */
     public static function index(){
         return PhotoController::get();
@@ -116,8 +115,8 @@ class UserController extends Controller
      * @apiParam {String} body_type User' body type.
      * @apiParam {String} body_style User' body style.
      *
-     * @apiSuccess {String} secret Update confirmation.
-     * @apiError {String} error  Secret key error
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
      */
     public function preferences(){
         DB::table('standart_users')->where('user_id',request('userId'))->update([
@@ -139,7 +138,8 @@ class UserController extends Controller
      *
      * @apiParam {String} secret User' secret key.
      *
-     * @apiSuccess {String} status Confirmation of logout.
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
      */
     public function logout(){
         DB::table('users')->where('id',request('userId'))->update([
@@ -152,12 +152,39 @@ class UserController extends Controller
             ],
         ];
     }
-
+    /**
+     * @api {post} /api/user/password Change Password
+     * @apiName ChangePassword
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {String} old-password User' old password.
+     * @apiParam {String} new-password User' new password.
+     * @apiParam {String} new-password2 User' new password confirmation.
+     *
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
     public function password(){
-      $this->validate(request(),[
-          'old-password' => 'required|string|min:6',
-          'new-password' => 'required|string|min:6|confirmed',
-      ]);
+        $old = request('old-password');
+        $new = request('new-password');
+        $new2 = request('new-password2');
+        if(strcmp($new,$new2) != 0){
+            return [
+                'error' => [
+                    "message" => 'Passwords not match.',
+                    "code" => 4
+                ]
+            ];
+        }
+        if(strcmp($old,$new) == 0){
+            return [
+                'error' => [
+                    "message" => 'Old and new passwords are same.',
+                    "code" => 4
+                ]
+            ];
+        }
       DB::table('users')->where('id',request('userId'))->
           where('password',bcrypt(request('old-password')))->update([
           'password' => bcrypt(request('new-password')),
@@ -173,12 +200,57 @@ class UserController extends Controller
 
     public static function settings(){
         $isInstagram = DB::table('users')->select('isInstagram')->where('id',Auth::id())->value('isInstagram');
+        //If user doesn't have secret, create one.
+        if(DB::table('users')->select('secret')->where('id',Auth::id())->value('secret') == null){
+            $token = str_random(64);
+            while(DB::table('users')->where('secret',$token)->exists() == true){
+                $token = str_random(64);
+            }
+            DB::table('users')->where('id',Auth::id())->update([
+                'secret' => $token
+            ]);
+        }
         return [
             'success' => [
                 "message" => 'Password changed.',
                 "code" => 5
             ],
             'instagram' => $isInstagram
+        ];
+    }
+    /**
+     * @api {post} /api/user/avatar Change Avatar
+     * @apiName UpdateAvatar
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {File} photo Photo file to be added.
+     *
+     * @apiSuccess {String} id Avatar id.
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public static function userAvatar($url = null){
+        $avatarId = str_random(8);
+        while(DB::table('users')->where('avatar',$avatarId)->exists() == true){
+            $avatarId = str_random(8);
+        }
+        if($url == null){
+            $image = Image::make(Input::file('photo'));
+        }else{
+            $image = Image::make($url);
+        }
+
+        $image->resize('150','150')->save(public_path('avatar') . DS . $avatarId . ".jpg");
+        DB::table('users')->where('id',request('userId'))->update([
+           'avatar' => $avatarId
+        ]);
+        return [
+            'success' => [
+                "message" => 'Avatar updated',
+                "code" => 5
+            ],
+            'id' => $avatarId
         ];
     }
 }

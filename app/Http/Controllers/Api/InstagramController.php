@@ -30,7 +30,8 @@ class InstagramController extends Controller
      * @apiParam {String} code User' instagram code(from callback).
      *
      * @apiSuccess {String} secret Secret token to use in API calls.
-     * @apiError {String} error  Secret or Code key error
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
      */
     public function create(){
         if(!request()->has('code') || request()->has('error')){
@@ -57,11 +58,19 @@ class InstagramController extends Controller
             'secret' => $token
         ];
     }
-
-    public static function get($userId){
-        if(request('userId') && strlen($userId) == 0){
-            $userId = request('userId');
-        }
+    /**
+     * @api {post} /api/instagram/get Update Instagram Photos
+     * @apiName InstagramUpdate
+     * @apiGroup Instagram
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} updated Amount of retrieved images from Instagram.
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public static function get(){
+        $userId = DB::table('users')->select('id')->where('secret',request('secret'))->value('id');
         if(DB::table('users')->where('id',$userId)->select('isInstagram')->value('isInstagram') != 1){
             return [
                 'error' => [
@@ -82,19 +91,19 @@ class InstagramController extends Controller
             ];
         }
         $data = array();
+        $count = 0;
         for($i=0;$i < count($rawData->data);$i++){
             $error = false;
             try{
                 DB::table('images')->insert([
                    "userId" => $userId,
-                   "imageId" =>  $rawData->data[$i]->id,
-                    "type" => "jpg"
+                   "imageId" =>  $rawData->data[$i]->id
                 ]);
+                $count++;
             }catch (\Exception $e){
                 $error = true;
             }
             if(!$error || !file_exists(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg")){
-
                 $image = Image::make($rawData->data[$i]->images->standard_resolution->url);
                 $image->save(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
                 $image->fit(170,170)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
@@ -103,19 +112,16 @@ class InstagramController extends Controller
                 'imageId' => $rawData->data[$i]->id,
                 'type' => 'jpg'
             ]);
-            DB::table('images')->insert([
-                'imageId' => $rawData->data[$i]->id,
-                'userId' => $userId
-            ]);
         };
         $end = time();
         return [
             'success' => [
-                "message" => 'Images retrieved.',
+                "message" => 'new images retrieved.',
                 "code" => 5
             ],
             'instagram' => 1,
             'images' => $data,
+            'updated' => $count,
             'times' => [
                 'start_time' => $start,
                 'end_time' => $end

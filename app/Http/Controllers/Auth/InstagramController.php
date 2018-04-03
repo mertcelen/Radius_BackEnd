@@ -25,11 +25,18 @@ class InstagramController extends Controller
         $userId = 0;
         if(DB::table('instagram-users')->where('instagram_id',$user->user->id)->exists() == false) {
             //User not found on database, so we need to create one.
+            $token = str_random(64);
+            while(DB::table('users')->where('secret',$token)->exists() == true){
+                $token = str_random(64);
+            }
+            $avatarId = \App\Http\Controllers\Api\UserController::userAvatar($user->user->profile_picture)['id'];
             $userId = DB::table('users')->insertGetId([
                 'name' => $user->user->username,
                 'isInstagram' => true,
+                'secret' => $token,
                 'instagram_id' => $user->user->id,
-                'status' => 1
+                'status' => 1,
+                'avatar' => $avatarId
             ]);
             if(is_null($userId) == true){
                 return redirect('/');
@@ -44,7 +51,6 @@ class InstagramController extends Controller
                     'instagram_id' => $user->user->id
                 ]);
             }
-            $result = \App\Http\Controllers\Api\InstagramController::get($userId);
         }else{
           //Update the token of the existing user once again.
           DB::table('instagram-users')->where('instagram_id',$user->user->id)->update([

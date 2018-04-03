@@ -19,6 +19,9 @@ class VerifyCsrfToken extends Middleware
         'api/user/preferences',
         'api/instagram/oauth',
         'photos/upload',
-        'api/user/password'
+        'api/user/password',
+        'api/user/photo',
+        '/user/avatar',
+        'photos/remove'
     ];
 }

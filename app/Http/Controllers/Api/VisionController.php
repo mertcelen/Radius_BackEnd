@@ -6,13 +6,36 @@ use App\Http\Controllers\Controller;
 use Vision\Vision;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic as Image;
+use App\Jobs\CloudVision;
 
 class VisionController extends Controller
 {
-    public function magic()
+    /**
+     * @api {post} /api/magic Cloth Detection
+     * @apiName ClothDetection
+     * @apiGroup Detection
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public function detect()
     {
-        $startTime = $this->getTime();
-        $imagePath = public_path('images') . DIRECTORY_SEPARATOR . request('imageId') . "." . request('type');
+        $job = (new CloudVision(request('userId')));
+        dispatch($job);
+        return [
+            'success' => [
+                "message" => 'Cloth detection is requested, it is going to work background because it will take a while.',
+                "code" => 5
+            ],
+        ];
+    }
+
+    public static function magic($imageId, $part, $userId)
+    {
+        $startTime = VisionController::getTime();
+        $imagePath = public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg";
         if (!file_exists($imagePath)) {
             return response()->json([
                 "error" => [
@@ -22,34 +45,37 @@ class VisionController extends Controller
             ]);
         }
         //Retrieving image details from the database.
-        $result = DB::table('images')->select([ 'red' .request('part') . " AS red", 'green' . request('part') . " AS green", 'blue' . request('part')
-            . " AS blue",  'labels'. request('part') ." AS labels", 'time' . request('part'). " AS time"])->where('imageId',request('imageId'))
-            ->where('isValid',true)->first();
+        $result = DB::table('images')->select(['red' . $part . " AS red", 'green' . $part . " AS green", 'blue' . $part
+            . " AS blue", 'labels' . $part . " AS labels", 'time' . $part . " AS time"])->where('imageId', $imageId)
+            ->where('isValid', true)->first();
         // To specifically check if that part is checked before or not.
         if (!empty($result) && $result->red != null) {
-          return [
-              'success' => [
-                  "message" => 'Image analyzed.',
-                  "code" => 5
-              ],
-              "labels" => $result->labels,
-              "colors" => "rgb($result->red, $result->green, $result->blue)",
-              "time" => $result->time
-          ];
+            return [
+                'success' => [
+                    "message" => 'Image analyzed.',
+                    "code" => 5
+                ],
+                "labels" => $result->labels,
+                "colors" => "rgb($result->red, $result->green, $result->blue)",
+                "time" => $result->time
+            ];
         }
 
-        $vertexes = $this->detectFace($imagePath, request('imageId'));
-        list($startX, $startY, $width, $height) = $this->calculate($vertexes, $imagePath, request('part'));
-        list($labels, $red, $green, $blue) = $this->detectArea($imagePath, $width, $height, $startX, $startY, request('part'));
-        $seconds = ($this->getTime() - $startTime) / 1000;
+        $vertexes = VisionController::detectFace($imagePath, $imageId, $userId);
+        if ($vertexes == null) {
+            return 0;
+        }
+        list($startX, $startY, $width, $height) = VisionController::calculate($vertexes, $imagePath, $part);
+        list($labels, $red, $green, $blue) = VisionController::detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId);
+        $seconds = (VisionController::getTime() - $startTime) / 1000;
         //Now that we have everything, we can update the image data in the database.
-        DB::table('images')->where('imageId',request('imageId'))->update([
+        DB::table('images')->where('imageId', $imageId)->update([
             'isValid' => true,
-            'red' . request('part') => $red,
-            'green'  . request('part') => $green,
-            'blue' . request('part') => $blue,
-            'labels' . request('part') => implode(',',$labels),
-            'time' . request('part') => $seconds
+            'red' . $part => $red,
+            'green' . $part => $green,
+            'blue' . $part => $blue,
+            'labels' . $part => implode(',', $labels),
+            'time' . $part => $seconds
         ]);
         return [
             'success' => [
@@ -62,10 +88,10 @@ class VisionController extends Controller
         ];
     }
 
-    private function detectArea($imagePath, $width, $height, $startX, $startY, $part)
+    private static function detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId)
     {
         $image = Image::make($imagePath)->crop(floor($width), floor($height), floor($startX), floor($startY));
-        $fileName = request('imageId') . '_' . $part . ".jpg";
+        $fileName = $imageId . '_' . $part . ".jpg";
         $image->save(public_path('cropped') . DIRECTORY_SEPARATOR . $fileName);
         //Second, detect image properties and detect labels
         $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::IMAGE_PROPERTIES, 100),
@@ -93,7 +119,7 @@ class VisionController extends Controller
         return array($temp, $red, $green, $blue);
     }
 
-    private function calculate($vertexes, $imagePath, $part)
+    private static function calculate($vertexes, $imagePath, $part)
     {
         $maxX = 0;
         $maxY = 0;
@@ -140,31 +166,22 @@ class VisionController extends Controller
         return array($startX, $startY, $width, $height);
     }
 
-    private function detectFace($imagePath, $imageId)
+    private static function detectFace($imagePath, $imageId, $userId)
     {
         $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::FACE_DETECTION, 100),]);
         $response = $vision->request(new \Vision\Request\Image\LocalImage($imagePath));
         $faces = $response->getFaceAnnotations();
-        if (count($faces) != 1) {
-            DB::table('images')->select('imageId', $imageId)->update([
-                'isValid' => false
-            ]);
-            return [
-                "labels" => "Image contains more than 1 face.",
-                'error' => [
-                    "message" => 'Image contains more than 1 face.',
-                    "code" => 4
-                ]
-            ];
-        }else{
-            DB::table('images')->select('imageId', $imageId)->update([
-                'isValid' => true
-            ]);
+        if (empty($faces) || count($faces) != 1) {
+            PhotoController::remove($imageId, $userId);
+            return null;
         }
+        DB::table('images')->select('imageId', $imageId)->update([
+            'isValid' => 1
+        ]);
         return $faces[0]->getBoundingPoly()->getVertices();
     }
 
-    private function getTime()
+    private static function getTime()
     {
         list($usec, $sec) = explode(" ", microtime());
         return round(((float)$usec + (float)$sec) * 1000);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -27,6 +28,13 @@ class LoginController extends Controller
      */
     protected $redirectTo = '/';
 
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'email' => 'required|string|email|max:255|exists',
+            'password' => 'required|string|min:6',
+        ]);
+    }
     /**
      * Create a new controller instance.
      *
@@ -35,5 +43,30 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+        $this->clearLoginAttempts($request);
+        if ($request->ajax()) {
+            return [
+                'success' => [
+                    "message" => 'User logged in.',
+                    "code" => 5
+                ]
+            ];
+        }
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        if ($request->ajax()) {
+            return response()->json([
+                'errors' => [
+                    "message" => 'Wrong parameter(s).'
+                ]
+            ],422);
+        }
     }
 }

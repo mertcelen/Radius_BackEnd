@@ -54,6 +54,12 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="admin">Admin Panel<span class="sr-only"></span></a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="http://sql.psactis.me" target="_blank">phpMyAdmin<span class="sr-only"></span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="http://api.psactis.me" target="_blank">ApiDoc<span class="sr-only"></span></a>
+                                </li>
                             @endif
                         @endauth
                     </ul>

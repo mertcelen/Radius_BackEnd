@@ -10,7 +10,7 @@ Route::group(['middleware' => ['parameters:secret']], function () {
     Route::post('images/remove','Api\PhotoController@remove')->middleware('parameters:imageId');
     Route::post('instagram/get','Api\InstagramController@get');
     Route::post('user/preferences','Api\UserController@preferences')->middleware('parameters:body_type,body_style');
-    Route::post('user/password','Api\UserController@password');
+    Route::post('user/password','Api\UserController@password')->middleware('parameters:old-password,new-password,new-password2');
     Route::post('magic','Api\VisionController@detect');
     Route::post('admin','Api\AdminController@index')->middleware('admin');
     Route::post('admin/user/status','Api\AdminController@updateStatus')->middleware(['admin','parameters:status,id']);

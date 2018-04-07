@@ -12,11 +12,13 @@
         <div class="card float-left" style="width: 18rem;">
             <div class="card-body">
                 <h3 class="card-title">Change Password</h3>
+                <div class="alert alert-danger passwordError" role="alert" style="background-color:#bc5100;color:white" hidden>
+                </div>
                 <input type="password" id="oldPassword" class="form-control input" placeholder="Old Password" required>
                 <input type="password" id="newPassword" class="form-control input" placeholder="New Password" required>
                 <input type="password" id="newPassword2" class="form-control input" placeholder="Confirm New Password"
                        required>
-                <button type="button" name="button" class="btn btn-primary btn-block" onclick="updatePassword()">Change
+                <button type="button" name="button" class="btn btn-custom btn-block" onclick="updatePassword('{{Auth::user()->secret}}')">Change
                     Password
                 </button>
             </div>
@@ -25,20 +27,20 @@
         <div class="card float-left" style="width: 18rem;">
             <div class="card-body">
                 <h3 class="card-title">Retrieve from Instagram</h3>
-                <button class="btn btn-primary btn-block" onclick="retrieve()">Retrieve</button>
+                <button class="btn btn-custom btn-block" onclick="retrieve()">Retrieve</button>
             </div>
         </div>
     @endif
     <div class="card float-left" style="width: 18rem;">
         <div class="card-body">
             <h3 class="card-title">Cloth Detection</h3>
-            <button class="btn btn-primary btn-block" onclick="magic('{{Auth::user()->secret}}')">Request Detection</button>
+            <button class="btn btn-custom btn-block" onclick="magic('{{Auth::user()->secret}}')">Request Detection</button>
         </div>
     </div>
     <div class="card float-left" style="width: 18rem;">
         <div class="card-body">
             <h3 class="card-title">Profile Photo</h3>
-            <form id="uploadPhoto" action="/user/avatar" class="dropzone">
+            <form id="uploadPhoto" action="/user/avatar" class="dropzone btn btn-custom">
                 <div class="fallback">
                     <input name="photo" type="file"/>
                 </div>

@@ -46,7 +46,7 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    <button type="submit" class="btn btn-primary">Save preferences</button>
+                    <button type="submit" class="btn btn-custom">Save preferences</button>
                 </td>
             </tr>
             </tbody>

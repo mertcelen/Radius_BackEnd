@@ -64,10 +64,15 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $token = str_random(64);
+        while(DB::table('users')->where('secret',$token)->exists() == true){
+            $token = str_random(64);
+        }
         $user = new User;
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = bcrypt($data['password']);
+        $user->secret = $token;
         $user->save();
         $id = DB::table('users')->where('email',$user->email)->select('id')->value('id');
         DB::table('standart_users')->insert([

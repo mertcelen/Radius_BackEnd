@@ -14,7 +14,7 @@
                 <div class="col-lg-8 mx-auto">
                     <p class="text-faded mb-5">Radius is a platform that suggests new fashion
                         styles and makes recommendations for new items.</p>
-                    <a class="btn btn-primary btn-xl js-scroll-trigger" onclick="action('login')">Start here</a>
+                    <a class="btn btn-custom btn-xl js-scroll-trigger" onclick="action('login')">Start here</a>
                 </div>
             </div>
         </div>

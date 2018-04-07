@@ -11,7 +11,7 @@
             <input name="photo" type="file"/>
         </div>
     </form>
-    <button class="btn btn-primary my-1 mx-1" onclick="toggle()">Sil</button>
+    <button class="btn btn-custom my-1 mx-1" onclick="toggle()">Sil</button>
     <div class="photos">
         @foreach($images as $image)
             <div class="photoWrapper">

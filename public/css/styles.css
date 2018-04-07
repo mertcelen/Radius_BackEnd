@@ -19,3 +19,23 @@ body{
 .navbar-custom .nav-item:hover .nav-link {
     color: #ffffff;
 }
+
+.btn-custom{
+  background-color: #bc5100;
+}
+
+.card{
+  margin : 10px;
+}
+
+.input{
+  margin-bottom: 10px;
+}
+
+form{
+  width: 100%;
+  background-color: #bc5100;
+  color: white;
+  text-align: center;
+  border-radius: 3px;
+}

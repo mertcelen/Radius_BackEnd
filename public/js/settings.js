@@ -1,25 +1,41 @@
-function updatePassword(){
-  var old = $("#oldPassword");
-  var updated = $("#newPassword");
-  var update2 = $("#newPassword2");
-  // $.ajax({
-  //   url : "/api/user/password",
-  //   data : {
-  //     "old-password" : old.val(),
-  //     "new-password" : updated.val(),
-  //     "new-password_confirmation" : update2.val()
-  //   },
-  //   type : "POST",
-  // }).done(function(response){
-  //     console.log(response);
-  // }).fail(function(){
-  //     alert("error");
-  // });
+function updatePassword(secret){
+  var old = $("#oldPassword").val();
+  var updated = $("#newPassword").val();
+  var update2 = $("#newPassword2").val();
+  if(!old || !updated || !update2){
+      $(".passwordError").html('Please fill all blanks.').removeAttr('hidden');
+      return;
+  }
+    $(".modal-title").html("Please Wait");
+    var loading = $(".loading").html();
+    $(".modal-body").html(loading);
+    $("#modalDialog").modal();
+  $.post({
+    url : "/api/user/password",
+    data : {
+      "old-password" : old,
+      "new-password" : updated,
+      "new-password2" : update2,
+      "secret" : secret
+    },
+      success : function(data){
+          if(data.success){
+              $(".modal-title").html("Updated");
+              $(".modal-body").html("Password successfully updated.");
+          }else{
+              $("#modalDialog").modal('toggle');
+              $(".passwordError").html(data.error.message).removeAttr('hidden');
+          }
+
+      }
+  });
 }
+Dropzone.prototype.defaultOptions.dictDefaultMessage = "Drop files or click here to upload";
 
 function retrieve(){
     $(".modal-title").html("Please Wait");
-    $(".modal-body").html("Retrieving from instagram");
+    var loading = $(".loading").html();
+    $(".modal-body").html(loading);
     $("#modalDialog").modal();
     var secret = $("#secret").html();
     $.post({

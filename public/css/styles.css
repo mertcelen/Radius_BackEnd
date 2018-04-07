@@ -1,9 +1,9 @@
 body{
-    background-image:url('/header.jpg');
+    background-color: #f57f17;
 }
 
 .navbar-custom {
-    background-color: #4285f4;
+    background-color: #bc5100;
 }
 /* change the brand and text color */
 .navbar-custom .navbar-brand,

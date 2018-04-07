@@ -2,7 +2,6 @@
 
 @section('content')
     <script src="{{asset('js/home.js')}}"></script>
-    <link rel="stylesheet" href="{{asset('css/home.css')}}">
     <header class="masthead text-center text-white d-flex">
         <div class="container my-auto">
             <div class="row">

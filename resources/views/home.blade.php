@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="row">
+    <div class="container">
       @empty($images)
         <h2>No photo found, go ahead and <a href="/photos">upload</a> photos right now.</h2>
       @else

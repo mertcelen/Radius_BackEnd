@@ -9,7 +9,7 @@
     <script type="text/javascript" src="/js/settings.js"></script>
     <span style="display: none" id="secret">{{$secret}}</span>
     @if($instagram == false)
-        <div class="card float-left" style="width: 36rem;">
+        <div class="card float-left" style="width: 18rem;">
             <div class="card-body">
                 <h3 class="card-title">Change Password</h3>
                 <input type="password" id="oldPassword" class="form-control input" placeholder="Old Password" required>
@@ -22,20 +22,20 @@
             </div>
         </div>
     @else
-        <div class="card float-left" style="width: 36rem;">
+        <div class="card float-left" style="width: 18rem;">
             <div class="card-body">
                 <h3 class="card-title">Retrieve from Instagram</h3>
                 <button class="btn btn-primary btn-block" onclick="retrieve()">Retrieve</button>
             </div>
         </div>
     @endif
-    <div class="card float-left" style="width: 36rem;">
+    <div class="card float-left" style="width: 18rem;">
         <div class="card-body">
             <h3 class="card-title">Cloth Detection</h3>
             <button class="btn btn-primary btn-block" onclick="magic('{{Auth::user()->secret}}')">Request Detection</button>
         </div>
     </div>
-    <div class="card float-left" style="width: 36rem;">
+    <div class="card float-left" style="width: 18rem;">
         <div class="card-body">
             <h3 class="card-title">Profile Photo</h3>
             <form id="uploadPhoto" action="/user/avatar" class="dropzone">

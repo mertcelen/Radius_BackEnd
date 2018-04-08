@@ -14,12 +14,12 @@ Dropzone.options.uploadPhoto = {
 };
 Dropzone.prototype.defaultOptions.dictDefaultMessage = "Drop files or click here to upload"
 function remove(imageId){
-    var loading = $(".loading").html();
-    $(".modal-body").html(loading);
-    $("#modalDialog").modal();
     if(enabled === false){
         return;
     }
+    var loading = $(".loading").html();
+    $(".modal-body").html(loading);
+    $("#modalDialog").modal();
     $.post({
         url : "/photos/remove",
         data : {

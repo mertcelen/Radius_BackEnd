@@ -22,8 +22,13 @@ class VisionController extends Controller
      */
     public function detect()
     {
-        $job = (new CloudVision(request('userId')));
-        dispatch($job);
+        $images = DB::table('images')->where('userId',request('userId'))->select('imageId')->get()->toArray();
+        foreach ($images as $image){
+            for ($i = 1 ; $i <=3; $i++){
+                $job = (new CloudVision(request('userId'),$image->imageId,(String)$i));
+                dispatch($job);
+            }
+        }
         return [
             'success' => [
                 "message" => 'Cloth detection is requested, it is going to work background because it will take a while.',

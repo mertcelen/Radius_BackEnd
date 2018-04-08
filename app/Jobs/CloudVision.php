@@ -14,14 +14,18 @@ class CloudVision implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     protected $userId;
+    protected $imageId;
+    protected $part;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($userId)
+    public function __construct($userId,$imageId,$part)
     {
         $this->userId= $userId;
+        $this->imageId = $imageId;
+        $this->part = $part;
     }
 
     /**
@@ -31,11 +35,6 @@ class CloudVision implements ShouldQueue
      */
     public function handle()
     {
-        $images = DB::table('images')->where('userId',$this->userId)->select('imageId')->get()->toArray();
-        foreach ($images as $image){
-            VisionController::magic((string)$image->imageId,'1',$this->userId);
-            VisionController::magic((string)$image->imageId,'2',$this->userId);
-            VisionController::magic((string)$image->imageId,'3',$this->userId);
-        }
+            VisionController::magic((string)$this->imageId,$this->part,$this->userId);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Input;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -185,17 +186,25 @@ class UserController extends Controller
                 ]
             ];
         }
-      DB::table('users')->where('id',request('userId'))->
-          where('password',bcrypt(request('old-password')))->update([
-          'password' => bcrypt(request('new-password')),
-          'secret' => null
-      ]);
-      return [
-        'success' => [
-            "message" => 'Password changed.',
-            "code" => 5
-        ],
-      ];
+        $current = DB::table('users')->select('password')->where('id',request('userId'))->value('password');
+        $flag = Hash::check(request('old-password'),$current);
+        if($flag == false){
+            return [
+                'error' => [
+                    "message" => 'Old password is wrong.',
+                    "code" => 4
+                ]
+            ];
+        }
+        DB::table('users')->where('id',request('userId'))->update([
+            'password' => bcrypt(request('new-password'))
+        ]);
+        return [
+          'success' => [
+              "message" => 'Password changed.',
+              "code" => 5
+          ],
+        ];
     }
 
     public static function settings(){
@@ -248,6 +257,27 @@ class UserController extends Controller
         return [
             'success' => [
                 "message" => 'Avatar updated',
+                "code" => 5
+            ],
+            'id' => $avatarId
+        ];
+    }
+    /**
+     * @api {post} /api/user/avatar/get Get Avatar
+     * @apiName GetAvatar
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} id Avatar id.
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public function getAvatar(){
+        $avatarId = DB::table('users')->select('avatar')->where('id',request('userId'))->value('avatar');
+        return [
+            'success' => [
+                "message" => 'Avatar id retrieved.',
                 "code" => 5
             ],
             'id' => $avatarId

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Auth;
 
 class RoutingController extends Controller
@@ -47,5 +48,10 @@ class RoutingController extends Controller
     public function updateInstagram(){
         $result = Api\InstagramController::get(Auth::user()->getAttribute('id'));
         return $result;
+    }
+
+    public function verify(){
+        $response = Api\UserController::verify();
+
     }
 }

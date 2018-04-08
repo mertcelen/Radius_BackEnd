@@ -18,6 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique()->nullable();
             $table->string('password')->nullable();
+            $table->string('verification')->nullable();
             $table->boolean('isInstagram')->default(false);
             $table->string('instagram_id')->unique()->nullable();
             $table->string('avatar')->nullable()->default('default_avatar');

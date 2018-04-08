@@ -1,51 +1,52 @@
-function action(type){
+function action(type) {
     $(".modal-title").html("Login the Radius");
     var data = $("." + type).html();
     $(".modal-body").html(data);
     $("#modalDialog").modal();
 }
 
-function loginUser(){
-    var email= $("#loginEmail").val();
+function loginUser() {
+    var email = $("#loginEmail").val();
     var password = $("#loginPassword").val();
     var oldHtml = $(".modal-body").html();
     var loading = $(".loading").html();
     $(".modal-body").html(loading);
-    if($("#loginEmail").is(':empty') || $("#loginPassword").is(':empty')){
+    if ($("#loginEmail").is(':empty') || $("#loginPassword").is(':empty')) {
         $(".loginError").html('Please fill all blanks.').removeClass('invisible');
     }
     $.post({
-        url  : "login",
-        data : {
-            "email" : email,
-            "password" : password,
-            "session" : true
+        url: "login",
+        data: {
+            "email": email,
+            "password": password,
+            "session": true
         },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        success : function(data){
-            if(data.success){
+        success: function (data) {
+            if (data.success) {
                 location.reload();
-            }else{
+            } else {
                 $(".modal-body").html(oldHtml);
                 $(".loginError").html(data.error.message).removeClass('invisible');
             }
         },
-        error : function(request){
+        error: function (request) {
             $(".modal-body").html(oldHtml);
             $(".loginError").html('').removeClass('invisible');
-            for (var element in request.responseJSON.errors){
+            for (var element in request.responseJSON.errors) {
                 $(".loginError").append(request.responseJSON.errors[element] + "<br>");
-            };
+            }
+            ;
             $("#loginEmail").val(email);
             $("#loginName").val(name);
         }
     });
 }
 
-function registerUser(){
-    var email= $("#registerEmail").val();
+function registerUser() {
+    var email = $("#registerEmail").val();
     var name = $("#registerName").val();
     var password = $("#registerPassword").val();
     var password2 = $("#registerPassword2").val();
@@ -53,27 +54,47 @@ function registerUser(){
     var loading = $(".loading").html();
     $(".modal-body").html(loading);
     $.post({
-        url  : "register",
-        data : {
-            "email" : email,
-            "password" : password,
-            "password-confirm" : password2,
-            "name" : name
+        url: "register",
+        data: {
+            "email": email,
+            "password": password,
+            "password-confirm": password2,
+            "name": name
         },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        success : function(data){
-            location.reload();
+        success: function () {
+            var verify = $(".verify").html();
+            $(".modal-body").html(verify);
+            $("#verificationEmail").html(email);
         },
-        error : function(request){
+        error: function (request) {
             $(".modal-body").html(oldHtml);
             $(".registerError").html('').removeClass('invisible');
-            for (var element in request.responseJSON.errors){
+            for (var element in request.responseJSON.errors) {
                 $(".registerError").append(request.responseJSON.errors[element] + "<br>");
-            };
+            }
+            ;
             $("#registerEmail").val(email);
             $("#registerName").val(name);
+        }
+    });
+}
+
+function verifyEmail() {
+    var code = $("#verifyCode").val();
+    if (!code) {
+        $(".verifyError").html('Code cannot empty.').removeAttr('hidden');
+        return;
+    }
+    $.get({
+        url: '/api/verify',
+        data: {
+            'code': code
+        },
+        success: function (data) {
+
         }
     });
 }

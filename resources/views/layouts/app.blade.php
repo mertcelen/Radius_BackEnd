@@ -4,12 +4,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#bc5100" />
+    <meta name="theme-color" content="#bc5100"/>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Radius</title>
     <link rel="manifest" href="manifest.json">
-    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"
+            integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+            crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -20,19 +22,20 @@
 <body>
 <div>
     @auth
-    <link rel="manifest" href="/manifest.json" />
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-    <script>
-      var OneSignal = window.OneSignal || [];
-      OneSignal.push(function() {
-        OneSignal.init({
-          appId: "fc2ccdef-7148-462d-9e58-238a96c100e0",
-        });
-      });
-    </script>
+        <link rel="manifest" href="/manifest.json"/>
+        <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+        <script>
+            var OneSignal = window.OneSignal || [];
+            OneSignal.push(function () {
+                OneSignal.init({
+                    appId: "fc2ccdef-7148-462d-9e58-238a96c100e0",
+
+                    autoRegister: false
+                });
+            });
+        </script>
         <header>
             <nav class="navbar navbar-expand-lg navbar-custom">
-
                 <a class="navbar-brand"
                    href="/"><strong>Radius</strong></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -57,10 +60,12 @@
                                     <a class="nav-link" href="admin">Admin Panel<span class="sr-only"></span></a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="http://sql.psactis.me" target="_blank">phpMyAdmin<span class="sr-only"></span></a>
+                                    <a class="nav-link" href="http://sql.psactis.me" target="_blank">phpMyAdmin<span
+                                                class="sr-only"></span></a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="http://api.psactis.me" target="_blank">ApiDoc<span class="sr-only"></span></a>
+                                    <a class="nav-link" href="http://api.psactis.me" target="_blank">ApiDoc<span
+                                                class="sr-only"></span></a>
                                 </li>
                             @endif
                         @endauth

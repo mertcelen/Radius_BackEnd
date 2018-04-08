@@ -18,7 +18,7 @@ Route::group(['middleware' => ['parameters:secret']], function () {
     Route::post('user/avatar/get','Api\UserController@getAvatar');
 });
 Route::post('user/avatar','Api\UserController@userAvatar')->middleware('parameters:secret,photo');
-
+Route::get('verify','Api\UserController@verify');
 Route::post('login','Api\UserController@login')->middleware('parameters:email,password');
 Route::post('register','Api\UserController@register')->middleware('parameters:email,name,password');
 Route::post('instagram/oauth','Api\InstagramController@create')->middleware('parameters:code');

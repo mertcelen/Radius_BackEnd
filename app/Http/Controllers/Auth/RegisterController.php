@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Jobs\SendVerification;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -68,16 +69,26 @@ class RegisterController extends Controller
         while(DB::table('users')->where('secret',$token)->exists() == true){
             $token = str_random(64);
         }
+        $verification = (String)rand(1000,9999);
+        while(DB::table('users')->where('verification',$verification)->exists() == true){
+            $verification = (String)rand(1000,9999);
+        }
         $user = new User;
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = bcrypt($data['password']);
+        $user->verification = $verification;
         $user->secret = $token;
         $user->save();
         $id = DB::table('users')->where('email',$user->email)->select('id')->value('id');
         DB::table('standart_users')->insert([
             'user_id' => $id
         ]);
-        return $user;
+
+        //Send Verification Email
+        $email = new SendVerification($user->email,$verification);
+        $this->dispatch($email);
+        Auth::login($user);
+        return 'ok';
     }
 }

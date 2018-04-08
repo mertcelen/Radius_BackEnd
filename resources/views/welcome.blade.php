@@ -22,4 +22,5 @@
     @include('layouts.auth')
     @include('auth.login')
     @include('auth.register')
+    @include('auth.verify')
 @endsection

@@ -283,4 +283,36 @@ class UserController extends Controller
             'id' => $avatarId
         ];
     }
+    /**
+     * @api {post} /api/user/verify Verify Email
+     * @apiName VerifyEmail
+     * @apiGroup User
+     *
+     * @apiParam {String} code Verification Email
+     *
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public static function verify(){
+        //First find id
+        $flag = DB::table('users')->where('verification',request('code'))->exists();
+        if($flag == false){
+            return [
+                'error' => [
+                    "message" => 'Verification code is invalid.',
+                    "code" => 4
+                ]
+            ];
+        }
+        DB::table('users')->where('verification',request('code'))->update([
+            'verification' => '1',
+            'status' => 1
+        ]);
+        return [
+            'success' => [
+                "message" => 'Email successfully verified.',
+                "code" => 5
+            ]
+        ];
+    }
 }

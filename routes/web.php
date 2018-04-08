@@ -16,7 +16,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/user/avatar', 'Api\UserController@userAvatar')->middleware('session');
     Route::post('/photos/remove', 'Api\PhotoController@remove')->middleware('session');
     Route::get('/settings', 'RoutingController@settings');
-    // Route::post('/photos/remove','Api\PhotosController@remove');
+    Route::get('/verify','RoutingController@verify');
 });
 
 Route::group(['middleware' => ['auth', 'session', 'admin']], function () {

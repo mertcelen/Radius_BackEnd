@@ -22,10 +22,10 @@ class VisionController extends Controller
      */
     public function detect()
     {
-        $images = DB::table('images')->where('userId',request('userId'))->select('imageId')->get()->toArray();
-        foreach ($images as $image){
-            for ($i = 1 ; $i <=3; $i++){
-                $job = (new CloudVision(request('userId'),$image->imageId,(String)$i));
+        $images = DB::table('images')->where('userId', request('userId'))->select('imageId')->get()->toArray();
+        foreach ($images as $image) {
+            for ($i = 1; $i <= 3; $i++) {
+                $job = (new CloudVision(request('userId'), $image->imageId, (String)$i));
                 dispatch($job);
             }
         }

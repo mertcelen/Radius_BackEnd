@@ -12,7 +12,7 @@
 Thanks for registering with us, please click the link below or copy the code below to confirm your email adress.<br><br>
 
 <h2>{{$code}}</h2>
-  <a href="https://psactis.me/verify/{{$code}}" style="color:white;text-decoration: none;"><div style="background-color:#f57f17;width:30%;height:50%;border-radius:5px;text-align:center;vertical-align: baseline;">
+  <a href="https://radiusfashion.com/verify/{{$code}}" style="color:white;text-decoration: none;"><div style="background-color:#f57f17;width:30%;height:50%;border-radius:5px;text-align:center;vertical-align: baseline;">
   <h2>Click Here</h2></div></a>
 </body>
 </html>

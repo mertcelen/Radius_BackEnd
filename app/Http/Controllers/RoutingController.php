@@ -52,6 +52,6 @@ class RoutingController extends Controller
 
     public function verify(){
         $response = Api\UserController::verify();
-
+        return redirect('/');
     }
 }

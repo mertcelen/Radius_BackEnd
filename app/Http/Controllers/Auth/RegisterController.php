@@ -88,7 +88,6 @@ class RegisterController extends Controller
         //Send Verification Email
         $email = new SendVerification($user->email,$verification);
         $this->dispatch($email);
-        Auth::login($user);
-        return 'ok';
+        return $user;
     }
 }

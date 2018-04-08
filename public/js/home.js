@@ -94,7 +94,11 @@ function verifyEmail() {
             'code': code
         },
         success: function (data) {
-
+            if(data.success){
+                location.reload();
+            }else{
+                $(".verifyError").html(data.error.message).removeAttr('hidden');
+            }
         }
     });
 }

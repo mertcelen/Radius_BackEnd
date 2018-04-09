@@ -95,7 +95,7 @@ function verifyEmail() {
         },
         success: function (data) {
             if(data.success){
-                location.reload();
+                window.location.replace('/');
             }else{
                 $(".verifyError").html(data.error.message).removeAttr('hidden');
             }

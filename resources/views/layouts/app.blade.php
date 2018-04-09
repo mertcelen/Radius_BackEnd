@@ -22,71 +22,95 @@
 <body>
 <div>
     @auth
-        <link rel="manifest" href="/manifest.json"/>
-        <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-        <script>
-            var OneSignal = window.OneSignal || [];
-            OneSignal.push(function () {
-                OneSignal.init({
-                    appId: "fc2ccdef-7148-462d-9e58-238a96c100e0",
+        @if(!Auth::user()->isVerified())
+            <link rel="manifest" href="/manifest.json"/>
+            <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+            <script>
+                var OneSignal = window.OneSignal || [];
+                OneSignal.push(function () {
+                    OneSignal.init({
+                        appId: "fc2ccdef-7148-462d-9e58-238a96c100e0",
 
-                    autoRegister: false
+                        autoRegister: false
+                    });
                 });
-            });
-        </script>
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-custom">
-                <a class="navbar-brand"
-                   href="/"><strong>Radius</strong></a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse"
-                        data-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fa fa-bars" style="color:white"></i>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/">Home <span class="sr-only"></span></a>
-                        </li>
-                        @auth
+            </script>
+            <header>
+                <nav class="navbar navbar-expand-lg navbar-custom">
+                    <a class="navbar-brand"
+                       href="/"><strong>Radius</strong></a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse"
+                            data-target="#navbarSupportedContent"
+                            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fa fa-bars" style="color:white"></i>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav mr-auto">
                             <li class="nav-item">
-                                <a class="nav-link" href="photos">My Photos <span class="sr-only"></span></a>
+                                <a class="nav-link" href="/">Home <span class="sr-only"></span></a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="settings">Settings<span class="sr-only"></span></a>
-                            </li>
-                            @if(Auth::user()->isAdmin())
+                            @auth
                                 <li class="nav-item">
-                                    <a class="nav-link" href="admin">Admin Panel<span class="sr-only"></span></a>
+                                    <a class="nav-link" href="photos">My Photos <span class="sr-only"></span></a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="http://sql.psactis.me" target="_blank">phpMyAdmin<span
-                                                class="sr-only"></span></a>
+                                    <a class="nav-link" href="settings">Settings<span class="sr-only"></span></a>
                                 </li>
+                                @if(Auth::user()->isAdmin())
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin">Admin Panel<span class="sr-only"></span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="product">Add Product<span class="sr-only"></span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="http://sql.psactis.me" target="_blank">phpMyAdmin<span
+                                                    class="sr-only"></span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="http://api.psactis.me" target="_blank">ApiDoc<span
+                                                    class="sr-only"></span></a>
+                                    </li>
+                                @endif
+                            @endauth
+                        </ul>
+                        <ul class="navbar-nav navbar-right">
+                            @auth
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                      style="display: none;">
+                                    {{ csrf_field() }}
+                                </form>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="http://api.psactis.me" target="_blank">ApiDoc<span
-                                                class="sr-only"></span></a>
-                                </li>
-                            @endif
-                        @endauth
-                    </ul>
-                    <ul class="navbar-nav navbar-right">
-                        @auth
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                {{ csrf_field() }}
-                            </form>
-                            <li class="nav-item">
-                                <a class="nav-link" onclick="event.preventDefault();
+                                    <a class="nav-link" onclick="event.preventDefault();
                                                  document.getElementById('logout-form').submit();">
-                                    <img src="/avatar/{{Auth::user()->avatar}}.jpg" width="30px" height="30px"/>
-                                    <b>Logout from {{Auth::user()->name}}</b>
-                                </a>
-                            </li>
-                        @endauth
-                    </ul>
-                </div>
-            </nav>
-        </header>
+                                        <img src="/avatar/{{Auth::user()->avatar}}.jpg" width="30px" height="30px"/>
+                                        <b>Logout from {{Auth::user()->name}}</b>
+                                    </a>
+                                </li>
+                            @endauth
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+        @else
+            <center>
+            <ul class="navbar-nav navbar-right">
+                @auth
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                          style="display: none;">
+                        {{ csrf_field() }}
+                    </form>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="event.preventDefault();
+                                                 document.getElementById('logout-form').submit();">
+                            <img src="/avatar/{{Auth::user()->avatar}}.jpg" width="30px" height="30px"/>
+                            <b>Logout from {{Auth::user()->name}}</b>
+                        </a>
+                    </li>
+                @endauth
+            </ul>
+            </center>
+        @endif
     @endauth
 
     <div class="container px-2 py-2">

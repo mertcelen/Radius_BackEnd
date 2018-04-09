@@ -59,6 +59,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'parameters' => \App\Http\Middleware\Parameters::class,
         'admin' => \App\Http\Middleware\Admin::class,
-        'session' => \App\Http\Middleware\SessionToToken::class
+        'session' => \App\Http\Middleware\SessionToToken::class,
+        'verification' => \App\Http\Middleware\Verification::class
     ];
 }

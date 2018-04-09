@@ -25,3 +25,7 @@ Route::post('instagram/oauth','Api\InstagramController@create')->middleware('par
 
 Route::get('instagram/url','Api\InstagramController@instagramUrl');
 Route::get('codes','Api\ErrorController@main');
+
+Route::get('products','Api\ProductController@main');
+Route::get('product','Api\ProductController@get');
+Route::post('product','Api\ProductController@add');

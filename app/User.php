@@ -33,7 +33,7 @@ class User extends Authenticatable
     }
 
     public function isVerified(){
-        return !$this->statusCheck(0);
+        return $this->statusCheck(0);
     }
 
     protected function statusCheck ($status = 0)

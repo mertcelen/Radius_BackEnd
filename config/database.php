@@ -53,6 +53,20 @@ return [
             'strict' => true,
             'engine' => null,
         ],
+        'mysql_clothes' => [
+            'driver' => 'mysql',
+            'host' => env('DB_CLOTHES_HOST', '127.0.0.1'),
+            'port' => env('DB_CLOTHES_PORT', '3306'),
+            'database' => env('DB_CLOTHES_DATABASE', 'forge'),
+            'username' => env('DB_CLOTHES_USERNAME', 'forge'),
+            'password' => env('DB_CLOTHES_PASSWORD', ''),
+            'unix_socket' => env('DB_CLOTHES_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
 
         'pgsql' => [
             'driver' => 'pgsql',

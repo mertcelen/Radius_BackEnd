@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RoutingController extends Controller
 {
     public function home(){
       if(Auth::check()) {
+          if(\Auth::user()->isVerified()){
+              return redirect('/verify');
+          }
           $response = Api\UserController::index();
           return view('home', [
               'images' => $response["images"]
@@ -51,7 +55,41 @@ class RoutingController extends Controller
     }
 
     public function verify(){
-        $response = Api\UserController::verify();
-        return redirect('/');
+        if(Auth::check() == true && !Auth::user()->isVerified()){
+            return redirect('/');
+        }
+        if(request()->has('code')){
+            $response = Api\UserController::verify();
+            if(array_key_exists('succcess',$response)){
+                return redirect('/');
+            }else{
+                return view('verification',[
+                   'error' => $response["error"]["message"]
+                ]);
+            }
+        }else{
+            return view('verification');
+        }
+    }
+
+    public function product(){
+        $types = DB::connection('mysql_clothes')->table('type')->get()->toArray();
+        $colors = DB::connection('mysql_clothes')->table('color')->get()->toArray();
+        $brands = DB::connection('mysql_clothes')->table('brand')->get()->toArray();
+        return view('admin.product',[
+            'types' => $types,
+            'colors' => $colors,
+            'brands' => $brands
+        ]);
+    }
+
+    public function color(){
+        $colors = [
+          'black' => 0,
+          'beige' => 16777215,
+            'blue' => 16777215,
+
+        ];
+        return view('color');
     }
 }

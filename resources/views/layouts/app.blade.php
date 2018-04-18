@@ -67,11 +67,11 @@
                                         <a class="nav-link" href="product">Add Product<span class="sr-only"></span></a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="http://sql.psactis.me" target="_blank">phpMyAdmin<span
+                                        <a class="nav-link" href="phpmyadmin" target="_blank">phpMyAdmin<span
                                                     class="sr-only"></span></a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="http://api.psactis.me" target="_blank">ApiDoc<span
+                                        <a class="nav-link" href="https://mertcelen.github.io/PSA_ApiDoc/" target="_blank">ApiDoc<span
                                                     class="sr-only"></span></a>
                                     </li>
                                 @endif

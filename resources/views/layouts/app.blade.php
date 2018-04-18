@@ -56,6 +56,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="settings">Settings<span class="sr-only"></span></a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="privacy_policy.html" target="_blank">Privacy Policy<span class="sr-only"></span></a>
+                                </li>
                                 @if(Auth::user()->isAdmin())
                                     <li class="nav-item">
                                         <a class="nav-link" href="admin">Admin Panel<span class="sr-only"></span></a>

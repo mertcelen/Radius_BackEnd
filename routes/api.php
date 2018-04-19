@@ -2,12 +2,12 @@
 Route::group(['middleware' => ['parameters:secret']], function () {
     Route::post('index','Api\UserController@index');
     Route::post('logout','Api\UserController@logout');
-    Route::post('user/favorites/list','Api\PhotoController@getFavorites');
-    Route::post('user/favorites/add','Api\PhotoController@addFavorite')->middleware('parameters:imageId');
-    Route::post('user/favorites/remove','Api\PhotoController@removeFavorite')->middleware('parameters:imageId');
-    Route::post('images/get','Api\PhotoController@get');
-    Route::post('images/add','Api\PhotoController@add')->middleware('parameters:photo');
-    Route::post('images/remove','Api\PhotoController@remove')->middleware('parameters:imageId');
+    Route::post('user/favorites/list','Api\ImageController@getFavorites');
+    Route::post('user/favorites/add','Api\ImageController@addFavorite')->middleware('parameters:imageId');
+    Route::post('user/favorites/remove','Api\ImageController@removeFavorite')->middleware('parameters:imageId');
+    Route::post('images/get','Api\ImageController@get');
+    Route::post('images/add','Api\ImageController@add')->middleware('parameters:photo');
+    Route::post('images/remove','Api\ImageController@remove')->middleware('parameters:imageId');
     Route::post('instagram/get','Api\InstagramController@get');
     Route::post('user/preferences','Api\UserController@preferences')->middleware('parameters:body_type,body_style');
     Route::post('user/password','Api\UserController@password')->middleware('parameters:old-password,new-password,new-password2');

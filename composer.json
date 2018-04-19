@@ -11,6 +11,7 @@
         "google/cloud-vision": "^0.10.1",
         "intervention/image": "^2.4",
         "ixudra/curl": "^6.16",
+        "jenssegers/mongodb": "^3.3",
         "jordikroon/google-vision": "^1.7",
         "ksubileau/color-thief-php": "^1.3",
         "laravel/framework": "5.5.*",

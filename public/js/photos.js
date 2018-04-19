@@ -17,9 +17,9 @@ function remove(imageId){
     if(enabled === false){
         return;
     }
-    var loading = $(".loading").html();
-    $(".modal-body").html(loading);
-    $("#modalDialog").modal();
+    // var loading = $(".loading").html();
+    // $(".modal-body").html(loading);
+    // $("#modalDialog").modal();
     $.post({
         url : "/photos/remove",
         data : {
@@ -27,11 +27,9 @@ function remove(imageId){
         },
         success : function(json){
             if (json.error) {
-                $(".modal-title").html("Error!");
-                $(".modal-body").html(json.error.message);
             } else {
-                $(".modal-title").html("Image removed!");
-                $(".modal-body").html(json.success.message);
+                $("#" + imageId).fadeOut();
+                toggle();
             }
         }
     });

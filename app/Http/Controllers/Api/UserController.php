@@ -105,7 +105,7 @@ class UserController extends Controller
      * @apiError   {Array} error Error response with message and code.
      */
     public static function index(){
-        return PhotoController::get();
+        return ImageController::get();
     }
     /**
      * @api {post} /api/user/preferences Preferences Update

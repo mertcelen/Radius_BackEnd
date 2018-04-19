@@ -23,7 +23,7 @@ class RoutingController extends Controller
     }
 
     public function photos(){
-      $images = Api\PhotoController::get();
+      $images = Api\ImageController::get();
       return view('photos',[
         'images' => $images["images"]
       ]);

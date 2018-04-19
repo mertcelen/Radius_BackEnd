@@ -11,11 +11,11 @@
             <input name="photo" type="file"/>
         </div>
     </form>
-    <button class="btn btn-custom my-1 mx-1" onclick="toggle()">Sil</button>
+    <button class="btn btn-custom my-1 mx-1" onclick="toggle()">Remove</button>
     <div class="photos">
         @foreach($images as $image)
             <div class="photoWrapper">
-                <img src="/thumb/{{$image->imageId}}.jpg" class="photo float-left"
+                <img id="{{$image->imageId}}" src="/thumb/{{$image->imageId}}.jpg" class="photo float-left"
                      onclick="remove('{{$image->imageId}}')"/>
             </div>
         @endforeach

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Intervention\Image\ImageManagerStatic as Image;
 
-class PhotoController extends Controller
+class ImageController extends Controller
 {
     /**
      * @api {post} /api/user/favorites/add Add User Favorites
@@ -110,7 +110,8 @@ class PhotoController extends Controller
      */
     public static function get()
     {
-        $images = DB::table('images')->select('imageId')->where('userId', request('userId'))->get()->reverse()->toArray();
+        $images = \App\Image::where('userId',request('userId'))->get();
+//        $images = DB::table('images')->select('imageId')->where('userId', request('userId'))->get()->reverse()->toArray();
         return [
             'success' => [
                 "message" => 'Images retrieved.',
@@ -135,27 +136,28 @@ class PhotoController extends Controller
      */
     public function add()
     {
-        $file_name = str_random(32);
-        //Making sure id not exist in db.
-        while (DB::table('images')->where('imageId', $file_name)->exists() == true) {
-            $file_name = str_random(32);
+        $imageId = str_random(16);
+        while (!empty(\App\Image::where('imageId', $imageId)->get()->toArray())) {
+            $imageId = str_random(16);
         }
+
         $image = Image::make(Input::file('photo'));
         //Save original file
-        $image->save(public_path('images') . DIRECTORY_SEPARATOR . $file_name . ".jpg");
+        $image->save(public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         //Save thumbnail
-        $image->fit(170, 170)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $file_name . ".jpg");
+        $image->fit(600, 600)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         // Write image information to database
-        DB::table('images')->insert([
-            "userId" => request('userId'),
-            "imageId" => $file_name
-        ]);
+        $mongoImage = new \App\Image();
+        $mongoImage->imageId = $imageId;
+        $mongoImage->userId = request('userId');
+        $mongoImage->save();
+
         return [
             'success' => [
                 "message" => 'Images added.',
                 "code" => 5
             ],
-            "imageId" => $file_name
+            "imageId" => $imageId
         ];
     }
 
@@ -176,8 +178,8 @@ class PhotoController extends Controller
             $imageId = request('imageId');
             $userId = request('userId');
         }
-        $image = DB::table('images')->select('imageId')->where('imageId', $imageId)->first();
-        if ($image == null) {
+        $flag  = empty(\App\Image::where('imageId',$imageId)->get()->toArray());
+        if ($flag == true) {
             return [
                 'error' => [
                     "message" => 'Image not found.',
@@ -185,7 +187,7 @@ class PhotoController extends Controller
                 ]
             ];
         }
-        DB::table('images')->where('imageId', $imageId)->where('userId', $userId)->delete();
+        \App\Image::where('imageId',$imageId)->delete();
         unlink(public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         unlink(public_path('thumb') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         return [

@@ -24,10 +24,10 @@ class VisionController extends Controller
     {
         $images = DB::table('images')->where('userId', request('userId'))->select('imageId')->get()->toArray();
         foreach ($images as $image) {
-            for ($i = 1; $i <= 3; $i++) {
-                $job = (new CloudVision(request('userId'), $image->imageId, (String)$i));
+//            for ($i = 1; $i <= 3; $i++) {
+                $job = (new CloudVision(request('userId'), $image->imageId, (String)1));
                 dispatch($job);
-            }
+//            }
         }
         return [
             'success' => [
@@ -50,21 +50,21 @@ class VisionController extends Controller
             ]);
         }
         //Retrieving image details from the database.
-        $result = DB::table('images')->select(['red' . $part . " AS red", 'green' . $part . " AS green", 'blue' . $part
-            . " AS blue", 'labels' . $part . " AS labels", 'time' . $part . " AS time"])->where('imageId', $imageId)
-            ->where('isValid', true)->first();
-        // To specifically check if that part is checked before or not.
-        if (!empty($result) && $result->red != null) {
-            return [
-                'success' => [
-                    "message" => 'Image analyzed.',
-                    "code" => 5
-                ],
-                "labels" => $result->labels,
-                "colors" => "rgb($result->red, $result->green, $result->blue)",
-                "time" => $result->time
-            ];
-        }
+//        $result = DB::table('images')->select(['red' . $part . " AS red", 'green' . $part . " AS green", 'blue' . $part
+//            . " AS blue", 'labels' . $part . " AS labels", 'time' . $part . " AS time"])->where('imageId', $imageId)
+//            ->where('isValid', true)->first();
+//        // To specifically check if that part is checked before or not.
+//        if (!empty($result) && $result->red != null) {
+//            return [
+//                'success' => [
+//                    "message" => 'Image analyzed.',
+//                    "code" => 5
+//                ],
+//                "labels" => $result->labels,
+//                "colors" => "rgb($result->red, $result->green, $result->blue)",
+//                "time" => $result->time
+//            ];
+//        }
 
         $vertexes = VisionController::detectFace($imagePath, $imageId, $userId);
         if ($vertexes == null) {
@@ -74,21 +74,28 @@ class VisionController extends Controller
         list($labels, $red, $green, $blue) = VisionController::detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId);
         $seconds = (VisionController::getTime() - $startTime) / 1000;
         //Now that we have everything, we can update the image data in the database.
-        DB::table('images')->where('imageId', $imageId)->update([
-            'isValid' => true,
-            'red' . $part => $red,
-            'green' . $part => $green,
-            'blue' . $part => $blue,
-            'labels' . $part => implode(',', $labels),
-            'time' . $part => $seconds
-        ]);
+        $color = VisionController::rgbToText(array($red,$green,$blue));
+//        $image = \App\Image::where('imageId',$imageId)->get();
+        $image = \App\Image::find('5ad85f9d98992e1c82503602');
+        $image->isValid = true;
+        $image->color = $color;
+        $image->labels = implode(',', $labels);
+        $image->save();
+//        DB::table('images')->where('imageId', $imageId)->update([
+//            'isValid' => true,
+//            'red' . $part => $red,
+//            'green' . $part => $green,
+//            'blue' . $part => $blue,
+//            'labels' . $part => implode(',', $labels),
+//            'time' . $part => $seconds
+//        ]);
         return [
             'success' => [
                 "message" => 'Image analyzed.',
                 "code" => 5
             ],
             "labels" => $labels,
-            "colors" => "rgb($red, $green, $blue)",
+            "color" => $color,
             "time" => $seconds
         ];
     }
@@ -177,7 +184,7 @@ class VisionController extends Controller
         $response = $vision->request(new \Vision\Request\Image\LocalImage($imagePath));
         $faces = $response->getFaceAnnotations();
         if (empty($faces) || count($faces) != 1) {
-            PhotoController::remove($imageId, $userId);
+            ImageController::remove($imageId, $userId);
             return null;
         }
         DB::table('images')->select('imageId', $imageId)->update([
@@ -191,4 +198,42 @@ class VisionController extends Controller
         list($usec, $sec) = explode(" ", microtime());
         return round(((float)$usec + (float)$sec) * 1000);
     }
+
+    private static function rgbToText($color)
+    {
+
+        $array['white'] = array(255, 255, 255);
+        $array['silver'] = array(191, 191, 191);
+        $array['gray'] = array(127.5, 127.5, 127.5);
+        $array['black'] = array(0, 0, 0);
+        $array['red'] = array(255, 0, 0);
+        $array['maroon'] = array(127.5, 0, 0);
+        $array['yellow'] = array(255, 255, 0);
+        $array['olive'] = array(127.5, 127.5, 0);
+        $array['lime'] = array(0, 255, 0);
+        $array['green'] = array(0, 255, 0);
+        $array['aqua'] = array(0, 255, 255);
+        $array['teal'] = array(0, 127.5, 127.5);
+        $array['blue'] = array(0, 0, 255);
+        $array['navy'] = array(0, 0, 127.5);
+        $array['fuchsia'] = array(255, 0, 255);
+        $array['purple'] = array(127.5, 0, 127.5);
+
+        $deviation = PHP_INT_MAX;
+        $colorName = '';
+        foreach ($array as $title => $current) {
+            $curDev = VisionController::compareColors($current, $color);
+            if ($curDev < $deviation) {
+                $deviation = $curDev;
+                $colorName = $title;
+            }
+        }
+        return $colorName;
+    }
+
+    private static function compareColors($colorA, $colorB)
+    {
+        return abs($colorA[0] - $colorB[0]) + abs($colorA[1] - $colorB[1]) + abs($colorA[2] - $colorB[2]);
+    }
+
 }

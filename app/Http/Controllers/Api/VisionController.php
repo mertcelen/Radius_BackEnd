@@ -178,6 +178,7 @@ class VisionController extends Controller
         $array['navy'] = array(0, 0, 127.5);
         $array['fuchsia'] = array(255, 0, 255);
         $array['purple'] = array(127.5, 0, 127.5);
+        $array['pink'] = array(255,192,203);
 
         $deviation = PHP_INT_MAX;
         $colorName = '';

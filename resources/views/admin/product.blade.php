@@ -10,7 +10,7 @@
             <select id="typeSelect" class="mdb-select">
                 <option value="" disabled selected>Choose type</option>
                 @foreach($types as $type)
-                    <option value="{{$type->TYPEID}}">{{$type->TYPE}}</option>
+                    <option value="{{$type->name}}">{{$type->name}}</option>
                 @endforeach
             </select>
         </div>
@@ -26,7 +26,7 @@
             <select id="brandSelect" class="mdb-select">
                 <option value="" disabled selected>Choose brand</option>
                 @foreach($brands as $brand)
-                    <option value="{{$brand->BRANDID}}">{{$brand->BRANDNAME}}</option>
+                    <option value="{{$brand->name}}">{{$brand->name}}</option>
                 @endforeach
             </select>
         </div>

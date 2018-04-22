@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Input;
 use Intervention\Image\ImageManagerStatic as Image;
 
 define('DS', DIRECTORY_SEPARATOR);
+
 class UserController extends Controller
 {
     /**
@@ -24,8 +25,9 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function login(){
-        if(!Auth::validate(['email' => request('email'),'password' => request('password')])){
+    public function login()
+    {
+        if (!Auth::validate(['email' => request('email'), 'password' => request('password')])) {
             return [
                 'error' => [
                     "message" => 'Wrong parameter(s).',
@@ -34,12 +36,12 @@ class UserController extends Controller
             ];
         }
         $token = str_random(64);
-        while(DB::table('users')->where('secret',$token)->exists() == true){
+        while (DB::table('users')->where('secret', $token)->exists() == true) {
             $token = str_random(64);
         }
-        DB::table('users')->where('email',request('email'))->update(['secret' => $token]);
+        DB::table('users')->where('email', request('email'))->update(['secret' => $token]);
         //Lastly check if request needs to start session
-        if(request()->has('session') && request('session') == true){
+        if (request()->has('session') && request('session') == true) {
             Auth::attempt([
                 "email" => request('email'),
                 "password" => request('password')
@@ -50,9 +52,10 @@ class UserController extends Controller
                 "message" => 'User logged in.',
                 "code" => 5
             ],
-           'secret' => $token
+            'secret' => $token
         ];
     }
+
     /**
      * @api {post} /api/register Register User
      * @apiName RegisterUser
@@ -66,14 +69,15 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function register(){
-        $this->validate(request(),[
+    public function register()
+    {
+        $this->validate(request(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
         ]);
         $token = str_random(64);
-        while(DB::table('users')->where('secret',$token)->exists() == true){
+        while (DB::table('users')->where('secret', $token)->exists() == true) {
             $token = str_random(64);
         }
         $id = DB::table('users')->insertGetId([
@@ -93,6 +97,7 @@ class UserController extends Controller
             'secret' => $token
         ];
     }
+
     /**
      * @api {post} /api/index Home Page
      * @apiName HomePage
@@ -104,9 +109,11 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public static function index(){
+    public static function index()
+    {
         return ImageController::get();
     }
+
     /**
      * @api {post} /api/user/preferences Preferences Update
      * @apiName UserPreferences
@@ -119,11 +126,12 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function preferences(){
-        DB::table('standart_users')->where('user_id',request('userId'))->update([
-           'body_type' => request('body_type'),
-           'body_style' => request('body_style'),
-           'is_completed' => 1
+    public function preferences()
+    {
+        DB::table('standart_users')->where('user_id', request('userId'))->update([
+            'body_type' => request('body_type'),
+            'body_style' => request('body_style'),
+            'is_completed' => 1
         ]);
         return [
             'success' => [
@@ -132,6 +140,7 @@ class UserController extends Controller
             ],
         ];
     }
+
     /**
      * @api {post} /api/logout Logout User
      * @apiName LogoutUser
@@ -142,9 +151,10 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function logout(){
-        DB::table('users')->where('id',request('userId'))->update([
-           'secret' => null
+    public function logout()
+    {
+        DB::table('users')->where('id', request('userId'))->update([
+            'secret' => null
         ]);
         return [
             'success' => [
@@ -153,6 +163,7 @@ class UserController extends Controller
             ],
         ];
     }
+
     /**
      * @api {post} /api/user/password Change Password
      * @apiName ChangePassword
@@ -166,11 +177,12 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function password(){
+    public function password()
+    {
         $old = request('old-password');
         $new = request('new-password');
         $new2 = request('new-password2');
-        if(strcmp($new,$new2) != 0){
+        if (strcmp($new, $new2) != 0) {
             return [
                 'error' => [
                     "message" => 'Passwords not match.',
@@ -178,7 +190,7 @@ class UserController extends Controller
                 ]
             ];
         }
-        if(strcmp($old,$new) == 0){
+        if (strcmp($old, $new) == 0) {
             return [
                 'error' => [
                     "message" => 'Old and new passwords are same.',
@@ -186,9 +198,9 @@ class UserController extends Controller
                 ]
             ];
         }
-        $current = DB::table('users')->select('password')->where('id',request('userId'))->value('password');
-        $flag = Hash::check(request('old-password'),$current);
-        if($flag == false){
+        $current = DB::table('users')->select('password')->where('id', request('userId'))->value('password');
+        $flag = Hash::check(request('old-password'), $current);
+        if ($flag == false) {
             return [
                 'error' => [
                     "message" => 'Old password is wrong.',
@@ -196,26 +208,27 @@ class UserController extends Controller
                 ]
             ];
         }
-        DB::table('users')->where('id',request('userId'))->update([
+        DB::table('users')->where('id', request('userId'))->update([
             'password' => bcrypt(request('new-password'))
         ]);
         return [
-          'success' => [
-              "message" => 'Password changed.',
-              "code" => 5
-          ],
+            'success' => [
+                "message" => 'Password changed.',
+                "code" => 5
+            ],
         ];
     }
 
-    public static function settings(){
-        $isInstagram = DB::table('users')->select('isInstagram')->where('id',Auth::id())->value('isInstagram');
+    public static function settings()
+    {
+        $isInstagram = DB::table('users')->select('isInstagram')->where('id', Auth::id())->value('isInstagram');
         //If user doesn't have secret, create one.
-        if(DB::table('users')->select('secret')->where('id',Auth::id())->value('secret') == null){
+        if (DB::table('users')->select('secret')->where('id', Auth::id())->value('secret') == null) {
             $token = str_random(64);
-            while(DB::table('users')->where('secret',$token)->exists() == true){
+            while (DB::table('users')->where('secret', $token)->exists() == true) {
                 $token = str_random(64);
             }
-            DB::table('users')->where('id',Auth::id())->update([
+            DB::table('users')->where('id', Auth::id())->update([
                 'secret' => $token
             ]);
         }
@@ -227,6 +240,7 @@ class UserController extends Controller
             'instagram' => $isInstagram
         ];
     }
+
     /**
      * @api {post} /api/user/avatar Change Avatar
      * @apiName UpdateAvatar
@@ -239,20 +253,21 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public static function userAvatar($url = null){
+    public static function userAvatar($url = null)
+    {
         $avatarId = str_random(8);
-        while(DB::table('users')->where('avatar',$avatarId)->exists() == true){
+        while (DB::table('users')->where('avatar', $avatarId)->exists() == true) {
             $avatarId = str_random(8);
         }
-        if($url == null){
+        if ($url == null) {
             $image = Image::make(Input::file('photo'));
-        }else{
+        } else {
             $image = Image::make($url);
         }
 
-        $image->resize('150','150')->save(public_path('avatar') . DS . $avatarId . ".jpg");
-        DB::table('users')->where('id',request('userId'))->update([
-           'avatar' => $avatarId
+        $image->resize('150', '150')->save(public_path('avatar') . DS . $avatarId . ".jpg");
+        DB::table('users')->where('id', request('userId'))->update([
+            'avatar' => $avatarId
         ]);
         return [
             'success' => [
@@ -262,6 +277,7 @@ class UserController extends Controller
             'id' => $avatarId
         ];
     }
+
     /**
      * @api {post} /api/user/avatar/get Get Avatar
      * @apiName GetAvatar
@@ -273,8 +289,9 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function getAvatar(){
-        $avatarId = DB::table('users')->select('avatar')->where('id',request('userId'))->value('avatar');
+    public function getAvatar()
+    {
+        $avatarId = DB::table('users')->select('avatar')->where('id', request('userId'))->value('avatar');
         return [
             'success' => [
                 "message" => 'Avatar id retrieved.',
@@ -283,6 +300,7 @@ class UserController extends Controller
             'id' => $avatarId
         ];
     }
+
     /**
      * @api {post} /api/user/verify Verify Email
      * @apiName VerifyEmail
@@ -293,10 +311,11 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public static function verify(){
+    public static function verify()
+    {
         //First find id
-        $flag = DB::table('users')->where('verification',request('code'))->exists();
-        if($flag == false){
+        $flag = DB::table('users')->where('verification', request('code'))->exists();
+        if ($flag == false) {
             return [
                 'error' => [
                     "message" => 'Verification code is invalid.',
@@ -304,7 +323,7 @@ class UserController extends Controller
                 ]
             ];
         }
-        DB::table('users')->where('verification',request('code'))->update([
+        DB::table('users')->where('verification', request('code'))->update([
             'verification' => '1',
             'status' => 1
         ]);

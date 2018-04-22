@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
-    public static function index(){
-        $users = DB::table('users')->select('id','name','isInstagram','status')->get();
+    public static function index()
+    {
+        $users = DB::table('users')->select('id', 'name', 'isInstagram', 'status')->get();
         return [
             "users" => $users,
             'success' => [
@@ -20,9 +21,10 @@ class AdminController extends Controller
 
     }
 
-    public static function logs(){
+    public static function logs()
+    {
         return [
-          "logs" => DB::table('logs')->get(),
+            "logs" => DB::table('logs')->get(),
             'success' => [
                 "message" => 'Logs retrieved.',
                 "code" => 5
@@ -30,9 +32,10 @@ class AdminController extends Controller
         ];
     }
 
-    public static function updateStatus(){
-        DB::table('users')->where('id',request('id'))->update([
-            'status'=> request('status')
+    public static function updateStatus()
+    {
+        DB::table('users')->where('id', request('id'))->update([
+            'status' => request('status')
         ]);
         return [
             'success' => [

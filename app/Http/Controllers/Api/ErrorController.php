@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 
 class ErrorController extends Controller
 {
-    public function main(){
+    public function main()
+    {
         return [
             "codes" => [
                 1 => "Missing parameter(s)",

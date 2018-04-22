@@ -110,7 +110,7 @@ class ImageController extends Controller
      */
     public static function get()
     {
-        $images = \App\Image::where('userId',request('userId'))->get();
+        $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->get();
 //        $images = DB::table('images')->select('imageId')->where('userId', request('userId'))->get()->reverse()->toArray();
         return [
             'success' => [
@@ -132,7 +132,6 @@ class ImageController extends Controller
      * @apiSuccess {String} imageId Added Image Id
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
-
      */
     public function add()
     {
@@ -150,6 +149,7 @@ class ImageController extends Controller
         $mongoImage = new \App\Image();
         $mongoImage->imageId = $imageId;
         $mongoImage->userId = request('userId');
+        $mongoImage->enabled = true;
         $mongoImage->save();
 
         return [
@@ -178,7 +178,7 @@ class ImageController extends Controller
             $imageId = request('imageId');
             $userId = request('userId');
         }
-        $flag  = empty(\App\Image::where('imageId',$imageId)->get()->toArray());
+        $flag = empty(\App\Image::where('imageId', $imageId)->get()->toArray());
         if ($flag == true) {
             return [
                 'error' => [
@@ -187,7 +187,9 @@ class ImageController extends Controller
                 ]
             ];
         }
-        \App\Image::where('imageId',$imageId)->delete();
+        \App\Image::where('imageId', $imageId)->update([
+            'enabled' => false
+        ]);
         unlink(public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         unlink(public_path('thumb') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         return [

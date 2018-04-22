@@ -8,85 +8,108 @@ use Illuminate\Support\Facades\DB;
 
 class RoutingController extends Controller
 {
-    public function home(){
-      if(Auth::check()) {
-          if(\Auth::user()->isVerified()){
-              return redirect('/verify');
-          }
-          $response = Api\UserController::index();
-          return view('home', [
-              'images' => $response["images"]
-          ]);
-      }else{
-          return view('welcome');
-      }
+    public function home()
+    {
+        if (Auth::check()) {
+            if (\Auth::user()->isVerified()) {
+                return redirect('/verify');
+            }
+            $images = Api\RecommendationController::main();
+            $part1 = array();
+            $part2 = array();
+            $part3 = array();
+            foreach ($images as $image) {
+                if (isset($image['part1']))
+                    array_push($part1, array($image['part1']['color'], $image['part1']['label']));
+                if (isset($image['part2']))
+                    array_push($part2, array($image['part2']['color'], $image['part2']['label']));
+                if (isset($image['part3']))
+                    array_push($part3, array($image['part3']['color'], $image['part3']['label']));
+            }
+
+            return view('home', [
+                'part1' => $part1,
+                'part2' => $part2,
+                'part3' => $part3
+            ]);
+        } else {
+            return view('welcome');
+        }
     }
 
-    public function photos(){
-      $images = Api\ImageController::get();
-      return view('photos',[
-        'images' => $images["images"]
-      ]);
+    public function photos()
+    {
+        $images = Api\ImageController::get();
+        return view('photos', [
+            'images' => $images["images"]
+        ]);
     }
 
-    public function admin(){
-      $users = Api\AdminController::index();
-      return view('admin',[
-          'users' => $users
-      ]);
+    public function admin()
+    {
+        $users = Api\AdminController::index();
+        return view('admin', [
+            'users' => $users
+        ]);
     }
 
-    public function settings(){
+    public function settings()
+    {
         $result = Api\UserController::settings();
-      return view('settings',[
-          'instagram' => $result["instagram"],
-          'secret' => Auth::user()->getAttribute('secret')
-      ]);
+        return view('settings', [
+            'instagram' => $result["instagram"],
+            'secret' => Auth::user()->getAttribute('secret')
+        ]);
     }
 
-    public function instagram(){
+    public function instagram()
+    {
         $link = Api\InstagramController::instagramUrl();
         return redirect($link["url"]);
     }
 
-    public function updateInstagram(){
+    public function updateInstagram()
+    {
         $result = Api\InstagramController::get(Auth::user()->getAttribute('id'));
         return $result;
     }
 
-    public function verify(){
-        if(Auth::check() == true && !Auth::user()->isVerified()){
+    public function verify()
+    {
+        if (Auth::check() == true && !Auth::user()->isVerified()) {
             return redirect('/');
         }
-        if(request()->has('code')){
+        if (request()->has('code')) {
             $response = Api\UserController::verify();
-            if(array_key_exists('succcess',$response)){
+            if (array_key_exists('succcess', $response)) {
                 return redirect('/');
-            }else{
-                return view('verification',[
-                   'error' => $response["error"]["message"]
+            } else {
+                return view('verification', [
+                    'error' => $response["error"]["message"]
                 ]);
             }
-        }else{
+        } else {
             return view('verification');
         }
     }
 
-    public function product(){
+    public function product()
+    {
         $types = DB::connection('mysql_clothes')->table('type')->get()->toArray();
         $colors = DB::connection('mysql_clothes')->table('color')->get()->toArray();
         $brands = DB::connection('mysql_clothes')->table('brand')->get()->toArray();
-        return view('admin.product',[
+        return view('admin.product', [
             'types' => $types,
             'colors' => $colors,
             'brands' => $brands
         ]);
     }
 
-    public function color(){
+    public function color()
+    {
         $colors = [
-          'black' => 0,
-          'beige' => 16777215,
+            'black' => 0,
+            'beige' => 16777215,
             'blue' => 16777215,
 
         ];

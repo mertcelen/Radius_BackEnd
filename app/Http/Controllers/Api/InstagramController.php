@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CloudVision;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic as Image;
 use Ixudra\Curl\Facades\Curl;
@@ -16,12 +17,14 @@ class InstagramController extends Controller
      *
      * @apiSuccess {String} url Instagram url to oAuth.
      */
-    public static function instagramUrl(){
+    public static function instagramUrl()
+    {
         return [
             'url' => 'https://api.instagram.com/oauth/authorize/?client_id=' . env('INSTAGRAM_ID')
                 . '&redirect_uri=' . env('INSTAGRAM_URI') . '&response_type=code'
         ];
     }
+
     /**
      * @api {post} /api/instagram/oauth Register Instagram User
      * @apiName InstagramOauth
@@ -33,8 +36,9 @@ class InstagramController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function create(){
-        if(!request()->has('code') || request()->has('error')){
+    public function create()
+    {
+        if (!request()->has('code') || request()->has('error')) {
             return [
                 'error' => [
                     "message" => 'Missing parameter(s).',
@@ -42,12 +46,12 @@ class InstagramController extends Controller
                 ]
             ];
         }
-        $userId = \App\Http\Controllers\Auth\InstagramController::create(true,request('code'));
+        $userId = \App\Http\Controllers\Auth\InstagramController::create(true, request('code'));
         $token = str_random(64);
-        while(DB::table('users')->where('secret',$token)->exists() == true){
-           $token = str_random(64);
+        while (DB::table('users')->where('secret', $token)->exists() == true) {
+            $token = str_random(64);
         }
-        DB::table('users')->where('id',$userId)->update([
+        DB::table('users')->where('id', $userId)->update([
             'secret' => $token
         ]);
         return [
@@ -58,6 +62,7 @@ class InstagramController extends Controller
             'secret' => $token
         ];
     }
+
     /**
      * @api {post} /api/instagram/get Update Instagram Photos
      * @apiName InstagramUpdate
@@ -69,9 +74,10 @@ class InstagramController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public static function get(){
-        $userId = DB::table('users')->select('id')->where('secret',request('secret'))->value('id');
-        if(DB::table('users')->where('id',$userId)->select('isInstagram')->value('isInstagram') != 1){
+    public static function get()
+    {
+        $userId = DB::table('users')->select('id')->where('secret', request('secret'))->value('id');
+        if (DB::table('users')->where('id', $userId)->select('isInstagram')->value('isInstagram') != 1) {
             return [
                 'error' => [
                     "message" => 'User is not instagram user.',
@@ -80,9 +86,9 @@ class InstagramController extends Controller
             ];
         }
         $start = time();
-        $token = DB::table('instagram-users')->where('user_id',$userId)->value('access_token');
+        $token = DB::table('instagram-users')->where('user_id', $userId)->value('access_token');
         $rawData = Curl::to('https://api.instagram.com/v1/users/self/media/recent/?access_token=' . $token)->asJsonResponse()->get();
-        if($rawData->meta->code != 200){
+        if ($rawData->meta->code != 200) {
             return [
                 'error' => [
                     "message" => 'Instagram token expired, please login again.',
@@ -90,41 +96,29 @@ class InstagramController extends Controller
                 ]
             ];
         }
-        $data = array();
-        $count = 0;
-        for($i=0;$i < count($rawData->data);$i++){
-            $error = false;
-            try{
-                DB::table('images')->insert([
-                   "userId" => $userId,
-                   "imageId" =>  $rawData->data[$i]->id
-                ]);
-                $count++;
-            }catch (\Exception $e){
-                $error = true;
-            }
-            if(!$error || !file_exists(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg")){
+        for ($i = 0; $i < count($rawData->data); $i++) {
+            if (!empty(\App\Image::where('imageId', $rawData->data[$i]->id)->get()->toArray()))
+                continue;
+            $image = new \App\Image();
+            $image->userId = $userId;
+            $image->imageId = $rawData->data[$i]->id;
+            $image->enabled = true;
+            $image->save();
+            if (!file_exists(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg")) {
                 $image = Image::make($rawData->data[$i]->images->standard_resolution->url);
                 $image->save(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
-                $image->fit(170,170)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
+                $image->fit(600, 600)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
             }
-            array_push($data,[
-                'imageId' => $rawData->data[$i]->id,
-                'type' => 'jpg'
-            ]);
+            for ($i = 1; $i <= 3; $i++) {
+                $job = (new CloudVision($userId, $rawData->data[$i]->id, (String)$i));
+                dispatch($job);
+            }
         };
         $end = time();
         return [
             'success' => [
-                "message" => 'new images retrieved.',
+                "message" => 'New images retrieved.',
                 "code" => 5
-            ],
-            'instagram' => 1,
-            'images' => $data,
-            'updated' => $count,
-            'times' => [
-                'start_time' => $start,
-                'end_time' => $end
             ]
         ];
     }

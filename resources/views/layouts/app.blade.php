@@ -13,6 +13,7 @@
             integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
             crossorigin="anonymous"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript"
@@ -30,7 +31,6 @@
                 OneSignal.push(function () {
                     OneSignal.init({
                         appId: "fc2ccdef-7148-462d-9e58-238a96c100e0",
-
                         autoRegister: false
                     });
                 });

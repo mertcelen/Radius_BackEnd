@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Vision\Vision;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -22,12 +23,12 @@ class VisionController extends Controller
      */
     public function detect()
     {
-        $images = DB::table('images')->where('userId', request('userId'))->select('imageId')->get()->toArray();
+        $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->get();
         foreach ($images as $image) {
-//            for ($i = 1; $i <= 3; $i++) {
-                $job = (new CloudVision(request('userId'), $image->imageId, (String)1));
+            for ($i = 1; $i <= 3; $i++) {
+                $job = (new CloudVision(request('userId'), $image->imageId, (String)$i));
                 dispatch($job);
-//            }
+            }
         }
         return [
             'success' => [
@@ -39,65 +40,30 @@ class VisionController extends Controller
 
     public static function magic($imageId, $part, $userId)
     {
-        $startTime = VisionController::getTime();
         $imagePath = public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg";
         if (!file_exists($imagePath)) {
-            return response()->json([
-                "error" => [
-                    "message" => "Image not found",
-                    "code" => 3
-                ]
-            ]);
+            return 0;
         }
-        //Retrieving image details from the database.
-//        $result = DB::table('images')->select(['red' . $part . " AS red", 'green' . $part . " AS green", 'blue' . $part
-//            . " AS blue", 'labels' . $part . " AS labels", 'time' . $part . " AS time"])->where('imageId', $imageId)
-//            ->where('isValid', true)->first();
-//        // To specifically check if that part is checked before or not.
-//        if (!empty($result) && $result->red != null) {
-//            return [
-//                'success' => [
-//                    "message" => 'Image analyzed.',
-//                    "code" => 5
-//                ],
-//                "labels" => $result->labels,
-//                "colors" => "rgb($result->red, $result->green, $result->blue)",
-//                "time" => $result->time
-//            ];
-//        }
-
+        if (\App\Image::where('imageId', $imageId)->first()->enabled == false) {
+            return 0;
+        }
+        if (!empty(\App\Image::where('imageId', $imageId)->where('part' . $part, 'exists', true)->get()->toArray())) {
+            return 1;
+        }
         $vertexes = VisionController::detectFace($imagePath, $imageId, $userId);
         if ($vertexes == null) {
             return 0;
         }
         list($startX, $startY, $width, $height) = VisionController::calculate($vertexes, $imagePath, $part);
         list($labels, $red, $green, $blue) = VisionController::detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId);
-        $seconds = (VisionController::getTime() - $startTime) / 1000;
-        //Now that we have everything, we can update the image data in the database.
-        $color = VisionController::rgbToText(array($red,$green,$blue));
-//        $image = \App\Image::where('imageId',$imageId)->get();
-        $image = \App\Image::find('5ad85f9d98992e1c82503602');
-        $image->isValid = true;
-        $image->color = $color;
-        $image->labels = implode(',', $labels);
-        $image->save();
-//        DB::table('images')->where('imageId', $imageId)->update([
-//            'isValid' => true,
-//            'red' . $part => $red,
-//            'green' . $part => $green,
-//            'blue' . $part => $blue,
-//            'labels' . $part => implode(',', $labels),
-//            'time' . $part => $seconds
-//        ]);
-        return [
-            'success' => [
-                "message" => 'Image analyzed.',
-                "code" => 5
-            ],
-            "labels" => $labels,
-            "color" => $color,
-            "time" => $seconds
-        ];
+        $color = VisionController::rgbToText(array($red, $green, $blue));
+        \App\Image::where('imageId', $imageId)->update([
+            'part' . $part => [
+                'color' => $color,
+                'label' => implode(',', $labels)
+            ]
+        ]);
+        return 1;
     }
 
     private static function detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId)
@@ -184,19 +150,13 @@ class VisionController extends Controller
         $response = $vision->request(new \Vision\Request\Image\LocalImage($imagePath));
         $faces = $response->getFaceAnnotations();
         if (empty($faces) || count($faces) != 1) {
-            ImageController::remove($imageId, $userId);
+            \App\Image::where('imageId', $imageId)->update([
+                'enabled' => false
+            ]);
             return null;
         }
-        DB::table('images')->select('imageId', $imageId)->update([
-            'isValid' => 1
-        ]);
-        return $faces[0]->getBoundingPoly()->getVertices();
-    }
 
-    private static function getTime()
-    {
-        list($usec, $sec) = explode(" ", microtime());
-        return round(((float)$usec + (float)$sec) * 1000);
+        return $faces[0]->getBoundingPoly()->getVertices();
     }
 
     private static function rgbToText($color)

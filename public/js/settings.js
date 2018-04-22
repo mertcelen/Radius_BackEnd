@@ -53,7 +53,7 @@ function modal(title, json) {
         $(".modal-body").html(json.error.message);
     } else {
         $(".modal-title").html(title);
-        $(".modal-body").html(json.updated + " " + json.success.message);
+        $(".modal-body").html(json.success.message);
     }
 }
 

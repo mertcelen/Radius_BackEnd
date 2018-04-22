@@ -18,7 +18,7 @@
             <select id="colorSelect" class="mdb-select" style="margin-bottom:10px">
                 <option value="" disabled selected>Choose color</option>
                 @foreach($colors as $color)
-                    <option value="{{$color->color}}">{{$color->color}}</option>
+                    <option value="{{$color->name}}">{{$color->name}}</option>
                 @endforeach
             </select>
         </div>

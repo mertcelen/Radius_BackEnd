@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CloudVision;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -127,7 +128,7 @@ class ImageController extends Controller
      * @apiGroup Images
      *
      * @apiParam {String} secret User' secret key.
-     * @apiParam {File} photo Photo of the User.
+     * @apiParam {File} photo Image of the User.
      *
      * @apiSuccess {String} imageId Added Image Id
      * @apiSuccess {Array} success Success response with message and code.
@@ -151,7 +152,10 @@ class ImageController extends Controller
         $mongoImage->userId = request('userId');
         $mongoImage->enabled = true;
         $mongoImage->save();
-
+        for ($i = 1; $i <= 3; $i++) {
+            $job = (new CloudVision(request('userId'), $imageId, (String)$i));
+            dispatch($job);
+        }
         return [
             'success' => [
                 "message" => 'Images added.',

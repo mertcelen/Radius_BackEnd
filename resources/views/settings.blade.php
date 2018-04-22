@@ -33,12 +33,6 @@
     @endif
     <div class="card float-left" style="width: 18rem;">
         <div class="card-body">
-            <h3 class="card-title">Cloth Detection</h3>
-            <button class="btn btn-custom btn-block" onclick="magic('{{Auth::user()->secret}}')">Request Detection</button>
-        </div>
-    </div>
-    <div class="card float-left" style="width: 18rem;">
-        <div class="card-body">
             <h3 class="card-title">Profile Photo</h3>
             <form id="uploadPhoto" action="/user/avatar" class="dropzone btn btn-custom">
                 <div class="fallback">

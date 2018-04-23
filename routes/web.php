@@ -27,4 +27,4 @@ Route::group(['middleware' => ['auth', 'session', 'admin']], function () {
 Route::get('/login/instagram', 'RoutingController@instagram');
 Route::get('/login/oauth', 'Auth\InstagramController@create')->middleware('parameters:code');
 
-Route::get('deneme','MongoController@main');
+Route::get('faagram','Faagram\AssociateController@init');

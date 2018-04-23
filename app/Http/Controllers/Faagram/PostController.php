@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Faagram;
 
-use App\FaagramPost;
+use App\Post;
 use App\Http\Controllers\Controller;
 
 class PostController extends Controller
@@ -21,11 +21,7 @@ class PostController extends Controller
      */
     public function add()
     {
-        $post = new FaagramPost();
-        $post->color = request('color');
-        $post->label = request('label');
-        $post->userId = request('id');
-        $post->save();
+        $post = new Post(request('id'));
         return [
             'success' => [
                 "message" => 'Post added.',
@@ -47,7 +43,7 @@ class PostController extends Controller
      */
     public function get()
     {
-        $posts = FaagramPost::where('userId', request('userId'));
+        $posts = Post::where('userId', request('userId'));
         return [
             'success' => [
                 "message" => 'Posts retrieved.',
@@ -69,7 +65,7 @@ class PostController extends Controller
      */
     public function remove()
     {
-        FaagramPost::find(request('id'))->delete();
+        Post::find(request('id'))->delete();
         return [
             'success' => [
                 "message" => 'Post removed.',

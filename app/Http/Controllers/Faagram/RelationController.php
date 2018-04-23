@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Faagram;
 
-use App\FaagramRelation;
+use App\Relation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -20,7 +20,7 @@ class RelationController extends Controller
      * @apiError   {Array} error Error response with message and code.
      */
     public function add(){
-        $relation = new FaagramRelation();
+        $relation = new Relation();
         $relation->follower = request('follower');
         $relation->following = request('following');
         $relation->save();
@@ -42,7 +42,7 @@ class RelationController extends Controller
      * @apiError   {Array} error Error response with message and code.
      */
     public function getFollowers(){
-        $followers = FaagramRelation::where('follower',request('userId'))->get();
+        $followers = Relation::where('follower',request('userId'))->get();
         return [
             'success' => [
                 "message" => 'Followers retrieved',
@@ -62,7 +62,7 @@ class RelationController extends Controller
      * @apiError   {Array} error Error response with message and code.
      */
     public function getFollowing(){
-        $following = FaagramRelation::where('following',request('userId'))->get();
+        $following = Relation::where('following',request('userId'))->get();
         return [
             'success' => [
                 "message" => 'Following retrieved',
@@ -82,7 +82,7 @@ class RelationController extends Controller
      * @apiError   {Array} error Error response with message and code.
      */
     public function remove(){
-        FaagramRelation::where('_id',request('id'))->delete();
+        Relation::where('_id',request('id'))->delete();
         return [
             'success' => [
                 "message" => 'Relation removed',

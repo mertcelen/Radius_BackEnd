@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Faagram;
 
-use App\FaagramUser;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -21,7 +21,7 @@ class UserController extends Controller
      */
     public function add()
     {
-        $user = FaagramUser::add(request('name'));
+        $user = User::add(request('name'));
         return [
             'success' => [
                 "message" => 'New user added.',
@@ -44,7 +44,7 @@ class UserController extends Controller
      */
     public function get()
     {
-        $user = FaagramUser::where('name', request('name'));
+        $user = User::where('name', request('name'));
         return [
             'success' => [
                 "message" => 'User retrieved.',
@@ -65,7 +65,7 @@ class UserController extends Controller
      */
     public function remove()
     {
-        FaagramUser::where('name', request('name'))->delete();
+        User::where('name', request('name'))->delete();
         return [
             'success' => [
                 "message" => 'User deleted.',

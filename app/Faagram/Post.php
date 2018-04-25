@@ -20,11 +20,15 @@ class Post extends Eloquent
         Post::$types = $types;
     }
 
-    public static function add($id){
+    public static function add($userId)
+    {
         $post = new self();
-        $post->id = $id;
-        $post->label = array_random(Post::$types,1)[0]->name;
-        $post->color = array_random(Post::$colors,1)[0]->name;
+        $post->userId = $userId;
+        $post->label = array_random(Post::$types, 1)[0]->name;
+        $post->color = array_random(Post::$colors, 1)[0]->name;
+        $post->likes = array();
+        $post->like_count = 0;
         $post->save();
+        return $post;
     }
 }

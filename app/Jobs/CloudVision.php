@@ -16,16 +16,18 @@ class CloudVision implements ShouldQueue
     protected $userId;
     protected $imageId;
     protected $part;
+    protected $faagramId;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($userId,$imageId,$part)
+    public function __construct($userId,$imageId,$part,$faagramId)
     {
         $this->userId= $userId;
         $this->imageId = $imageId;
         $this->part = $part;
+        $this->faagramId = $faagramId;
     }
 
     /**
@@ -35,6 +37,6 @@ class CloudVision implements ShouldQueue
      */
     public function handle()
     {
-            VisionController::magic((string)$this->imageId,$this->part,$this->userId);
+            VisionController::magic((string)$this->imageId,$this->part,$this->userId,$this->faagramId);
     }
 }

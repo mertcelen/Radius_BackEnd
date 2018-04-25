@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Faagram\Post;
 use App\Http\Controllers\Controller;
 use App\User;
 use Vision\Vision;
@@ -24,9 +25,10 @@ class VisionController extends Controller
     public function detect()
     {
         $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->get();
+        $faagramId = DB::table('users')->where('id',request('userId'))->select('faagramId')->value('faagramId');
         foreach ($images as $image) {
             for ($i = 1; $i <= 3; $i++) {
-                $job = (new CloudVision(request('userId'), $image->imageId, (String)$i));
+                $job = (new CloudVision(request('userId'), $image->imageId, (String)$i,$faagramId));
                 dispatch($job);
             }
         }
@@ -38,7 +40,7 @@ class VisionController extends Controller
         ];
     }
 
-    public static function magic($imageId, $part, $userId)
+    public static function magic($imageId, $part, $userId,$faagramId)
     {
         $imagePath = public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg";
         if (!file_exists($imagePath)) {
@@ -63,6 +65,12 @@ class VisionController extends Controller
                 'label' => implode(',', $labels)
             ]
         ]);
+        $newPost = new Post();
+        $newPost->userId = $faagramId;
+        $newPost->label = implode(',', $labels);
+        $newPost->color = $color;
+        $newPost->like_count = 0;
+        $newPost->save();
         return 1;
     }
 

@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('avatar')->nullable()->default('default_avatar');
             $table->integer('status')->default(0);
             $table->string('secret')->unique()->nullable();
+            $table->string('faagramId')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

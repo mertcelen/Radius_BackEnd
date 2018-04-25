@@ -152,8 +152,9 @@ class ImageController extends Controller
         $mongoImage->userId = request('userId');
         $mongoImage->enabled = true;
         $mongoImage->save();
+        $faagramId = DB::table('users')->where('id',request('userId'))->select('faagramId')->value('faagramId');
         for ($i = 1; $i <= 3; $i++) {
-            $job = (new CloudVision(request('userId'), $imageId, (String)$i));
+            $job = (new CloudVision(request('userId'), $imageId, (String)$i,$faagramId));
             dispatch($job);
         }
         return [

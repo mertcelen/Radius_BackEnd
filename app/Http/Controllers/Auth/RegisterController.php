@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Faagram\AssociateController;
 use App\Jobs\SendVerification;
 use App\User;
 use App\Http\Controllers\Controller;
@@ -84,7 +85,7 @@ class RegisterController extends Controller
         DB::table('standart_users')->insert([
             'user_id' => $id
         ]);
-
+        AssociateController::real($id);
         //Send Verification Email
         $email = new SendVerification($user->email,$verification);
         $this->dispatch($email);

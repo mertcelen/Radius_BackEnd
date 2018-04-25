@@ -10,29 +10,12 @@ class RoutingController extends Controller
 {
     public function home()
     {
-        if (Auth::check()) {
-            if (\Auth::user()->isVerified()) {
-                return redirect('/verify');
-            }
-            $images = Api\RecommendationController::main();
-            $part1 = array();
-            $part2 = array();
-            $part3 = array();
-            foreach ($images as $image) {
-                if (isset($image['part1']))
-                    array_push($part1, array($image['part1']['color'], $image['part1']['label']));
-                if (isset($image['part2']))
-                    array_push($part2, array($image['part2']['color'], $image['part2']['label']));
-                if (isset($image['part3']))
-                    array_push($part3, array($image['part3']['color'], $image['part3']['label']));
-            }
-
-            return view('home', [
-                'part1' => $part1,
-                'part2' => $part2,
-                'part3' => $part3
+        if(Auth::check()){
+            $result = Api\RecommendationController::main(Auth::id());
+            return view('home',[
+                'recommendations' => $result
             ]);
-        } else {
+        }else{
             return view('welcome');
         }
     }

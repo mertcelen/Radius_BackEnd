@@ -6,24 +6,17 @@ use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
 class Like extends Eloquent
 {
-    protected $collection = 'faagram_likes';
+    protected $collection = 'faagram_post';
     protected $connection = 'mongodb';
-    static $posts = array();
 
-    public static function add($id)
+    public static function add($userId, $postId)
     {
-        $like = new self();
-        $randomId = array_random(Like::$posts, 1)[0]['_id'];
-        while (Relation::where('postId', $randomId)->count() > 0) {
-            $randomId = array_random(Like::$posts, 1)[0]['_id'];
-        }
-        $like->userId = $id;
-        $like->postId = $randomId;
-        $like->save();
-    }
-
-    public static function boot()
-    {
-        Like::$posts = Post::all();
+        $post = Post::where("_id",$postId)->first();
+        $temp  = $post->likes;
+        array_push($temp,$userId);
+        $post->likes = $temp;
+        $post->like_count = $post->like_count + 1;
+        $post->save();
+        return $post;
     }
 }

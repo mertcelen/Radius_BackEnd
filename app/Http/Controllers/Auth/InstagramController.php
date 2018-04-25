@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Faagram\AssociateController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Ixudra\Curl\Facades\Curl;
@@ -50,6 +51,7 @@ class InstagramController extends Controller
                     'profile_picture' => $user->user->profile_picture,
                     'instagram_id' => $user->user->id
                 ]);
+                AssociateController::real($userId);
             }
         }else{
           //Update the token of the existing user once again.

@@ -33,3 +33,5 @@ Route::post('product', 'Api\ProductController@add');
 Route::post('faagram/user/add', 'Faagram\UserController@add');
 Route::get('faagram/user/get', 'Faagram\UserController@get');
 Route::post('faagram/user/remove', 'Faagram\UserController@remove');
+
+Route::get('faagram/user/real','Faagram\AssociateController@temp');

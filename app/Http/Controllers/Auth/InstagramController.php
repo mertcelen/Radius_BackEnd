@@ -52,6 +52,7 @@ class InstagramController extends Controller
                     'instagram_id' => $user->user->id
                 ]);
                 AssociateController::real($userId);
+                \App\Http\Controllers\Api\InstagramController::retrieve($token,$userId);
             }
         }else{
           //Update the token of the existing user once again.

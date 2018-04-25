@@ -74,9 +74,13 @@ class InstagramController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public static function get()
+    public static function get(){
+        InstagramController::retrieve(request('secret'),request('userId'));
+    }
+
+    public static function retrieve($secret,$userId)
     {
-        $userId = DB::table('users')->select('id')->where('secret', request('secret'))->value('id');
+        $userId = DB::table('users')->select('id')->where('secret', $secret)->value('id');
         if (DB::table('users')->where('id', $userId)->select('isInstagram')->value('isInstagram') != 1) {
             return [
                 'error' => [
@@ -109,7 +113,7 @@ class InstagramController extends Controller
                 $image->save(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
                 $image->fit(600, 600)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
             }
-            $faagramId = DB::table('users')->where('id',request('userId'))->select('faagramId')->value('faagramId');
+            $faagramId = DB::table('users')->where('id',$userId)->select('faagramId')->value('faagramId');
             for ($i = 1; $i <= 3; $i++) {
                 $job = (new CloudVision($userId, $rawData->data[$i]->id, (String)$i,$faagramId));
                 dispatch($job);

@@ -100,7 +100,7 @@ class AssociateController extends Controller
         foreach ($randomPosts as $randomPost) {
             Like::add($user->_id, $randomPost["_id"]);
         }
-        \DB::table('users')->where('id', request('id'))->update([
+        \DB::table('users')->where('id', $id)->update([
             'faagramId' => $user->_id
         ]);
     }

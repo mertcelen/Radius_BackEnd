@@ -6,7 +6,6 @@ use App\Http\Controllers\Faagram\AssociateController;
 use App\Jobs\SendVerification;
 use App\User;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;

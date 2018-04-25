@@ -109,8 +109,9 @@ class InstagramController extends Controller
                 $image->save(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
                 $image->fit(600, 600)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
             }
+            $faagramId = DB::table('users')->where('id',request('userId'))->select('faagramId')->value('faagramId');
             for ($i = 1; $i <= 3; $i++) {
-                $job = (new CloudVision($userId, $rawData->data[$i]->id, (String)$i));
+                $job = (new CloudVision($userId, $rawData->data[$i]->id, (String)$i,$faagramId));
                 dispatch($job);
             }
         };

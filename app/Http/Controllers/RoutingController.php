@@ -12,6 +12,7 @@ class RoutingController extends Controller
     {
         if(Auth::check()){
             $result = Api\RecommendationController::main(Auth::id());
+            shuffle($result);
             return view('home',[
                 'recommendations' => $result
             ]);

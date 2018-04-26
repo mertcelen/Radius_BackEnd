@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Faagram\Post;
 use App\Http\Controllers\Controller;
 use App\Jobs\CloudVision;
 use Illuminate\Support\Facades\DB;
@@ -195,6 +196,8 @@ class ImageController extends Controller
         \App\Image::where('imageId', $imageId)->update([
             'enabled' => false
         ]);
+        \App\Faagram\Post::where('imageId',$imageId)->delete();
+        Post::where('userId',$userId)->delete();
         unlink(public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         unlink(public_path('thumb') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         return [

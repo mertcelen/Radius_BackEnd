@@ -70,6 +70,7 @@ class VisionController extends Controller
         $newPost->label = implode(',', $labels);
         $newPost->color = $color;
         $newPost->like_count = 0;
+        $newPost->imageId = $imageId;
         $newPost->save();
         return 1;
     }

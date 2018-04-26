@@ -1,11 +1,11 @@
 function updatePassword(secret){
   var old = $("#oldPassword").val();
-  var updated = $("#newPassword").val();
-  var update2 = $("#newPassword2").val();
-  if(!old || !updated || !update2){
-      $(".passwordError").html('Please fill all blanks.').removeAttr('hidden');
-      return;
-  }
+    var updated = $("#newPassword").val();
+    var update2 = $("#newPassword2").val();
+    if(!old || !updated || !update2){
+        $(".passwordError").html('Please fill all blanks.').removeAttr('hidden');
+        return;
+    }
     $(".modal-title").html("Please Wait");
     var loading = $(".loading").html();
     $(".modal-body").html(loading);
@@ -30,7 +30,7 @@ function updatePassword(secret){
       }
   });
 }
-Dropzone.prototype.defaultOptions.dictDefaultMessage = "Drop files or click here to upload";
+Dropzone.prototype.defaultOptions.dictDefaultMessage = "Click here to upload";
 
 function retrieve(){
     $(".modal-title").html("Please Wait");
@@ -42,7 +42,7 @@ function retrieve(){
         url  : "/api/instagram/get",
         data : { "secret" : secret},
         success : function(data){
-            modal("Images Updated",data);
+            window.location.href = "/photos";
         }
     });
 }
@@ -81,6 +81,9 @@ Dropzone.options.uploadPhoto = {
     success : function(response){
         var avatarId = JSON.parse(response.xhr.response).id;
         $(".dz-message").html("Avatar updated.");
-        $(".avatarPhoto").html("<img src='/avatar/" + avatarId + ".jpg'/>");
+        setTimeout(function(){
+            $(".dz-message").html("Click here to upload.");
+        },1000);
+        $("#userAvatar").attr('src','/avatar/' + avatarId + '.jpg');
     }
 };

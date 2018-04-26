@@ -87,7 +87,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" onclick="event.preventDefault();
                                                  document.getElementById('logout-form').submit();">
-                                        <img src="/avatar/{{Auth::user()->avatar}}.jpg" width="30px" height="30px"/>
+                                        <img id="userAvatar" src="/avatar/{{Auth::user()->avatar}}.jpg" width="30px" height="30px"/>
                                         <b>Logout from {{Auth::user()->name}}</b>
                                     </a>
                                 </li>

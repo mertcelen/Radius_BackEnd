@@ -54,6 +54,7 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
+            'female' => 'required|string'
         ]);
     }
 
@@ -79,6 +80,7 @@ class RegisterController extends Controller
         $user->password = bcrypt($data['password']);
         $user->verification = $verification;
         $user->secret = $token;
+        $user->female = ($data['female'] == true ? 1 : 0) ;
         $user->save();
         $id = DB::table('users')->where('email',$user->email)->select('id')->value('id');
         DB::table('standart_users')->insert([

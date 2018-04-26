@@ -13,6 +13,9 @@ class Like extends Eloquent
     {
         $post = Post::where("_id",$postId)->first();
         $temp  = $post->likes;
+        if($temp == null){
+            $temp = array();
+        }
         array_push($temp,$userId);
         $post->likes = $temp;
         $post->like_count = $post->like_count + 1;

@@ -18,7 +18,8 @@
             <select id="colorSelect" class="mdb-select" style="margin-bottom:10px">
                 <option value="" disabled selected>Choose color</option>
                 @foreach($colors as $color)
-                    <option value="{{$color->name}}" style="background-color: {{$color->name}}">{{$color->name}}</option>
+                    <option value="{{$color->name}}"
+                            style="background-color: {{$color->name}}">{{$color->name}}</option>
                 @endforeach
             </select>
         </div>
@@ -28,6 +29,13 @@
                 @foreach($brands as $brand)
                     <option value="{{$brand->name}}">{{$brand->name}}</option>
                 @endforeach
+            </select>
+        </div>
+        <div class="btn-group" style="margin-bottom:10px">
+            <select id="genderSelect" class="mdb-select">
+                <option value="" disabled selected>Choose Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
             </select>
         </div>
         <div class="md-form">

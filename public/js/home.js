@@ -50,6 +50,7 @@ function registerUser() {
     var name = $("#registerName").val();
     var password = $("#registerPassword").val();
     var password2 = $("#registerPassword2").val();
+    var isFemale = $("#radio2").is(":checked");
     var oldHtml = $(".modal-body").html();
     var loading = $(".loading").html();
     $(".modal-body").html(loading);
@@ -59,7 +60,8 @@ function registerUser() {
             "email": email,
             "password": password,
             "password-confirm": password2,
-            "name": name
+            "name": name,
+            "female" : isFemale
         },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->integer('status')->default(0);
             $table->string('secret')->unique()->nullable();
             $table->string('faagramId')->nullable();
+            $table->boolean('female')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

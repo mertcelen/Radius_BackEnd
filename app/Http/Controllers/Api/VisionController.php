@@ -172,7 +172,6 @@ class VisionController extends Controller
     {
 
         $array['white'] = array(255, 255, 255);
-        $array['silver'] = array(191, 191, 191);
         $array['gray'] = array(127.5, 127.5, 127.5);
         $array['black'] = array(0, 0, 0);
         $array['red'] = array(255, 0, 0);
@@ -182,12 +181,11 @@ class VisionController extends Controller
         $array['lime'] = array(0, 255, 0);
         $array['green'] = array(0, 255, 0);
         $array['aqua'] = array(0, 255, 255);
-        $array['teal'] = array(0, 127.5, 127.5);
         $array['blue'] = array(0, 0, 255);
         $array['navy'] = array(0, 0, 127.5);
-        $array['fuchsia'] = array(255, 0, 255);
         $array['purple'] = array(127.5, 0, 127.5);
         $array['pink'] = array(255,192,203);
+        $array['beige'] = array (245, 245, 220);
 
         $deviation = PHP_INT_MAX;
         $colorName = '';

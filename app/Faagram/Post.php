@@ -26,6 +26,7 @@ class Post extends Eloquent
         $post->userId = $userId;
         $post->label = array_random(Post::$types, 1)[0]->name;
         $post->color = array_random(Post::$colors, 1)[0]->name;
+        $post->gender = $gender = Post::$types[array_search($post->label,array_column(Post::$types,'name'))]->gender;
         $post->likes = array();
         $post->like_count = 0;
         $post->save();

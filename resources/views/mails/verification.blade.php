@@ -7,12 +7,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Radius Email Verification </title>
 </head>
-<body style="background-color:#bc5100;color:white">
-<h1>Radius Email Verification</h1>
-Thanks for registering with us, please click the link below or copy the code below to confirm your email adress.<br><br>
-
-<h2>{{$code}}</h2>
-  <a href="https://radiusfashion.com/verify?code={{$code}}" style="color:white;text-decoration: none;"><div style="background-color:#f57f17;width:30%;height:50%;border-radius:5px;text-align:center;vertical-align: baseline;">
-  <h2>Click Here</h2></div></a>
+<body>
+<img src="https://radiusfashion.com/logo_radius.png" alt="Radius Fashion Logo" width="150px" height="150px"><br>
+<h1>Radius Email Verification</h1><br>
+Thanks for registering with us, please click the link below to confirm your email adress.<br><br>
+<span hidden>{{$code}}</span>
+<a href="https://radiusfashion.com/setup/email?code={{$code}}" style="color:white;text-decoration: none;line-height: 100px">
+    <div style="background-color:#f57f17;width:300px;height:100px;border-radius:5px;text-align:center">
+        <h2>Click Here</h2></div>
+</a>
 </body>
 </html>

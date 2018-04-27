@@ -25,16 +25,6 @@
     @auth
         @if(!Auth::user()->isVerified())
             <link rel="manifest" href="/manifest.json"/>
-            <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
-            <script>
-                var OneSignal = window.OneSignal || [];
-                OneSignal.push(function () {
-                    OneSignal.init({
-                        appId: "fc2ccdef-7148-462d-9e58-238a96c100e0",
-                        autoRegister: false
-                    });
-                });
-            </script>
             <header>
                 <nav class="navbar navbar-expand-lg navbar-custom">
                     <img src="logo_radius.png" alt="" width="35px" height="35px">
@@ -48,32 +38,57 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav mr-auto">
                             <li class="nav-item">
-                                <a class="nav-link" href="/">Recommendations<span class="sr-only"></span></a>
+                                <a class="nav-link" href="/home">Recommendations<span class="sr-only"></span></a>
                             </li>
                             @auth
                                 <li class="nav-item">
-                                    <a class="nav-link" href="photos">My Photos <span class="sr-only"></span></a>
+                                    <a class="nav-link" href="/photos">My Photos <span class="sr-only"></span></a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="settings">Settings<span class="sr-only"></span></a>
+                                    <a class="nav-link" href="/settings">Settings<span class="sr-only"></span></a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="privacy_policy.html" target="_blank">Privacy Policy<span class="sr-only"></span></a>
+                                    <a class="nav-link" href="/privacy_policy.html" target="_blank">Privacy Policy<span class="sr-only"></span></a>
                                 </li>
                                 @if(Auth::user()->isAdmin())
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="admin">Admin Panel<span class="sr-only"></span></a>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Admin
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="/admin/users">User Configuration</a>
+                                        </div>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="product">Add Product<span class="sr-only"></span></a>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Products
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="/product/list">Product List</a>
+                                            <a class="dropdown-item" href="/product/add">Add Product</a>
+                                        </div>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="phpmyadmin" target="_blank">phpMyAdmin<span
-                                                    class="sr-only"></span></a>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Faagram
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="/faagram/users">User List</a>
+                                            <a class="dropdown-item" href="/faagram/posts">Post List</a>
+                                            <a class="dropdown-item" href="/faagram/relations">Relation List</a>
+                                            <a class="dropdown-item disabled" href="/faagram/likes" disabled>Like List</a>
+                                        </div>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="https://mertcelen.github.io/PSA_ApiDoc/" target="_blank">ApiDoc<span
-                                                    class="sr-only"></span></a>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            System
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="/phpmyadmin" target="_blank">phpMyAdmin</a>
+                                            <a class="dropdown-item" href="https://mertcelen.github.io/PSA_ApiDoc" target="_blank">ApiDoc</a>
+                                            <a class="dropdown-item" href="/admin/logs">Logs</a>
+                                            <a class="dropdown-item" href="/admin/config">Configuration</a>
+                                        </div>
                                     </li>
                                 @endif
                             @endauth

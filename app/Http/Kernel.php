@@ -60,6 +60,6 @@ class Kernel extends HttpKernel
         'parameters' => \App\Http\Middleware\Parameters::class,
         'admin' => \App\Http\Middleware\Admin::class,
         'session' => \App\Http\Middleware\SessionToToken::class,
-        'verification' => \App\Http\Middleware\Verification::class
+        'setup' => \App\Http\Middleware\Setup::class
     ];
 }

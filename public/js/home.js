@@ -67,9 +67,7 @@ function registerUser() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function () {
-            var verify = $(".verify").html();
-            $(".modal-body").html(verify);
-            $("#verificationEmail").html(email);
+            $(".modal-body").html("Registration email sent, please check " + email + " to complete registration.");
         },
         error: function (request) {
             $(".modal-body").html(oldHtml);
@@ -80,27 +78,6 @@ function registerUser() {
             ;
             $("#registerEmail").val(email);
             $("#registerName").val(name);
-        }
-    });
-}
-
-function verifyEmail() {
-    var code = $("#verifyCode").val();
-    if (!code) {
-        $(".verifyError").html('Code cannot empty.').removeAttr('hidden');
-        return;
-    }
-    $.get({
-        url: '/api/verify',
-        data: {
-            'code': code
-        },
-        success: function (data) {
-            if(data.success){
-                window.location.replace('/');
-            }else{
-                $(".verifyError").html(data.error.message).removeAttr('hidden');
-            }
         }
     });
 }

@@ -10,7 +10,7 @@ class AdminController extends Controller
 {
     public static function index()
     {
-        $users = DB::table('users')->select('id', 'name', 'isInstagram', 'status')->get();
+        $users = DB::table('users')->get();
         return [
             "users" => $users,
             'success' => [

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -153,8 +154,12 @@ class UserController extends Controller
      */
     public function logout()
     {
+        $token = str_random(64);
+        while (DB::table('users')->where('secret', $token)->exists() == true) {
+            $token = str_random(64);
+        }
         DB::table('users')->where('id', request('userId'))->update([
-            'secret' => null
+            'secret' => $token
         ]);
         return [
             'success' => [
@@ -306,32 +311,80 @@ class UserController extends Controller
      * @apiName VerifyEmail
      * @apiGroup User
      *
-     * @apiParam {String} code Verification Email
+     * @apiParam {String} code Setup Email
      *
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
     public static function verify()
     {
-        //First find id
-        $flag = DB::table('users')->where('verification', request('code'))->exists();
-        if ($flag == false) {
+        $user = \App\User::where('verification',request('code'))->first();
+        if($user == null){
             return [
                 'error' => [
-                    "message" => 'Verification code is invalid.',
+                    "message" => 'Setup code is invalid.',
                     "code" => 4
                 ]
             ];
         }
-        DB::table('users')->where('verification', request('code'))->update([
-            'verification' => '1',
-            'status' => 1
-        ]);
+        $user->verification = 1;
+        $user->status = 1;
+        $user->save();
         return [
             'success' => [
                 "message" => 'Email successfully verified.',
                 "code" => 5
+            ],
+            'userId' => $user->id
+        ];
+    }
+    /**
+     * @api {post} /api/user/values Recommendation Preferences
+     * @apiName UpdateRecommendationPreferences
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {String} first User' Post Preference
+     * @apiParam {String} second User' Like Preference
+     * @apiParam {String} third User' Following Preference
+     *
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public function values(){
+        $user = User::find(request('userId'))->first();
+        $user->values = implode(',',[request('first'),request('second'),request('third')]);
+        $user->save();
+        return [
+            'success' => [
+                "message" => 'User preferences updated.',
+                "code" => 5
             ]
         ];
     }
+
+    /**
+     * @api {get} /api/user/values Recommendation Preferences
+     * @apiName GetRecommendationPreferences
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     *
+     * @apiSuccess {Array} values User' Recommendation Preferences.
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public function getValues(){
+        $user = User::find(request('userId'))->first();
+        $values = explode(',',$user->values);
+        return [
+            'success' => [
+                "message" => 'User preferences updated.',
+                "code" => 5
+            ],
+            'values' => $values
+        ];
+    }
+
 }

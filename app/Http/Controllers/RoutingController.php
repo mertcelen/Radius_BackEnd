@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Api\UserController;
+use App\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -10,13 +10,20 @@ class RoutingController extends Controller
 {
     public function home()
     {
-        if(Auth::check()){
-            $result = Api\RecommendationController::main(Auth::id());
+        $result = Api\RecommendationController::main(Auth::id());
+        if ($result != null) {
             shuffle($result);
-            return view('home',[
-                'recommendations' => $result
-            ]);
-        }else{
+        }
+        return view('home', [
+            'recommendations' => $result
+        ]);
+    }
+
+    public function welcome()
+    {
+        if (Auth::check()) {
+            return redirect('/home');
+        } else {
             return view('welcome');
         }
     }
@@ -32,7 +39,7 @@ class RoutingController extends Controller
     public function admin()
     {
         $users = Api\AdminController::index();
-        return view('admin', [
+        return view('admin.users', [
             'users' => $users
         ]);
     }
@@ -40,9 +47,13 @@ class RoutingController extends Controller
     public function settings()
     {
         $result = Api\UserController::settings();
+        $array = explode(',', Auth::user()->values);
         return view('settings', [
             'instagram' => $result["instagram"],
-            'secret' => Auth::user()->getAttribute('secret')
+            'secret' => Auth::user()->getAttribute('secret'),
+            'first' => (Integer)$array[0],
+            'second' => (Integer)$array[1],
+            'third' => (Integer)$array[2]
         ]);
     }
 
@@ -54,49 +65,64 @@ class RoutingController extends Controller
 
     public function updateInstagram()
     {
-        $result = Api\InstagramController::get(Auth::user()->getAttribute('id'));
+        $result = Api\InstagramController::get();
         return $result;
     }
 
     public function verify()
     {
-        if (Auth::check() == true && !Auth::user()->isVerified()) {
-            return redirect('/');
-        }
         if (request()->has('code')) {
             $response = Api\UserController::verify();
-            if (array_key_exists('succcess', $response)) {
-                return redirect('/');
-            } else {
-                return view('verification', [
-                    'error' => $response["error"]["message"]
-                ]);
+            if (array_key_exists('success', $response)) {
+                Auth::loginUsingId($response["userId"]);
+                return redirect('/home');
             }
-        } else {
-            return view('verification');
         }
+        return redirect('/');
     }
 
-    public function product()
+    public function productAdd()
     {
         $types = DB::connection('mysql_clothes')->table('type')->get()->toArray();
         $colors = DB::connection('mysql_clothes')->table('color')->get()->toArray();
         $brands = DB::connection('mysql_clothes')->table('brand')->get()->toArray();
-        return view('admin.product', [
+        return view('products.add', [
             'types' => $types,
             'colors' => $colors,
             'brands' => $brands
         ]);
     }
 
-    public function color()
+    public function productList()
     {
-        $colors = [
-            'black' => 0,
-            'beige' => 16777215,
-            'blue' => 16777215,
-
-        ];
-        return view('color');
+        $products = Product::paginate(20);
+        return view('products.list', [
+            "products" => $products
+        ]);
     }
+
+    public function faagramUsers()
+    {
+        $users = \App\Faagram\User::paginate(20);
+        return view('faagram.user', [
+            "users" => $users
+        ]);
+    }
+
+    public function faagramPosts()
+    {
+        $posts = \App\Faagram\Post::paginate(20);
+        return view('faagram.post', [
+            "posts" => $posts
+        ]);
+    }
+
+    public function faagramRelations()
+    {
+        $relations = \App\Faagram\Relation::paginate(20);
+        return view('faagram.relation', [
+            "relations" => $relations
+        ]);
+    }
+
 }

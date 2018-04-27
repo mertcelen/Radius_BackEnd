@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('content')
+    <script>
+        var secret = "{{Auth::user()->secret}}";
+    </script>
     <!-- View Specific Imports -->
     <script type="text/javascript" src="/js/libraries/dropzone.js"></script>
     <script type="text/javascript" src="/js/photos.js"></script>
@@ -11,12 +14,9 @@
         </div>
     </form>
     <div class="photos">
-        @foreach($images as $image)
-            <div class="photoWrapper">
-                <img id="{{$image->imageId}}" src="/thumb/{{$image->imageId}}.jpg" class="photo float-left"
-                     onclick="preview('{{$image->imageId}}')" data-toggle="tooltip" data-placement="top" title="Click here to see details"/>
-            </div>
-        @endforeach
+        <script>
+            update();
+        </script>
     </div>
     <div id="popup">
         <!-- Modal -->
@@ -32,12 +32,12 @@
                     </div>
                     <div class="modal-body">
                         <center>
-                            <img id="bigImage" alt="" style="border:3px solid #bc5100">
+                            <img id="bigImage" alt="">
                         </center>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-custom" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-danger" id="removeButton">Remove Image</button>
+                        <button type="button" class="btn btn-custom2" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-custom" id="removeButton">Remove Image</button>
                         {{--<button type="button" class="btn btn-success">Promote Image</button>--}}
                     </div>
                 </div>

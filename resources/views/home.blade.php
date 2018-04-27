@@ -5,7 +5,7 @@
 
         @isset($recommendations)
             <table class="table">
-                <thead class="thead-dark">
+                <thead class="thead">
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Product Name</th>

@@ -6,6 +6,7 @@
         <div class="container my-auto">
             <div class="row">
                 <div class="col-lg-10 mx-auto">
+                    <img src="/logo_radius.png" alt="">
                     <h1 class="text-uppercase">
                         <strong>Radius</strong>
                     </h1>
@@ -22,5 +23,4 @@
     @include('layouts.auth')
     @include('auth.login')
     @include('auth.register')
-    @include('auth.verify')
 @endsection

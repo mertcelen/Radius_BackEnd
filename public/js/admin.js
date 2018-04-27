@@ -13,7 +13,8 @@ function addProduct() {
             'color': color,
             'link': link,
             'image': image,
-            'gender': gender
+            'gender': gender,
+            'secret' : secret
         },
         success: function (data) {
             if (data.success) {

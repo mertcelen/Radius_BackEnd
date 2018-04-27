@@ -1,4 +1,5 @@
 var enabled = false;
+var currentImages = [];
 Dropzone.options.uploadPhoto = {
     paramName: "photo",
     thumbnail: null,
@@ -37,7 +38,33 @@ function remove(imageId) {
             } else {
                 $("#previewImage").modal('hide');
                 $("#" + imageId).fadeOut();
+                update();
             }
         }
     });
 }
+function update(){
+    $.post({
+        url: "/api/images/get",
+        data: {
+            "secret": secret
+        },
+        success: function (json) {
+            if(json.success && json.images !== currentImages || currentImages == null){
+                currentImages = json.images;
+                $(".photos").html("");
+                $.each(currentImages,function(key,value){
+                    value = value.imageId;
+                    console.log(value);
+                    var removeFunction = "preview(\'" +  value + "\')";
+                    $(".photos").prepend("<div class='photoWrapper'><img src='/thumb/" +
+                        value + ".jpg' class='photo float-left' onclick=\"" + removeFunction + "\"/></div>")
+                });
+            }
+        }
+    });
+}
+
+setInterval(function(){
+    update();
+},5000);

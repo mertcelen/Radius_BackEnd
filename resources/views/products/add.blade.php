@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+    <script>
+        var secret = "{{Auth::user()->secret}}";
+    </script>
     <script src="{{asset('js/admin.js')}}"></script>
     <div class="container" style="background: white;padding:30px;border-radius: 30px;">
         <h2>Add Product to Database</h2>

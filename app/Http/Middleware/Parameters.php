@@ -23,7 +23,8 @@ class Parameters
                     "error" => [
                         "message" => "Missing parameter(s)",
                         "code" => 1
-                    ]
+                    ],
+                    "missing" => $parameter
                 ]);
             }
         }

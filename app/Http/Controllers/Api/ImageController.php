@@ -112,8 +112,7 @@ class ImageController extends Controller
      */
     public static function get()
     {
-        $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->get();
-//        $images = DB::table('images')->select('imageId')->where('userId', request('userId'))->get()->reverse()->toArray();
+        $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->select('imageId')->get()->reverse();
         return [
             'success' => [
                 "message" => 'Images retrieved.',

@@ -6,6 +6,8 @@ use App\Http\Controllers\Faagram\AssociateController;
 use App\Jobs\SendVerification;
 use App\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -45,7 +47,7 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param  array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
@@ -61,18 +63,18 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
+     * @param  array $data
      * @return \App\User
      */
     protected function create(array $data)
     {
         $token = str_random(64);
-        while(DB::table('users')->where('secret',$token)->exists() == true){
+        while (DB::table('users')->where('secret', $token)->exists() == true) {
             $token = str_random(64);
         }
-        $verification = (String)rand(1000,9999);
-        while(DB::table('users')->where('verification',$verification)->exists() == true){
-            $verification = (String)rand(1000,9999);
+        $verification = str_random(32);
+        while (DB::table('users')->where('verification', $verification)->exists() == true) {
+            $verification = str_random(32);
         }
         $user = new User;
         $user->name = $data['name'];
@@ -80,16 +82,24 @@ class RegisterController extends Controller
         $user->password = bcrypt($data['password']);
         $user->verification = $verification;
         $user->secret = $token;
-        $user->female = ($data['female'] == true ? 1 : 0) ;
+        $user->female = ($data['female'] == true ? 1 : 0);
         $user->save();
-        $id = DB::table('users')->where('email',$user->email)->select('id')->value('id');
+        $id = DB::table('users')->where('email', $user->email)->select('id')->value('id');
         DB::table('standart_users')->insert([
             'user_id' => $id
         ]);
         AssociateController::real($id);
-        //Send Verification Email
-        $email = new SendVerification($user->email,$verification);
+        //Send Setup Email
+        $email = new SendVerification($user->email, $verification);
         $this->dispatch($email);
         return $user;
+    }
+
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+        event(new Registered($user = $this->create($request->all())));
+        return $this->registered($request, $user)
+            ?: redirect($this->redirectPath());
     }
 }

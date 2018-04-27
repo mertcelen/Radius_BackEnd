@@ -30,7 +30,7 @@ class Verification extends Mailable
     public function build()
     {
         $address = 'verification@radiusfashion.com';
-        $name = 'Radius Email Verification';
+        $name = 'Radius Email Setup';
         return $this->view('mails.verification')->from($address,$name)->with(['code' => $this->code]);
     }
 }

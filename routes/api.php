@@ -29,7 +29,7 @@ Route::group(['middleware' => ['parameters:secret']], function () {
     Route::post('/user/values','Api\UserController@values');
     Route::get('/user/values','Api\UserController@getValues');
     Route::post('user/avatar', 'Api\UserController@userAvatar')->middleware('parameters:photo');
-    Route::post('product', 'Api\ProductController@add');
+    Route::post('product', 'Api\ProductController@add')->middleware('parameters:brand,color,image,link,type,gender');
     Route::get('products', 'Api\ProductController@main');
     Route::get('product', 'Api\ProductController@get');
 });

@@ -28,6 +28,15 @@ class ProductController extends Controller
         while (!empty(Product::where('image', $imageId)->get()->toArray())) {
             $imageId = str_random(16);
         }
+        $flag = Product::where('link',request('link'))->first();
+        if($flag == null){
+            return [
+                'error' => [
+                    "message" => 'Product already exist.',
+                    "code" => 4
+                ]
+            ];
+        }
         $product = new Product();
         $product->fill(request()->all());
         $product->image = $imageId;

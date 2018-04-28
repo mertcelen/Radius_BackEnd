@@ -29,7 +29,7 @@ class ProductController extends Controller
             $imageId = str_random(16);
         }
         $flag = Product::where('link',request('link'))->first();
-        if($flag != null){
+        if($flag){
             return [
                 'error' => [
                     "message" => 'Product already exist.',

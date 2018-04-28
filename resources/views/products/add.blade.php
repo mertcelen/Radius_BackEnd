@@ -9,6 +9,7 @@
         <h2>Add Product to Database</h2>
         <div class="alert alert-danger productError" role="alert" style="background-color:#bc5100;color:white" hidden>
         </div>
+
         <div class="btn-group" style="margin-bottom:10px">
             <select id="typeSelect" class="mdb-select">
                 <option value="" disabled selected>Choose type</option>

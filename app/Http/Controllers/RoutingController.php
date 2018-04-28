@@ -7,6 +7,7 @@ use App\Product;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 
 class RoutingController extends Controller
 {
@@ -97,9 +98,20 @@ class RoutingController extends Controller
 
     public function productList()
     {
-        $products = Product::paginate(20);
+        $search = array();
+        if (request()->has('brand')) array_push($search,['brand',request('brand')]);
+        if (request()->has('color')) array_push($search,['color',request('color')]);
+        if (request()->has('type')) array_push($search,['type',request('type')]);
+        if (request()->has('gender')) array_push($search,['gender',request('gender')]);
+        $types = DB::connection('mysql_clothes')->table('type')->get()->toArray();
+        $colors = DB::connection('mysql_clothes')->table('color')->get()->toArray();
+        $brands = DB::connection('mysql_clothes')->table('brand')->get()->toArray();
+        $products = Product::where($search)->paginate(20);
         return view('products.list', [
-            "products" => $products
+            "products" => $products->appends(Input::except(['page','userId'])),
+            'types' => $types,
+            'colors' => $colors,
+            'brands' => $brands
         ]);
     }
 

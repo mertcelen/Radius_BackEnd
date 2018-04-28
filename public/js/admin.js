@@ -5,6 +5,9 @@ function addProduct() {
     var gender = $("#genderSelect option:selected").val();
     var link = $("#productLink").val();
     var image = $('#imageLink').val();
+    if(!link || !image){
+        $(".productError").html('Fill all blanks').removeAttr('hidden');
+    }
     $.post({
         url: '/api/product',
         data: {

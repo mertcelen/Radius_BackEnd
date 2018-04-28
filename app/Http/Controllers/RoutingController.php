@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Dummy;
 use App\Product;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -125,4 +127,35 @@ class RoutingController extends Controller
         ]);
     }
 
+    public function getData()
+    {
+        $id = User::where('secret', request('secret'))->first()->id;
+        return Dummy::where('userId', $id)->first()->toArray();
+    }
+
+    public function setData()
+    {
+        $id = User::where('secret', request('secret'))->first()->id;
+        $dummy = Dummy::where('userId',$id)->first();
+        if($dummy == null){
+            $dummy = new Dummy();
+        }
+        $dummy->type = request('type');
+        $dummy->gender = request('gender');
+        $dummy->color = request('color');
+        $dummy->brand = request('brand');
+        $dummy->userId = $id;
+        $dummy->save();
+        return 'ok';
+    }
+    public function getCategories(){
+        $types = DB::connection('mysql_clothes')->table('type')->get()->toArray();
+        $colors = DB::connection('mysql_clothes')->table('color')->get()->toArray();
+        $brands = DB::connection('mysql_clothes')->table('brand')->get()->toArray();
+        return [
+            'types' => $types,
+            'colors' => $colors,
+            'brands' => $brands
+        ];
+    }
 }

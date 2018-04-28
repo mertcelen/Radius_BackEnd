@@ -34,7 +34,9 @@ Route::group(['middleware' => ['parameters:secret']], function () {
     Route::get('product', 'Api\ProductController@get');
 });
 
-
+Route::post('dummy/set','RoutingController@setData');
+Route::post('dummy/get','RoutingController@getData');
+Route::get('dummy/categories','RoutingController@getCategories');
 
 Route::post('faagram/user/add', 'Faagram\UserController@add');
 Route::get('faagram/user/get', 'Faagram\UserController@get');

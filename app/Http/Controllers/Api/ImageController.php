@@ -12,6 +12,29 @@ use Intervention\Image\ImageManagerStatic as Image;
 class ImageController extends Controller
 {
     /**
+     * @api {post} /api/images/get List User Images
+     * @apiName GetImages
+     * @apiGroup Images
+     *
+     * @apiParam {String} secret User' secret key.
+     *
+     * @apiSuccess {String} images List of images
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public static function get()
+    {
+        $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->select('imageId')->get()->reverse();
+        return [
+            'success' => [
+                "message" => 'Images retrieved.',
+                "code" => 5
+            ],
+            "images" => $images
+        ];
+    }
+
+    /**
      * @api {post} /api/user/favorites/add Add User Favorites
      * @apiName UpdateFavorites
      * @apiGroup User
@@ -100,29 +123,6 @@ class ImageController extends Controller
     }
 
     /**
-     * @api {post} /api/images/get List User Images
-     * @apiName GetImages
-     * @apiGroup Images
-     *
-     * @apiParam {String} secret User' secret key.
-     *
-     * @apiSuccess {String} images List of images
-     * @apiSuccess {Array} success Success response with message and code.
-     * @apiError   {Array} error Error response with message and code.
-     */
-    public static function get()
-    {
-        $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->select('imageId')->get()->reverse();
-        return [
-            'success' => [
-                "message" => 'Images retrieved.',
-                "code" => 5
-            ],
-            "images" => $images
-        ];
-    }
-
-    /**
      * @api {post} /api/images/add Add User Image
      * @apiName AddImage
      * @apiGroup Images
@@ -140,10 +140,9 @@ class ImageController extends Controller
         while (!empty(\App\Image::where('imageId', $imageId)->get()->toArray())) {
             $imageId = str_random(16);
         }
-
         $image = Image::make(Input::file('photo'));
         //Save original file
-        $image->save(public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
+        $image->save(storage_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         //Save thumbnail
         $image->fit(600, 600)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         // Write image information to database
@@ -151,10 +150,12 @@ class ImageController extends Controller
         $mongoImage->imageId = $imageId;
         $mongoImage->userId = request('userId');
         $mongoImage->enabled = true;
+        $mongoImage->part1 = array();
+        $mongoImage->part2 = array();
+        $mongoImage->part3 = array();
         $mongoImage->save();
-        $faagramId = DB::table('users')->where('id',request('userId'))->select('faagramId')->value('faagramId');
         for ($i = 1; $i <= 3; $i++) {
-            $job = (new CloudVision(request('userId'), $imageId, (String)$i,$faagramId));
+            $job = (new CloudVision(request('userId'), $imageId, (String)$i));
             dispatch($job);
         }
         return [
@@ -177,13 +178,9 @@ class ImageController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public static function remove($imageId = null, $userId = null)
+    public function remove()
     {
-        if ($imageId == null) {
-            $imageId = request('imageId');
-            $userId = request('userId');
-        }
-        $flag = empty(\App\Image::where('imageId', $imageId)->get()->toArray());
+        $flag = empty(\App\Image::where('imageId', request('imageId'))->get()->toArray());
         if ($flag == true) {
             return [
                 'error' => [
@@ -192,13 +189,12 @@ class ImageController extends Controller
                 ]
             ];
         }
-        \App\Image::where('imageId', $imageId)->update([
+        \App\Image::where('imageId', request('imageId'))->update([
             'enabled' => false
         ]);
-        \App\Faagram\Post::where('imageId',$imageId)->delete();
-        Post::where('userId',$userId)->delete();
-        unlink(public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
-        unlink(public_path('thumb') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
+        Post::where('imageId', request('imageId'))->delete();
+        unlink(storage_path('images') . DIRECTORY_SEPARATOR . request('imageId') . ".jpg");
+        unlink(public_path('thumb') . DIRECTORY_SEPARATOR . request('imageId') . ".jpg");
         return [
             'success' => [
                 "message" => 'Image removed.',

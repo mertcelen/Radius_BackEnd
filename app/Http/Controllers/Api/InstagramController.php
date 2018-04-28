@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\CloudVision;
+use App\User;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic as Image;
 use Ixudra\Curl\Facades\Curl;
@@ -74,14 +75,12 @@ class InstagramController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public static function get(){
-        InstagramController::retrieve(request('secret'),request('userId'));
-    }
-
-    public static function retrieve($secret,$userId)
+    public static function get($userId = null)
     {
-        $userId = DB::table('users')->select('id')->where('secret', $secret)->value('id');
-        if (DB::table('users')->where('id', $userId)->select('isInstagram')->value('isInstagram') != 1) {
+        if($userId == null){
+            $userId = \App\User::where('secret',request('secret'))->first()->id;
+        }
+        if (User::where('id',$userId)->first()->isInstagram != 1) {
             return [
                 'error' => [
                     "message" => 'User is not instagram user.',
@@ -89,7 +88,6 @@ class InstagramController extends Controller
                 ]
             ];
         }
-        $start = time();
         $token = DB::table('instagram-users')->where('user_id', $userId)->value('access_token');
         $rawData = Curl::to('https://api.instagram.com/v1/users/self/media/recent/?access_token=' . $token)->asJsonResponse()->get();
         if ($rawData->meta->code != 200) {
@@ -101,25 +99,31 @@ class InstagramController extends Controller
             ];
         }
         for ($i = 0; $i < count($rawData->data); $i++) {
+            $imageId = $rawData->data[$i]->id;
             if (!empty(\App\Image::where('imageId', $rawData->data[$i]->id)->get()->toArray()))
                 continue;
-            $image = new \App\Image();
-            $image->userId = $userId;
-            $image->imageId = $rawData->data[$i]->id;
-            $image->enabled = true;
-            $image->save();
-            if (!file_exists(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg")) {
-                $image = Image::make($rawData->data[$i]->images->standard_resolution->url);
-                $image->save(public_path('images') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
-                $image->fit(600, 600)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $rawData->data[$i]->id . ".jpg");
+            if (\App\Image::where('imageId',$rawData->data[$i]->id)->exists() == true){
+                break;
             }
-            $faagramId = DB::table('users')->where('id',$userId)->select('faagramId')->value('faagramId');
-            for ($i = 1; $i <= 3; $i++) {
-                $job = (new CloudVision($userId, $rawData->data[$i]->id, (String)$i,$faagramId));
+            $imageObj = new \App\Image();
+            $imageObj->userId = $userId;
+            $imageObj->imageId = $imageId;
+            $imageObj->part1 = array();
+            $imageObj->part2 = array();
+            $imageObj->part3 = array();
+            $imageObj->enabled = true;
+            $imageObj->save();
+            if (!file_exists(storage_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg")) {
+                $image = Image::make($rawData->data[$i]->images->standard_resolution->url);
+                $image->save(storage_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
+                $image->fit(600, 600)->save(public_path('thumb') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
+            }
+            //thanks for fix of my stupid mistake https://github.com/omerberk
+            for ($omerberkucar_adamgibiadam = 1; $omerberkucar_adamgibiadam <= 3; $omerberkucar_adamgibiadam++) {
+                $job = (new CloudVision($userId, $imageId, (String)$omerberkucar_adamgibiadam));
                 dispatch($job);
             }
         };
-        $end = time();
         return [
             'success' => [
                 "message" => 'New images retrieved.',

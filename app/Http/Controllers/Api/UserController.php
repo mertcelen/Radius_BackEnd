@@ -318,8 +318,8 @@ class UserController extends Controller
      */
     public static function verify()
     {
-        $user = \App\User::where('verification',request('code'))->first();
-        if($user == null){
+        $user = \App\User::where('verification', request('code'))->first();
+        if ($user == null) {
             return [
                 'error' => [
                     "message" => 'Setup code is invalid.',
@@ -338,6 +338,7 @@ class UserController extends Controller
             'userId' => $user->id
         ];
     }
+
     /**
      * @api {post} /api/user/values Recommendation Preferences
      * @apiName UpdateRecommendationPreferences
@@ -351,9 +352,10 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function values(){
-        $user = User::find(request('userId'))->first();
-        $user->values = implode(',',[request('first'),request('second'),request('third')]);
+    public function values()
+    {
+        $user = User::where('secret',request('secret'))->first();
+        $user->values = implode(',', [request('first'), request('second'), request('third')]);
         $user->save();
         return [
             'success' => [
@@ -375,9 +377,10 @@ class UserController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function getValues(){
+    public function getValues()
+    {
         $user = User::find(request('userId'))->first();
-        $values = explode(',',$user->values);
+        $values = explode(',', $user->values);
         return [
             'success' => [
                 "message" => 'User preferences updated.',

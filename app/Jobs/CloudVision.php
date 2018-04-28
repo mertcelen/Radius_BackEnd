@@ -8,7 +8,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\DB;
 
 class CloudVision implements ShouldQueue
 {
@@ -16,18 +15,17 @@ class CloudVision implements ShouldQueue
     protected $userId;
     protected $imageId;
     protected $part;
-    protected $faagramId;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($userId,$imageId,$part,$faagramId)
+    public function __construct($userId, $imageId, $part)
     {
-        $this->userId= $userId;
+        $this->userId = $userId;
         $this->imageId = $imageId;
         $this->part = $part;
-        $this->faagramId = $faagramId;
     }
 
     /**
@@ -37,6 +35,6 @@ class CloudVision implements ShouldQueue
      */
     public function handle()
     {
-            VisionController::magic((string)$this->imageId,$this->part,$this->userId,$this->faagramId);
+        VisionController::magic((string)$this->imageId, $this->part, $this->userId);
     }
 }

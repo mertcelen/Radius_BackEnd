@@ -55,7 +55,6 @@ function update(){
                 $(".photos").html("");
                 $.each(currentImages,function(key,value){
                     value = value.imageId;
-                    console.log(value);
                     var removeFunction = "preview(\'" +  value + "\')";
                     $(".photos").prepend("<div class='photoWrapper'><img src='/thumb/" +
                         value + ".jpg' class='photo float-left' onclick=\"" + removeFunction + "\"/></div>")

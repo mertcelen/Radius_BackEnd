@@ -12,98 +12,45 @@ use App\Jobs\CloudVision;
 
 class VisionController extends Controller
 {
-    /**
-     * @api {post} /api/magic Cloth Detection
-     * @apiName ClothDetection
-     * @apiGroup Detection
-     *
-     * @apiParam {String} secret User' secret key.
-     *
-     * @apiSuccess {Array} success Success response with message and code.
-     * @apiError   {Array} error Error response with message and code.
-     */
-    public function detect()
+    public static function magic($imageId, $part, $userId)
     {
-        $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->get();
-        $faagramId = DB::table('users')->where('id',request('userId'))->select('faagramId')->value('faagramId');
-        foreach ($images as $image) {
-            for ($i = 1; $i <= 3; $i++) {
-                $job = (new CloudVision(request('userId'), $image->imageId, (String)$i,$faagramId));
-                dispatch($job);
-            }
-        }
-        return [
-            'success' => [
-                "message" => 'Cloth detection is requested, it is going to work background because it will take a while.',
-                "code" => 5
-            ],
-        ];
-    }
-
-    public static function magic($imageId, $part, $userId,$faagramId)
-    {
-        $imagePath = public_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg";
-        if (!file_exists($imagePath)) {
-            return 0;
-        }
-        if (\App\Image::where('imageId', $imageId)->first()->enabled == false) {
-            return 0;
-        }
-        if (!empty(\App\Image::where('imageId', $imageId)->where('part' . $part, 'exists', true)->get()->toArray())) {
-            return 1;
-        }
-        $vertexes = VisionController::detectFace($imagePath, $imageId, $userId);
-        if ($vertexes == null) {
-            return 0;
+        $imagePath = storage_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg";
+        $vertexes = VisionController::detectFace($imagePath);
+        if ($vertexes == null){
+            \App\Image::where('imageId',$imageId)->update([
+                'enabled' => false
+            ]);
+            return false;
         }
         list($startX, $startY, $width, $height) = VisionController::calculate($vertexes, $imagePath, $part);
-        list($labels, $red, $green, $blue) = VisionController::detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId);
+        list($label, $red, $green, $blue) = VisionController::detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId);
         $color = VisionController::rgbToText(array($red, $green, $blue));
         \App\Image::where('imageId', $imageId)->update([
+            'enabled' => true,
             'part' . $part => [
                 'color' => $color,
-                'label' => implode(',', $labels)
+                'label' => $label
             ]
         ]);
         $newPost = new Post();
-        $newPost->userId = $faagramId;
-        $newPost->label = implode(',', $labels);
+        $newPost->userId = User::find($userId)->first()->faagramId;
+        $newPost->label = $label;
         $newPost->color = $color;
         $newPost->like_count = 0;
         $newPost->imageId = $imageId;
         $newPost->save();
-        return 1;
+        return true;
     }
 
-    private static function detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId)
+    private static function detectFace($imagePath)
     {
-        $image = Image::make($imagePath)->crop(floor($width), floor($height), floor($startX), floor($startY));
-        $fileName = $imageId . '_' . $part . ".jpg";
-        $image->save(public_path('cropped') . DIRECTORY_SEPARATOR . $fileName);
-        //Second, detect image properties and detect labels
-        $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::IMAGE_PROPERTIES, 100),
-            new \Vision\Feature(\Vision\Feature::LABEL_DETECTION, 100)]);
-        $imagePath = public_path('cropped') . DIRECTORY_SEPARATOR . $fileName;
+        $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::FACE_DETECTION, 100)]);
         $response = $vision->request(new \Vision\Request\Image\LocalImage($imagePath));
-        unlink(public_path('cropped') . DIRECTORY_SEPARATOR . $fileName);
-        $colors = $response->getImagePropertiesAnnotation()->getDominantColors();
-        $red = $colors[0]->getColor()->getRed();
-        $green = $colors[0]->getColor()->getGreen();
-        $blue = $colors[0]->getColor()->getBlue();
-
-        $labels = $response->getLabelAnnotations();
-        $ignoredWords = [
-            "black", "fashion", "button", "outwear", "clothing", "design", "shoulder", "neck", "joint", "sleeve", "formal wear", "collar", "fashion model"
-        ];
-        $counter = 0;
-        $temp = [];
-        foreach ($labels as $label) {
-            if (!in_array($label->getDescription(), $ignoredWords) && $counter < 3) {
-                array_push($temp, $label->getDescription());
-                $counter++;
-            }
+        $faces = $response->getFaceAnnotations();
+        if (count($faces) != 1) {
+            return null;
         }
-        return array($temp, $red, $green, $blue);
+        return $faces[0]->getBoundingPoly()->getVertices();
     }
 
     private static function calculate($vertexes, $imagePath, $part)
@@ -153,39 +100,52 @@ class VisionController extends Controller
         return array($startX, $startY, $width, $height);
     }
 
-    private static function detectFace($imagePath, $imageId, $userId)
+    private static function detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId)
     {
-        $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::FACE_DETECTION, 100),]);
-        $response = $vision->request(new \Vision\Request\Image\LocalImage($imagePath));
-        $faces = $response->getFaceAnnotations();
-        if (empty($faces) || count($faces) != 1) {
-            \App\Image::where('imageId', $imageId)->update([
-                'enabled' => false
-            ]);
-            return null;
+        $image = Image::make($imagePath)->crop(floor($width), floor($height), floor($startX), floor($startY));
+        $fileName = $imageId . '_' . $part . ".jpg";
+        $path = public_path('cropped') . DIRECTORY_SEPARATOR . $fileName;
+        $image->save($path);
+        //Second, detect image properties and detect labels
+        $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::IMAGE_PROPERTIES, 100),
+            new \Vision\Feature(\Vision\Feature::LABEL_DETECTION, 100)]);
+        $response = $vision->request(new \Vision\Request\Image\LocalImage($path));
+        unlink($path);
+        $colors = $response->getImagePropertiesAnnotation()->getDominantColors();
+        $red = $colors[0]->getColor()->getRed();
+        $green = $colors[0]->getColor()->getGreen();
+        $blue = $colors[0]->getColor()->getBlue();
+        $labels = $response->getLabelAnnotations();
+        $ignoredWords = [
+            "black", "fashion", "button", "outwear", "clothing", "design", "shoulder",
+            "neck", "joint", "sleeve", "formal wear", "collar", "fashion model",
+            "polka dot", "pattern", "white", "product"
+        ];
+        $temp = "";
+        foreach ($labels as $label) {
+            if (!in_array($label->getDescription(), $ignoredWords)) {
+                $temp = $label->getDescription();
+                break;
+            }
         }
-
-        return $faces[0]->getBoundingPoly()->getVertices();
+        return array($temp, $red, $green, $blue);
     }
 
     private static function rgbToText($color)
     {
 
         $array['white'] = array(255, 255, 255);
+        $array['beige'] = array(245, 245, 220);
         $array['gray'] = array(127.5, 127.5, 127.5);
         $array['black'] = array(0, 0, 0);
         $array['red'] = array(255, 0, 0);
         $array['maroon'] = array(127.5, 0, 0);
         $array['yellow'] = array(255, 255, 0);
-        $array['olive'] = array(127.5, 127.5, 0);
-        $array['lime'] = array(0, 255, 0);
         $array['green'] = array(0, 255, 0);
         $array['aqua'] = array(0, 255, 255);
         $array['blue'] = array(0, 0, 255);
-        $array['navy'] = array(0, 0, 127.5);
         $array['purple'] = array(127.5, 0, 127.5);
-        $array['pink'] = array(255,192,203);
-        $array['beige'] = array (245, 245, 220);
+        $array['pink'] = array(255, 102, 178);
 
         $deviation = PHP_INT_MAX;
         $colorName = '';
@@ -203,5 +163,4 @@ class VisionController extends Controller
     {
         return abs($colorA[0] - $colorB[0]) + abs($colorA[1] - $colorB[1]) + abs($colorA[2] - $colorB[2]);
     }
-
 }

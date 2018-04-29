@@ -163,9 +163,17 @@ class UserController extends Controller
     public function register()
     {
         $this->validate(request(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
+            'name' => 'required|string|max:255|min:3',
+            'email' => ['required', 'email',
+                function ($attribute, $value, $fail) {
+                    if ($attribute == 'email') {
+                        $customer = User::where($attribute, 'like', $value)->first();
+                        if ($customer !== null)
+                            return $fail(ucfirst($attribute) . ' already exists.');
+                    }
+                }],
+            'password' => 'required|string|min:6|max:255',
+            'female' => 'required|string'
         ]);
 
         $user = User::add(request('name'), request('email'), request('password'), intval(request('gender')));

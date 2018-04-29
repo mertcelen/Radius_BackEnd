@@ -42,7 +42,7 @@ class User extends Authenticatable
         //Sadly we have to write to retrieve _id value.
         $user->save();
 
-        $user->faagramId = AssociateController::real($user->_id);
+        $user->faagramId = AssociateController::real($user->_id,$user->name);
         $user->save();
         return $user;
     }

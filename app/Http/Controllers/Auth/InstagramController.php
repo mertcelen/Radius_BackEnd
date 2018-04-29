@@ -67,8 +67,10 @@ class InstagramController extends Controller
             ];
             $user->save();
         }
+        echo "Secret > " . $secret;
+        die();
         if ($isApicall == true) {
-            return array($secret);
+            return $secret;
         } else {
             Auth::loginUsingId($userId,true);
             return redirect('/home');

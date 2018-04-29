@@ -162,7 +162,7 @@ class UserController extends Controller
      */
     public function register()
     {
-        $this->validate(request(), [
+        /*$this->validate(request(), [
             'name' => 'required|string|max:255|min:3',
             'email' => ['required', 'email',
                 function ($attribute, $value, $fail) {
@@ -174,8 +174,9 @@ class UserController extends Controller
                 }],
             'password' => 'required|string|min:6|max:255',
             'female' => 'required|string'
-        ]);
-
+        ]);*/
+        echo "girdi";
+        die();
         $user = User::add(request('name'), request('email'), request('password'), intval(request('gender')));
         //Send Setup Email
         $email = new SendVerification($user->email, $user->verification);
@@ -205,7 +206,7 @@ class UserController extends Controller
         while (User::where('secret', $secret)->exists() == true) {
             $secret = str_random(64);
         }
-        $user = User::where('userId', request('userId'))->first();
+        $user = User::where('_id', request('userId'))->first();
         $user->secret = $secret;
         $user->save();
         return [
@@ -250,7 +251,7 @@ class UserController extends Controller
                 ]
             ];
         }
-        $user = User::where('userId', request('userId'))->first();
+        $user = User::where('_id', request('userId'))->first();
         $flag = Hash::check(request('old-password'), $user->password);
         if ($flag == false) {
             return [
@@ -283,7 +284,7 @@ class UserController extends Controller
      */
     public function getAvatar()
     {
-        $user = User::where('userId', request('userId'))->first();
+        $user = User::where('_id', request('userId'))->first();
         return [
             'success' => [
                 "message" => 'Avatar id retrieved.',

@@ -1,7 +1,7 @@
 <?php
 //Manuel Login Routes
 Route::post('login', 'Api\UserController@login')->middleware('parameters:email,password');
-Route::post('register', 'Api\UserController@register')->middleware('parameters:email,name,password');
+Route::get('register', 'Api\UserController@register')->middleware('parameters:email,name,password');
 //Instagram Login Routes
 Route::post('instagram/oauth', 'Api\InstagramController@create')->middleware('parameters:code');
 Route::get('instagram/url', 'Api\InstagramController@instagramUrl');

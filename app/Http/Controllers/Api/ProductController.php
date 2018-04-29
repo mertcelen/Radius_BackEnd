@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class ProductController extends Controller

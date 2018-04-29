@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\User;
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class Admin
 {
@@ -17,23 +17,22 @@ class Admin
      */
     public function handle($request, Closure $next)
     {
-        if(DB::table('users')->select('status')->where('id',request('userId'))->value('status') != 3) {
-          //Dirty check for if its coming from session or not
-            if(Auth::check()){
+        $user = User::where('userId', request('userId'))->first();
+        if ($user == null)
+            $user = User::where('secret', request('secret'))->first();
+        if ($user->status != 3) {
+            //Dirty check for if its coming from session or not
+            if (Auth::check()) {
                 return redirect('/');
-            }else{
-                if(DB::table('users')->select('status')->where('secret',request('secret'))->value('status') == 3){
-                    return $next($request);
-                }else{
-                    return response()->json([
-                        'error' => [
-                            "message" => 'Not allowed',
-                            "code" => 4
-                        ]
-                    ]);
-                }
-
+            } else {
+                return response()->json([
+                    'error' => [
+                        "message" => 'Not allowed',
+                        "code" => 4
+                    ]
+                ]);
             }
+
         }
         return $next($request);
     }

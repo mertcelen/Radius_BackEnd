@@ -25,7 +25,7 @@
 <body>
 <div>
     @auth
-        @if(!Auth::user()->isVerified())
+        @if(Auth::user()->isVerified())
             <link rel="manifest" href="/manifest.json"/>
             <header>
                 <nav class="navbar navbar-expand-lg navbar-custom">

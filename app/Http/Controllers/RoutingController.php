@@ -49,10 +49,8 @@ class RoutingController extends Controller
 
     public function settings()
     {
-        $result = Api\UserController::settings();
         $array = explode(',', Auth::user()->values);
         return view('settings', [
-            'instagram' => $result["instagram"],
             'secret' => Auth::user()->getAttribute('secret'),
             'first' => (Integer)$array[0],
             'second' => (Integer)$array[1],

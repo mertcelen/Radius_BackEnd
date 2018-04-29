@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Faagram\Post;
+use App\Favorite;
 use App\Http\Controllers\Controller;
 use App\Jobs\CloudVision;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -24,7 +24,8 @@ class ImageController extends Controller
      */
     public static function get()
     {
-        $images = \App\Image::where('userId', request('userId'))->where('enabled', true)->select('imageId')->get()->reverse();
+        $images = \App\Image::where('userId', request('userId'))
+            ->where('enabled',true)->select('imageId')->get()->reverse()->toArray();
         return [
             'success' => [
                 "message" => 'Images retrieved.',
@@ -40,32 +41,35 @@ class ImageController extends Controller
      * @apiGroup User
      *
      * @apiParam {String} secret User' secret key.
-     * @apiParam {String} imageID Image ID to add.
+     * @apiParam {String} productID Product ID to add.
      *
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
     public function addFavorite()
     {
-        try {
-            DB::table('favorites')->insert([
-                'userId' => request('userId'),
-                'imageId' => request('imageId')
-            ]);
-        } catch (\Exception $e) {
+        if ($result = Favorite::add(request('userId'), request('productId'))) {
+            return [
+                'success' => [
+                    "message" => 'Image added to favorites.',
+                    "code" => 5
+                ]
+            ];
+        } else if ($result == 1) {
             return [
                 'error' => [
                     "message" => 'Image already added.',
                     "code" => 4
                 ]
             ];
+        } else {
+            return [
+                'error' => [
+                    "message" => 'Product not found.',
+                    "code" => 4
+                ]
+            ];
         }
-        return [
-            'success' => [
-                "message" => 'Image added to favorites.',
-                "code" => 5
-            ]
-        ];
     }
 
     /**
@@ -74,16 +78,21 @@ class ImageController extends Controller
      * @apiGroup User
      *
      * @apiParam {String} secret User' secret key.
-     * @apiParam {String} imageID Image ID to add.
+     * @apiParam {String} favoriteId Favorite ID to remove.
      *
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
     public function removeFavorite()
     {
-        try {
-            DB::table('favorites')->where('userId', request('userId'))->where('imageId', request('imageId'))->delete();
-        } catch (\Exception $e) {
+        if (Favorite::remove(request('favoriteId'), request('userId'))) {
+            return [
+                'success' => [
+                    "message" => 'Image successfully removed from favorites.',
+                    "code" => 5
+                ]
+            ];
+        } else {
             return [
                 'error' => [
                     "message" => 'Image not found in favorites.',
@@ -91,12 +100,6 @@ class ImageController extends Controller
                 ]
             ];
         }
-        return [
-            'success' => [
-                "message" => 'Image successfully removed from favorites.',
-                "code" => 5
-            ]
-        ];
     }
 
     /**
@@ -112,7 +115,7 @@ class ImageController extends Controller
      */
     public function getFavorites()
     {
-        $favoriteList = DB::table('favorites')->select('imageID')->where('userId', request('userId'))->get()->toArray();
+        $favoriteList = Favorite::where('userId', request('userId'))->get();
         return [
             'success' => [
                 "message" => 'Favorite images retrieved.',
@@ -202,4 +205,5 @@ class ImageController extends Controller
             ]
         ];
     }
+
 }

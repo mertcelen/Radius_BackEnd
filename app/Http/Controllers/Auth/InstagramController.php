@@ -22,56 +22,61 @@ class InstagramController extends Controller
         } else {
             $code = request('code');
         }
-        list($error, $user) = InstagramController::getToken($code, env('INSTAGRAM_URI'));
+        list($error, $instagramUser) = InstagramController::getToken($code, env('INSTAGRAM_URI'));
         if ($error) return redirect('/');
         //Now check if user is actually exist or not.
-        $userId = 0;
-        if (DB::table('instagram-users')->where('instagram_id', $user->user->id)->exists() == false) {
+        $secret = str_random(64);
+        $userId = "";
+        if (User::where('instagram.id', $instagramUser->user->id)->exists() == false) {
             //User not found on database, so we need to create one.
-            $token = str_random(64);
-            while (DB::table('users')->where('secret', $token)->exists() == true) {
-                $token = str_random(64);
+            $user = new User();
+            $user->name = $instagramUser->user->username;
+            $secret = str_random(64);
+            while (User::where('secret', $secret)->exists() == true) {
+                $secret = str_random(64);
             }
-            $avatarId = \App\Http\Controllers\Api\UserController::userAvatar($user->user->profile_picture)['id'];
-            $userId = DB::table('users')->insertGetId([
-                'name' => $user->user->username,
-                'isInstagram' => true,
-                'secret' => $token,
-                'instagram_id' => $user->user->id,
-                'status' => 1,
-                'avatar' => $avatarId
-            ]);
-            if (is_null($userId) == true) {
-                return redirect('/');
-            } else {
-                // Now add user to instagram table using that user id.
-                DB::table('instagram-users')->insert([
-                    'user_id' => $userId,
-                    'access_token' => $user->access_token,
-                    'username' => $user->user->username,
-                    'full_name' => $user->user->full_name,
-                    'profile_picture' => $user->user->profile_picture,
-                    'instagram_id' => $user->user->id
-                ]);
-                AssociateController::real($userId);
-                \App\Http\Controllers\Api\InstagramController::get($userId);
-            }
+            $user->secret = $secret;
+            $user->status = 1;
+            $user->type = 2;
+            $user->avatar = \App\Http\Controllers\Api\UserController::userAvatar($instagramUser->user->profile_picture)['avatarId'];
+            $user->instagram = [
+                'access_token' => $instagramUser->access_token,
+                'username' => $instagramUser->user->username,
+                'full_name' => $instagramUser->user->full_name,
+                'id' => $instagramUser->user->id
+            ];
+            $user->values = "50,25,25";
+            $user->save();
+            $userId = $user->_id;
+            $user->faagramId = AssociateController::real($user->_id,$user->name);
+            $user->save();
+            \App\Http\Controllers\Api\InstagramController::get($user->_id);
         } else {
+            $user = User::where('instagram.id',$instagramUser->user->id)->first();
+            $userId = $user->_id;
             //Update the token of the existing user once again.
-            DB::table('instagram-users')->where('instagram_id', $user->user->id)->update([
-                'access_token' => $user->access_token
-            ]);
+            while (User::where('secret', $secret)->exists() == true) {
+                $secret = str_random(64);
+            }
+            $user->secret = $secret;
+            $user->instagram = [
+                'access_token' => $instagramUser->access_token,
+                'username' => $instagramUser->user->username,
+                'full_name' => $instagramUser->user->full_name,
+                'id' => $instagramUser->user->id
+            ];
+            $user->save();
         }
-        $userId = User::where('instagram_id',$user->user->id)->first()->id;
         if ($isApicall == true) {
-            return $userId;
+            return array($secret);
         } else {
-            Auth::loginUsingId($userId);
+            Auth::loginUsingId($userId,true);
             return redirect('/home');
         }
     }
 
-    public static function getToken($code, $uri)
+    public
+    static function getToken($code, $uri)
     {
         $response = Curl::to('https://api.instagram.com/oauth/access_token')->withData(array(
             'client_id' => env('INSTAGRAM_ID'),

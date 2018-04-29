@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Jobs\CloudVision;
 use App\User;
-use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic as Image;
 use Ixudra\Curl\Facades\Curl;
 
@@ -27,44 +26,6 @@ class InstagramController extends Controller
     }
 
     /**
-     * @api {post} /api/instagram/oauth Register Instagram User
-     * @apiName InstagramOauth
-     * @apiGroup Instagram
-     *
-     * @apiParam {String} code User' instagram code(from callback).
-     *
-     * @apiSuccess {String} secret Secret token to use in API calls.
-     * @apiSuccess {Array} success Success response with message and code.
-     * @apiError   {Array} error Error response with message and code.
-     */
-    public function create()
-    {
-        if (!request()->has('code') || request()->has('error')) {
-            return [
-                'error' => [
-                    "message" => 'Missing parameter(s).',
-                    "code" => 4
-                ]
-            ];
-        }
-        $userId = \App\Http\Controllers\Auth\InstagramController::create(true, request('code'));
-        $token = str_random(64);
-        while (DB::table('users')->where('secret', $token)->exists() == true) {
-            $token = str_random(64);
-        }
-        DB::table('users')->where('id', $userId)->update([
-            'secret' => $token
-        ]);
-        return [
-            'success' => [
-                "message" => 'User logged in.',
-                "code" => 5
-            ],
-            'secret' => $token
-        ];
-    }
-
-    /**
      * @api {post} /api/instagram/get Update Instagram Photos
      * @apiName InstagramUpdate
      * @apiGroup Instagram
@@ -77,10 +38,11 @@ class InstagramController extends Controller
      */
     public static function get($userId = null)
     {
-        if($userId == null){
-            $userId = \App\User::where('secret',request('secret'))->first()->id;
+        if ($userId == null) {
+            $userId = User::where('secret', request('secret'))->first()->id;
         }
-        if (User::where('id',$userId)->first()->isInstagram != 1) {
+        $user = User::find($userId);
+        if ($user->type != 2) {
             return [
                 'error' => [
                     "message" => 'User is not instagram user.',
@@ -88,8 +50,8 @@ class InstagramController extends Controller
                 ]
             ];
         }
-        $token = DB::table('instagram-users')->where('user_id', $userId)->value('access_token');
-        $rawData = Curl::to('https://api.instagram.com/v1/users/self/media/recent/?access_token=' . $token)->asJsonResponse()->get();
+        $rawData = Curl::to('https://api.instagram.com/v1/users/self/media/recent/?access_token='
+            . $user->instagram["access_token"])->asJsonResponse()->get();
         if ($rawData->meta->code != 200) {
             return [
                 'error' => [
@@ -102,7 +64,7 @@ class InstagramController extends Controller
             $imageId = $rawData->data[$i]->id;
             if (!empty(\App\Image::where('imageId', $rawData->data[$i]->id)->get()->toArray()))
                 continue;
-            if (\App\Image::where('imageId',$rawData->data[$i]->id)->exists() == true){
+            if (\App\Image::where('imageId', $rawData->data[$i]->id)->exists() == true) {
                 break;
             }
             $imageObj = new \App\Image();
@@ -129,6 +91,32 @@ class InstagramController extends Controller
                 "message" => 'New images retrieved.',
                 "code" => 5
             ]
+        ];
+    }
+
+    /**
+     * @api {post} /api/instagram/oauth Register Instagram User
+     * @apiName InstagramOauth
+     * @apiGroup Instagram
+     *
+     * @apiParam {String} code User' instagram code(from callback).
+     *
+     * @apiSuccess {String} secret Secret token to use in API calls.
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public function create()
+    {
+        if (request()->has('error')) {
+            return redirect('/');
+        }
+        $secret = \App\Http\Controllers\Auth\InstagramController::create(true, request('code'));
+        return [
+            'success' => [
+                "message" => 'User logged in.',
+                "code" => 5
+            ],
+            'secret' => $secret
         ];
     }
 

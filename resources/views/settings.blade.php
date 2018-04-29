@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/settings.css">
     <script type="text/javascript" src="/js/settings.js"></script>
     <span style="display: none" id="secret">{{$secret}}</span>
-    @if($instagram == false)
+    @if(Auth::user()->type == 1)
         <div class="card float-left" style="width: 18rem;">
             <div class="card-body">
                 <h3 class="card-title">Change Password</h3>

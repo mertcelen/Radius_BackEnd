@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +50,7 @@ class LoginController extends Controller
     protected function sendLoginResponse(Request $request)
     {
         $token = str_random(64);
-        while(DB::table('users')->where('secret',$token)->exists() == true){
+        while(User::where('secret',$token)->exists() == true){
             $token = str_random(64);
         }
         \Auth::user()->secret = $token;

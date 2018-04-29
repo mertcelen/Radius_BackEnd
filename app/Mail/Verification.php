@@ -5,7 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class Verification extends Mailable
 {
@@ -30,7 +29,7 @@ class Verification extends Mailable
     public function build()
     {
         $address = 'verification@radiusfashion.com';
-        $name = 'Radius Email Setup';
+        $name = 'Radius Email Verification';
         return $this->view('mails.verification')->from($address,$name)->with(['code' => $this->code]);
     }
 }

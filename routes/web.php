@@ -23,7 +23,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/setup/style', 'UserController@setup');
 });
 
-Route::group(['middleware' => ['auth', 'setup']], function () {
+Route::group(['middleware' => ['auth']], function () {
     Route::get('/home','RoutingController@home');
     Route::get('/photos', 'RoutingController@photos')->middleware('session');
     Route::post('/photos/upload', 'Api\ImageController@add')->middleware('session');

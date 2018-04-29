@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\User;
 use Closure;
-use Illuminate\Support\Facades\DB;
 
 class Parameters
 {
@@ -30,8 +30,8 @@ class Parameters
         }
         if($request->has('secret')){
             //Checking if token is real.
-            $userId = DB::table('users')->where('secret',$request->get('secret'))->select('id')->value('id');
-            if($userId == null || empty($userId)){
+            $userId = User::where('secret',request('secret'))->first()->_id;
+            if( $userId == null){
                 return response()->json([
                     "error" => [
                         "message" => "Wrong parameter(s)",

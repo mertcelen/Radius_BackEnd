@@ -68,12 +68,11 @@ class AssociateController extends Controller
         AssociateController::real(request('id'));
     }
 
-    public static function real($id)
+    public static function real($userId,$name)
     {
-        $sqlUser = \App\User::where('id', $id)->first();
-        $posts = Image::where('userId', $id)->get();
+        $posts = Image::where('userId', $userId)->get();
         $user = new User();
-        $user->name = $sqlUser->name;
+        $user->name = $name;
         $user->following = random_int(10, 100);
         $user->follower = random_int(10, 100);
         $user->post_count = count($posts);
@@ -100,8 +99,9 @@ class AssociateController extends Controller
         foreach ($randomPosts as $randomPost) {
             Like::add($user->_id, $randomPost["_id"]);
         }
-        \DB::table('users')->where('id', $id)->update([
+        User::where('_id',$userId)->update([
             'faagramId' => $user->_id
         ]);
+        return $user->_id;
     }
 }

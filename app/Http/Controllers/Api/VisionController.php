@@ -6,9 +6,7 @@ use App\Faagram\Post;
 use App\Http\Controllers\Controller;
 use App\User;
 use Vision\Vision;
-use Illuminate\Support\Facades\DB;
 use Intervention\Image\ImageManagerStatic as Image;
-use App\Jobs\CloudVision;
 
 class VisionController extends Controller
 {

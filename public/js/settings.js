@@ -79,7 +79,7 @@ Dropzone.options.uploadPhoto = {
         $(".dz-message").html("Uploading");
     },
     success: function (response) {
-        var avatarId = JSON.parse(response.xhr.response).id;
+        var avatarId = JSON.parse(response.xhr.response).avatarId;
         $(".dz-message").html("Avatar updated.");
         setTimeout(function () {
             $(".dz-message").html("Click here to upload.");

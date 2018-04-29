@@ -2,42 +2,63 @@
 
 namespace App;
 
+use App\Http\Controllers\Faagram\AssociateController;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Jenssegers\Mongodb\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    protected $collection = 'users';
+    protected $connection = 'mongodb';
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'gender'
     ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
     protected $hidden = [
         'password', 'remember_token',
     ];
 
-    public function isAdmin ()
+    public static function add($name, $email, $password, $gender)
+    {
+        $user = new self();
+        $user->name = $name;
+        $user->email = $email;
+        $user->password = bcrypt($password);
+        $user->gender = $gender;
+        $verification = str_random(64);
+        while (User::where('verification', $verification)->exists() == true) {
+            $verification = str_random(64);
+        }
+        $user->type = 1;
+        $user->verification = $verification;
+        $user->status = 0;
+        $user->values = "50,25,25";
+        $secret = str_random(64);
+        while (User::where('secret', $secret)->exists() == true) {
+            $secret = str_random(64);
+        }
+        $user->secret = $secret;
+        $user->avatar = "default_avatar";
+        //Sadly we have to write to retrieve _id value.
+        $user->save();
+
+        $user->faagramId = AssociateController::real($user->_id);
+        $user->save();
+        return $user;
+    }
+
+    public function isAdmin()
     {
         return $this->statusCheck(3);
     }
 
-    public function isVerified(){
-        return $this->statusCheck(0);
-    }
-
-    protected function statusCheck ($status = 0)
+    protected function statusCheck($status = 0)
     {
         return $this->status === $status ? true : false;
+    }
+
+    public function isVerified()
+    {
+        return !$this->statusCheck(0);
     }
 }

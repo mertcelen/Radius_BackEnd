@@ -154,7 +154,7 @@ class UserController extends Controller
      * @apiParam {String} email User' email address.
      * @apiParam {String} password User' password.
      * @apiParam {String} name User' name.
-     * @apiParam {Integer} gender User' gender (0 Male 1 Female).
+     * @apiParam {String} gender User' gender (0 Male 1 Female).
      *
      * @apiSuccess {String} user User All user information.
      * @apiSuccess {Array} success Success response with message and code.
@@ -168,7 +168,7 @@ class UserController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        $user = User::add(request('name'), request('email'), request('password'), request('gender'));
+        $user = User::add(request('name'), request('email'), request('password'), intval(request('gender')));
         //Send Setup Email
         $email = new SendVerification($user->email, $user->verification);
         $this->dispatch($email);

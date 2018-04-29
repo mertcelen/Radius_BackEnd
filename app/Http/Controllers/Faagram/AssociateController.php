@@ -56,6 +56,11 @@ class AssociateController extends Controller
                 $like_count++;
             }
         }
+        //We have to update follower count again.
+        foreach ($users as $user){
+            $user->follower = intval(Relation::where('following',$user->_id)->count());
+            $user->save();
+        }
         echo "Total " . $user_count . " user added<br>";
         echo "Total " . $post_count . " post added<br>";
         echo "Total " . $relation_count . " relation added<br>";
@@ -65,7 +70,7 @@ class AssociateController extends Controller
 
     public function temp()
     {
-        AssociateController::real(request('id'));
+        AssociateController::real(request('id'),request('userId'));
     }
 
     public static function real($userId,$name)
@@ -95,6 +100,11 @@ class AssociateController extends Controller
         foreach ($randomUsers as $randomUser) {
             Relation::add($user->_id, $randomUser["_id"]);
         }
+//        //We have to update follower count again.
+//        foreach ($randomUsers as $randomUser){
+//            $randomUser->follower = intval(Relation::where('following',$randomUser->_id)->count());
+//            $randomUser->save();
+//        }
         $randomPosts = array_random(Post::all()->toArray(), $user->like_count);
         foreach ($randomPosts as $randomPost) {
             Like::add($user->_id, $randomPost["_id"]);

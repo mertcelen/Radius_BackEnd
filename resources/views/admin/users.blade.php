@@ -47,12 +47,12 @@
                 <td>{{$user->email}}</td>
                 <td>{{$user->faagramId}}</td>
                 <td>{{($user->female == 1 ? 'Female' : 'Male') }}</td>
-                <td>{{($user->isInstagram == 1 ? 'True' : 'False')}}</td>
-                <td>{{($user->verification > 1 ? 'False' : 'True')}}</td>
+                <td>{{($user->type == 1 ? 'False' : 'True')}}</td>
+                <td>{{($user->verification > 1 ? 'True' : 'False')}}</td>
                 <td>
                     <div class="btn-group">
                         <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
+                                aria-haspopup="true" aria-expanded="false" disabled>
                             @switch($user->status)
                                 @case(0)
                                 Unconfirmed

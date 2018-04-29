@@ -17,10 +17,7 @@ class Admin
      */
     public function handle($request, Closure $next)
     {
-        $user = User::where('userId', request('userId'))->first();
-        if ($user == null)
-            $user = User::where('secret', request('secret'))->first();
-        if ($user->status != 3) {
+        if (Auth::user()->status != 3) {
             //Dirty check for if its coming from session or not
             if (Auth::check()) {
                 return redirect('/');

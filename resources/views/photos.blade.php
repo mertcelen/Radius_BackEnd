@@ -8,7 +8,7 @@
     <script type="text/javascript" src="/js/photos.js"></script>
     <link rel="stylesheet" href="/css/photo.css">
     <!-- End of imports -->
-    <form id="uploadPhoto" action="/photos/upload" class="dropzone">
+    <form id="uploadPhoto" action="/photos/upload" class="dropzone" method>
         <div class="fallback">
             <input name="photo" type="file"/>
         </div>
@@ -38,7 +38,6 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-custom2" data-dismiss="modal">Close</button>
                         <button type="button" class="btn btn-custom" id="removeButton">Remove Image</button>
-                        {{--<button type="button" class="btn btn-success">Promote Image</button>--}}
                     </div>
                 </div>
             </div>

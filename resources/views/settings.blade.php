@@ -36,11 +36,11 @@
     <div class="card float-left sliders" style="width: 18rem;">
         <div class="card-body">
             <h3 class="card-title">Recommendation Preferences</h3>
-            <label for="postRange" style="color: #bc5100;">Weight of your posts</label>
+            <label for="postRange" style="color: #2196F3;">Weight of your posts</label>
             <input type="range" min="0" max="100" value="{{$first}}" class="slider btn-block" id="1">
-            <label for="likeRange" style="color: #bc5100;">Weight of your likes</label>
+            <label for="likeRange" style="color: #2196F3;">Weight of your likes</label>
             <input type="range" min="0" max="100" value="{{$second}}" class="slider btn-block" id="2">
-            <label for="followingRange" style="color: #bc5100;">Weight of people who you follow</label>
+            <label for="followingRange" style="color: #2196F3;">Weight of people who you follow</label>
             <input type="range" min="0" max="100" value="{{$third}}" class="slider btn-block" id="3">
             <button class="btn btn-custom btn-block" onclick="savePreferences()">Save</button>
         </div>

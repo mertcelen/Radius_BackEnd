@@ -19,7 +19,7 @@
         @foreach ($users as $user)
             <tr>
                 <th scope="row">{{$loop->iteration + (20 * $users->currentPage() - 20)}}</th>
-                <td>{{$user->name}}</td>
+                <td style="text-decoration: underline ;"><a href="/faagram/posts?user={{$user->_id}}">{{$user->name}}</a></td>
                 <td>{{$user->follower}}</td>
                 <td>{{$user->following}}</td>
                 <td>{{$user->post_count}}</td>

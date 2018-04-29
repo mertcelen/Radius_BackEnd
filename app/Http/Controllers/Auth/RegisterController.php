@@ -64,13 +64,13 @@ class RegisterController extends Controller
             'email' => ['required', 'email',
                 function ($attribute, $value, $fail) {
                     if ($attribute == 'email') {
-                        $customer = User::where($attribute, 'like', $value)->first();
-                        if ($customer !== null)
+                        $user = User::where($attribute, 'like', $value)->first();
+                        if ($user !== null)
                             return $fail(ucfirst($attribute) . ' already exists.');
                     }
                 }],
             'password' => 'required|string|min:6|max:255',
-            'female' => 'required|string'
+            'gender' => 'required|string'
         ]);
     }
 
@@ -84,7 +84,7 @@ class RegisterController extends Controller
     {
         $user = User::add($data["name"],
             $data["email"], $data["password"],
-            ($data['female'] == true ? 1 : 0));
+            (intval($data['gender'])));
         //Send Setup Email
         $email = new SendVerification($user->email, $user->verification);
         $this->dispatch($email);

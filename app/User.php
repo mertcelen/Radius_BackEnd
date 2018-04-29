@@ -30,6 +30,7 @@ class User extends Authenticatable
             $verification = str_random(64);
         }
         $user->type = 1;
+        $user->setup = false;
         $user->verification = $verification;
         $user->status = 0;
         $user->values = "50,25,25";
@@ -60,5 +61,9 @@ class User extends Authenticatable
     public function isVerified()
     {
         return !$this->statusCheck(0);
+    }
+
+    public function isComplete(){
+        return $this->setup;
     }
 }

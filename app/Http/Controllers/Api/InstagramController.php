@@ -101,7 +101,7 @@ class InstagramController extends Controller
      *
      * @apiParam {String} code User' instagram code(from callback).
      *
-     * @apiSuccess {String} secret Secret token to use in API calls.
+     * @apiSuccess {Array} user Instagram User.
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
@@ -110,13 +110,13 @@ class InstagramController extends Controller
         if (request()->has('error')) {
             return redirect('/');
         }
-        $secret = \App\Http\Controllers\Auth\InstagramController::create(true, request('code'));
+        $user = \App\Http\Controllers\Auth\InstagramController::create(true, request('code'));
         return [
             'success' => [
                 "message" => 'User logged in.',
                 "code" => 5
             ],
-            'secret' => $secret
+            'user' => $user
         ];
     }
 

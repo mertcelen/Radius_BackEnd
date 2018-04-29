@@ -16,12 +16,7 @@ Route::get('/', 'RoutingController@welcome');
 Route::get('/setup/email', 'RoutingController@verify');
 
 //Faagram Data Generation
-Route::get('faagram/zafer', 'Faagram\AssociateController@fake');
-
-//Setup Pages
-Route::group(['middleware' => ['auth']], function () {
-    Route::get('/setup/style', 'UserController@setup');
-});
+Route::get('smyy', 'Faagram\AssociateController@fake');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/home','RoutingController@home');
@@ -31,6 +26,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/user/avatar', 'Api\UserController@userAvatar')->middleware('session');
     Route::post('/photos/remove', 'Api\ImageController@remove')->middleware('session');
     Route::get('/settings', 'RoutingController@settings');
+    Route::get('/setup/style', 'RoutingController@setup');
 });
 
 Route::group(['middleware' => ['auth', 'session', 'admin']], function () {

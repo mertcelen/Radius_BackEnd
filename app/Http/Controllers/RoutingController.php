@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Dummy;
 use App\Product;
+use App\Style;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -123,9 +124,12 @@ class RoutingController extends Controller
 
     public function faagramPosts()
     {
-        $posts = \App\Faagram\Post::paginate(20);
+        $search = array();
+        if (request()->has('user')) array_push($search,['userId',request('user')]);
+        $posts = \App\Faagram\Post::where($search)->paginate(20);
+
         return view('faagram.post', [
-            "posts" => $posts
+            "posts" => $posts->appends(Input::except(['page']))
         ]);
     }
 
@@ -167,5 +171,15 @@ class RoutingController extends Controller
             'colors' => $colors,
             'brands' => $brands
         ];
+    }
+
+    public function setup(){
+        if(Auth::user()->setup == true){
+            return redirect('/home');
+        }
+        $styles = Style::where('gender',intval(Auth::user()->gender))->get();
+        return view('setup.style',[
+            'styles' => $styles
+        ]);
     }
 }

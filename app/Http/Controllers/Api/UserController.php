@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Faagram\Post;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendVerification;
+use App\Style;
 use App\User;
 use Auth;
 use Illuminate\Support\Facades\Hash;
@@ -154,7 +157,7 @@ class UserController extends Controller
      * @apiParam {String} email User' email address.
      * @apiParam {String} password User' password.
      * @apiParam {String} name User' name.
-     * @apiParam {String} gender User' gender (0 Male 1 Female).
+     * @apiParam {String} gender User' gender (1 Male 2 Female).
      *
      * @apiSuccess {String} user User All user information.
      * @apiSuccess {Array} success Success response with message and code.
@@ -162,21 +165,22 @@ class UserController extends Controller
      */
     public function register()
     {
-        /*$this->validate(request(), [
+        $validator = \Validator::make(request()->all(),[
             'name' => 'required|string|max:255|min:3',
             'email' => ['required', 'email',
                 function ($attribute, $value, $fail) {
                     if ($attribute == 'email') {
-                        $customer = User::where($attribute, 'like', $value)->first();
-                        if ($customer !== null)
+                        $user = User::where($attribute, 'like', $value)->first();
+                        if ($user !== null)
                             return $fail(ucfirst($attribute) . ' already exists.');
                     }
                 }],
             'password' => 'required|string|min:6|max:255',
-            'female' => 'required|string'
-        ]);*/
-        echo "girdi";
-        die();
+            'gender' => 'required|string'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        }
         $user = User::add(request('name'), request('email'), request('password'), intval(request('gender')));
         //Send Setup Email
         $email = new SendVerification($user->email, $user->verification);
@@ -243,10 +247,10 @@ class UserController extends Controller
                 ]
             ];
         }
-        if (strcmp($old, $new) == 0) {
+        if (strlen($new) == 0){
             return [
                 'error' => [
-                    "message" => 'Old and new passwords are same.',
+                    "message" => 'New password cannot blank.',
                     "code" => 4
                 ]
             ];
@@ -272,7 +276,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {post} /api/user/avatar/get Get Avatar
+     * @api {get} /api/user/avatar Get Avatar
      * @apiName GetAvatar
      * @apiGroup User
      *
@@ -345,4 +349,54 @@ class UserController extends Controller
         ];
     }
 
+    /**
+     * @api {post} /api/user/style User Style
+     * @apiName UserStyle
+     * @apiGroup User
+     *
+     * @apiParam {String} secret User' secret key.
+     * @apiParam {Array} selected User' selected image id array.
+     *
+     *
+     * @apiSuccess {Array} success Success response with message and code.
+     * @apiError   {Array} error Error response with message and code.
+     */
+    public function setup(){
+        $user = User::where('_id',request('userId'))->first();
+        $array = array();
+        if(count(request('selected')) < 5){
+            return [
+                'error' => [
+                    "message" => 'Please select at least 5 photos that you like.',
+                    "code" => 4
+                ]
+            ];
+        }
+        foreach (request('selected') as $item){
+            $style = Style::where('name',$item)->where('gender',intval($user->gender))->first();
+            $post = new Post();
+            $post->userId = $user->faagramId;
+            $post->label = $style->part1["type"];
+            $post->color = $style->part1["color"];
+            $post->save();
+            array_push($array,$post->_id);
+            if($style->part2 != null){
+                $post = new Post();
+                $post->userId = $user->faagramId;
+                $post->label = $style->part2["type"];
+                $post->color = $style->part2["color"];
+                $post->save();
+                array_push($array,$post->_id);
+            }
+        }
+        $user->setup = true;
+        $user->save();
+        return [
+            'success' => [
+                "message" => 'User style updated.',
+                "code" => 5
+            ],
+            'posts' => $array
+        ];
+    }
 }

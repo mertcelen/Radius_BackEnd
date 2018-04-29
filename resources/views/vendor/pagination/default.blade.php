@@ -1,7 +1,7 @@
 @if ($paginator->hasPages())
     <style>
         .pagination.pg-blue .page-item.active .page-link, .pagination.pg-blue .page-item.active .page-link:hover{
-            background-color: #bc5100;
+            background-color: #2196F3;
         }
     </style>
     <ul class="pagination pg-blue">

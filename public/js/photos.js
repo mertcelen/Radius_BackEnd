@@ -1,7 +1,7 @@
 var enabled = false;
 var currentImages = [];
 Dropzone.options.uploadPhoto = {
-    paramName: "photo",
+    paramName: "image",
     thumbnail: null,
     previewsContainer: false,
     processing: function () {
@@ -11,7 +11,7 @@ Dropzone.options.uploadPhoto = {
         var imageId = JSON.parse(response.xhr.response).imageId;
         $(".dz-message").html("Photo uploaded.");
         setTimeout(function(){
-            $(".dz-message").html("Drop files or click here to upload.");
+            $(".dz-message").html("Drop files here or click to upload.");
         },1000);
         var removeFunction = "preview(\'" +  imageId + "\')";
         $(".photos").prepend("<div class='photoWrapper'><img src='/thumb/" +
@@ -28,10 +28,12 @@ function preview(imageId) {
 }
 
 function remove(imageId) {
-    $.post({
-        url: "/photos/remove",
+    $.ajax({
+        type : "delete",
+        url: "/api/image/",
         data: {
-            "imageId": imageId
+            "imageId": imageId,
+            "secret" : secret
         },
         success: function (json) {
             if (json.error) {
@@ -44,8 +46,8 @@ function remove(imageId) {
     });
 }
 function update(){
-    $.post({
-        url: "/api/images/get",
+    $.get({
+        url: "/api/image",
         data: {
             "secret": secret
         },

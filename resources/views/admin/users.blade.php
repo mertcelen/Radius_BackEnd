@@ -7,22 +7,28 @@
     <script>
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
-        function updateStatus(userId, newStatus) {
-            $('.status').text('Updating ' + userId + '\' status');
-            $.post("user/status", {id: userId, status: newStatus, _token: CSRF_TOKEN}, function (result) {
-                if (result == 0) {
-                    $('.status').text('An error occurred');
+        function updateStatus(userId, newStatus,label) {
+            var alert = $('.alert');
+            alert.fadeIn();
+            alert.text('Updating ' + userId + '\' status');
+            $.post("/api/admin/user/status", {id: userId, status: newStatus, _token: CSRF_TOKEN,secret : secret}, function (result) {
+                if (result === 0) {
+                    alert.text('An error occurred');
                     setTimeout(function () {
-                        $('.status').text('User status updated');
+                        alert.fadeOut();
                     }, 3000);
                 } else {
-                    $('.status').text('User status updated');
+                    alert.text('User status updated');
+                    $('#' + userId).html(label);
+                    setTimeout(function () {
+                        alert.fadeOut();
+                    }, 3000);
                 }
             });
         }
     </script>
-    <div class="alert" role="alert" style="background-color: #bc5100;color: white;">
-        Status : <span class="status">Ready for commands</span>
+    <div class="alert" role="alert" style="background-color: #2196F3;color: white;display: none">
+
     </div>
     <table class="table">
         <thead class="thead">
@@ -35,7 +41,7 @@
             <th scope="col">Gender</th>
             <th scope="col">Instagram</th>
             <th scope="col">Verification</th>
-            <th scope="col">Edit User</th>
+            <th scope="col">Change Role</th>
         </tr>
         </thead>
         <tbody>
@@ -52,7 +58,7 @@
                 <td>
                     <div class="btn-group">
                         <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false" disabled>
+                                aria-haspopup="true" aria-expanded="false" id="{{$user->id}}">
                             @switch($user->status)
                                 @case(0)
                                 Unconfirmed
@@ -60,19 +66,15 @@
                                 @case(1)
                                 Confirmed
                                 @break
-                                @case(2)
-                                Banned
-                                @break
                                 @case(3)
                                 Administrator
                                 @break
                             @endswitch
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#" onclick="updateStatus({{$user->id}},0)">Unconfirmed</a>
-                            <a class="dropdown-item" href="#" onclick="updateStatus({{$user->id}},1)">Confirmed</a>
-                            <a class="dropdown-item" href="#" onclick="updateStatus({{$user->id}},2)">Banned</a>
-                            <a class="dropdown-item" href="#" onclick="updateStatus({{$user->id}},3)">Admin</a>
+                            <a class="dropdown-item" href="#" onclick="updateStatus('{{$user->id}}',0,'Unconfirmed')">Unconfirmed</a>
+                            <a class="dropdown-item" href="#" onclick="updateStatus('{{$user->id}}',1,'Confirmed')">Confirmed</a>
+                            <a class="dropdown-item" href="#" onclick="updateStatus('{{$user->id}}',3,'Administrator')">Administrator</a>
                         </div>
                     </div>
                 </td>

@@ -17,10 +17,15 @@ class Admin
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::user()->status != 3) {
-            //Dirty check for if its coming from session or not
-            if (Auth::check()) {
-                return redirect('/');
+        if (Auth::check()) {
+            if (Auth::user()->isAdmin()) {
+                return $next($request);
+            } else {
+                return redirect('/home');
+            }
+        } else {
+            if (User::where('secret', request('secret'))->first()->isAdmin()) {
+                return $next($request);
             } else {
                 return response()->json([
                     'error' => [
@@ -29,8 +34,6 @@ class Admin
                     ]
                 ]);
             }
-
         }
-        return $next($request);
     }
 }

@@ -4,7 +4,7 @@
     <script>
         var secret = "{{Auth::user()->secret}}";
     </script>
-    <script src="{{asset('js/admin.js')}}"></script>
+    <script src="{{asset('js/product.js')}}"></script>
     <div class="container" style="background: white;padding:30px;border-radius: 30px;">
         <h2>Add Product to Database</h2>
         <div class="alert alert-danger productError" role="alert" style="background-color:#bc5100;color:white" hidden>

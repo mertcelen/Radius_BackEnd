@@ -24,7 +24,7 @@ class AdminController extends Controller
     public static function updateStatus()
     {
         User::where('_id',request('id'))->update([
-           'status' => request('status')
+           'status' => intval(request('status'))
         ]);
         return [
             'success' => [

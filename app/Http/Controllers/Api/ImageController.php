@@ -12,7 +12,7 @@ use Intervention\Image\ImageManagerStatic as Image;
 class ImageController extends Controller
 {
     /**
-     * @api {post} /api/images/get List User Images
+     * @api {get} /api/image List User Images
      * @apiName GetImages
      * @apiGroup Images
      *
@@ -25,7 +25,7 @@ class ImageController extends Controller
     public static function get()
     {
         $images = \App\Image::where('userId', request('userId'))
-            ->where('enabled',true)->select('imageId')->get()->reverse()->toArray();
+            ->where('enabled',true)->select('imageId')->orderBy('id','DESC')->get()->toArray();
         return [
             'success' => [
                 "message" => 'Images retrieved.',
@@ -36,7 +36,7 @@ class ImageController extends Controller
     }
 
     /**
-     * @api {post} /api/user/favorites/add Add User Favorites
+     * @api {post} /api/user/favorites Add User Favorites
      * @apiName UpdateFavorites
      * @apiGroup User
      *
@@ -48,7 +48,7 @@ class ImageController extends Controller
      */
     public function addFavorite()
     {
-        if ($result = Favorite::add(request('userId'), request('productId'))) {
+        if ($result = Favorite::add(request('userId'), request('productId')) == 3) {
             return [
                 'success' => [
                     "message" => 'Image added to favorites.',
@@ -73,7 +73,7 @@ class ImageController extends Controller
     }
 
     /**
-     * @api {post} /api/user/favorites/remove Remove User Favorites
+     * @api {delete} /api/user/favorites Remove User Favorites
      * @apiName RemoveFavorites
      * @apiGroup User
      *
@@ -88,14 +88,14 @@ class ImageController extends Controller
         if (Favorite::remove(request('favoriteId'), request('userId'))) {
             return [
                 'success' => [
-                    "message" => 'Image successfully removed from favorites.',
+                    "message" => 'Recommendation successfully removed from favorites.',
                     "code" => 5
                 ]
             ];
         } else {
             return [
                 'error' => [
-                    "message" => 'Image not found in favorites.',
+                    "message" => 'Recommendation not found in favorites.',
                     "code" => 4
                 ]
             ];
@@ -103,7 +103,7 @@ class ImageController extends Controller
     }
 
     /**
-     * @api {post} /api/user/favorites/list List User Favorites
+     * @api {get} /api/user/favorites List User Favorites
      * @apiName GetFavorites
      * @apiGroup User
      *
@@ -126,12 +126,12 @@ class ImageController extends Controller
     }
 
     /**
-     * @api {post} /api/images/add Add User Image
+     * @api {post} /api/image Add User Image
      * @apiName AddImage
      * @apiGroup Images
      *
      * @apiParam {String} secret User' secret key.
-     * @apiParam {File} photo Image of the User.
+     * @apiParam {File} image Image of the User.
      *
      * @apiSuccess {String} imageId Added Image Id
      * @apiSuccess {Array} success Success response with message and code.
@@ -143,7 +143,7 @@ class ImageController extends Controller
         while (!empty(\App\Image::where('imageId', $imageId)->get()->toArray())) {
             $imageId = str_random(16);
         }
-        $image = Image::make(Input::file('photo'));
+        $image = Image::make(Input::file('image'));
         //Save original file
         $image->save(storage_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg");
         //Save thumbnail
@@ -171,7 +171,7 @@ class ImageController extends Controller
     }
 
     /**
-     * @api {post} /api/images/remove Remove User Image
+     * @api {delete} /api/image Remove User Image
      * @apiName RemoveImage
      * @apiGroup Images
      *

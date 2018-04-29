@@ -30,8 +30,8 @@ class Parameters
         }
         if($request->has('secret')){
             //Checking if token is real.
-            $userId = User::where('secret',request('secret'))->first()->_id;
-            if( $userId == null){
+            $user = User::where('secret',request('secret'))->first();
+            if( $user == null){
                 return response()->json([
                     "error" => [
                         "message" => "Wrong parameter(s)",
@@ -39,6 +39,7 @@ class Parameters
                     ]
                 ]);
             }
+            $userId = $user->_id;
             //Now that we have confirmed token and received id, we can now add to the request so that controllers can access without requiring more database calls.
             $request->request->add(['userId' => $userId]);
         }

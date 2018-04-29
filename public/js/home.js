@@ -9,8 +9,8 @@ function loginUser() {
     var email = $("#loginEmail").val();
     var password = $("#loginPassword").val();
     var oldHtml = $(".modal-body").html();
-    var loading = $(".loading").html();
-    $(".modal-body").html(loading);
+        var loading = $(".loading").html();
+        $(".modal-body").html(loading);
     if ($("#loginEmail").is(':empty') || $("#loginPassword").is(':empty')) {
         $(".loginError").html('Please fill all blanks.').removeClass('invisible');
     }
@@ -50,7 +50,11 @@ function registerUser() {
     var name = $("#registerName").val();
     var password = $("#registerPassword").val();
     var password2 = $("#registerPassword2").val();
-    var isFemale = $("#radio2").is(":checked");
+    if($("#radio2").is(":checked")){
+        var gender = 2;
+    }else{
+        var gender = 1;
+    }
     var oldHtml = $(".modal-body").html();
     var loading = $(".loading").html();
     $(".modal-body").html(loading);
@@ -61,7 +65,7 @@ function registerUser() {
             "password": password,
             "password-confirm": password2,
             "name": name,
-            "female" : isFemale
+            "gender" : gender
         },
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

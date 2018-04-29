@@ -26,10 +26,9 @@ class InstagramController extends Controller
         if ($error) return redirect('/');
         //Now check if user is actually exist or not.
         $secret = str_random(64);
-        $userId = "";
+        $user = new User();
         if (User::where('instagram.id', $instagramUser->user->id)->exists() == false) {
             //User not found on database, so we need to create one.
-            $user = new User();
             $user->name = $instagramUser->user->username;
             $secret = str_random(64);
             while (User::where('secret', $secret)->exists() == true) {
@@ -67,12 +66,10 @@ class InstagramController extends Controller
             ];
             $user->save();
         }
-        echo "Secret > " . $secret;
-        die();
         if ($isApicall == true) {
-            return $secret;
+            return $user;
         } else {
-            Auth::loginUsingId($userId,true);
+            Auth::loginUsingId($user->_id,true);
             return redirect('/home');
         }
     }

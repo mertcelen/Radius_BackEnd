@@ -4,24 +4,16 @@
     <div class="container">
 
         @isset($recommendations)
-            <table class="table">
-                <thead class="thead">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Product Name</th>
-                    <th scope="col">Product Color</th>
-                </tr>
-                </thead>
-                <tbody>
-            @foreach($recommendations as $recommendation)
-                <tr>
-                    <th scope="row">{{$loop->iteration}}</th>
-                    <td>{{$recommendation["label"]}}</td>
-                    <td>{{$recommendation["color"]}}</td>
-                </tr>
-            @endforeach
-                </tbody>
-            </table>
+            <div class="photos">
+                @foreach($recommendations as $recommendation)
+                    <div class='photoWrapper'>
+                        <a href="{{$recommendation["link"]}}">
+                            <img src="/products/{{$recommendation["image"]}}.jpg"
+                                 class='photo float-left'/>
+                        </a>
+                    </div>
+                @endforeach
+            </div>
         @endisset
     </div>
 @endsection

@@ -15,11 +15,16 @@ class RoutingController extends Controller
     public function home()
     {
         $result = Api\RecommendationController::main(Auth::id());
+        $products = array();
+        foreach ($result as $item){
+            array_push($products,Product::where('type',$item["label"])
+                ->where('color',$item["color"])->select(['image','link'])->first());
+        }
         if ($result != null) {
             shuffle($result);
         }
         return view('home', [
-            'recommendations' => $result
+            'recommendations' => $products,
         ]);
     }
 

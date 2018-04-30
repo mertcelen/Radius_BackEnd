@@ -10,7 +10,7 @@ class RecommendationController extends Controller
     public static function main($userId)
     {
         try {
-            $user = \App\User::where('id', $userId)->first();
+            $user = \App\User::where('_id', $userId)->first();
             $preferences = explode(',', $user->values);
             $faagramId = $user->faagramId;
             $posts = User::getPosts($faagramId);

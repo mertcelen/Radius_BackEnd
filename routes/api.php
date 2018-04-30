@@ -18,7 +18,7 @@ Route::group(['middleware' => ['parameters:secret']], function () {
     //Favorites Routes
     Route::get('user/favorites', 'Api\ImageController@getFavorites');
     Route::post('user/favorites', 'Api\ImageController@addFavorite')->middleware('parameters:productId');
-    Route::delete('user/favorites', 'Api\ImageController@removeFavorite')->middleware('parameters:favoriteId');
+    Route::post('user/favorites/delete', 'Api\ImageController@removeFavorite')->middleware('parameters:favoriteId');
 
     //Recommendation Values Routes
     Route::get('user/values','Api\UserController@getValues');
@@ -27,7 +27,7 @@ Route::group(['middleware' => ['parameters:secret']], function () {
     //Image Routes
     Route::get('image', 'Api\ImageController@get');
     Route::post('image', 'Api\ImageController@add')->middleware('parameters:image');
-    Route::delete('image', 'Api\ImageController@remove')->middleware('parameters:imageId');
+    Route::post('image/remove', 'Api\ImageController@remove')->middleware('parameters:imageId');
 
     //User Avatar Routes
     Route::get('user/avatar', 'Api\UserController@getAvatar');

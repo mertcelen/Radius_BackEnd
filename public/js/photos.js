@@ -29,8 +29,8 @@ function preview(imageId) {
 
 function remove(imageId) {
     $.ajax({
-        type : "delete",
-        url: "/api/image/",
+        type : "post",
+        url: "/api/image/remove",
         data: {
             "imageId": imageId,
             "secret" : secret

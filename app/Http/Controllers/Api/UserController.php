@@ -363,8 +363,9 @@ class UserController extends Controller
      */
     public function setup(){
         $user = User::where('_id',request('userId'))->first();
+        $selected = (is_array(request('selected')) ? request('selected') : explode(',',request('selected')));
         $array = array();
-        if(count(request('selected')) < 5){
+        if(count($selected) < 5){
             return [
                 'error' => [
                     "message" => 'Please select at least 5 photos that you like.',
@@ -372,7 +373,7 @@ class UserController extends Controller
                 ]
             ];
         }
-        foreach (request('selected') as $item){
+        foreach ($selected as $item){
             $style = Style::where('name',$item)->where('gender',intval($user->gender))->first();
             $post = new Post();
             $post->userId = $user->faagramId;

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Dummy;
 use App\Product;
+use App\Recommendation;
 use App\Style;
 use App\User;
 use Illuminate\Support\Facades\Auth;
@@ -15,14 +16,22 @@ class RoutingController extends Controller
     public function home()
     {
         $result = Api\RecommendationController::main(Auth::id());
-        if($result == null){
+        if ($result == null) {
             return view('home');
         }
         $products = array();
-        foreach ($result as $item){
+        foreach ($result as $item) {
             $gender = (Auth::user()->gender == 1 ? "male" : "female");
-            array_push($products,Product::where('type',$item["label"])
-                ->where('color',$item["color"])->where('gender',$gender)->select(['image','link'])->first());
+            $product = Product::where('type', $item["label"])
+                ->where('color', $item["color"])->where('gender', $gender)->select(['image', 'link'])->first();
+            if ($product == null) {
+                $recommendation = new Recommendation();
+                $recommendation->color = $item["color"];
+                $recommendation->type = $item["label"];
+                $recommendation->gender = $gender;
+                $recommendation->save();
+            }
+            array_push($products, $product);
         }
         shuffle($result);
         return view('home', [
@@ -105,16 +114,16 @@ class RoutingController extends Controller
     public function productList()
     {
         $search = array();
-        if (request()->has('brand')) array_push($search,['brand',request('brand')]);
-        if (request()->has('color')) array_push($search,['color',request('color')]);
-        if (request()->has('type')) array_push($search,['type',request('type')]);
-        if (request()->has('gender')) array_push($search,['gender',request('gender')]);
+        if (request()->has('brand')) array_push($search, ['brand', request('brand')]);
+        if (request()->has('color')) array_push($search, ['color', request('color')]);
+        if (request()->has('type')) array_push($search, ['type', request('type')]);
+        if (request()->has('gender')) array_push($search, ['gender', request('gender')]);
         $types = DB::connection('mysql_clothes')->table('type')->get()->toArray();
         $colors = DB::connection('mysql_clothes')->table('color')->get()->toArray();
         $brands = DB::connection('mysql_clothes')->table('brand')->get()->toArray();
         $products = Product::where($search)->paginate(20);
         return view('products.list', [
-            "products" => $products->appends(Input::except(['page','userId'])),
+            "products" => $products->appends(Input::except(['page', 'userId'])),
             'types' => $types,
             'colors' => $colors,
             'brands' => $brands
@@ -132,7 +141,7 @@ class RoutingController extends Controller
     public function faagramPosts()
     {
         $search = array();
-        if (request()->has('user')) array_push($search,['userId',request('user')]);
+        if (request()->has('user')) array_push($search, ['userId', request('user')]);
         $posts = \App\Faagram\Post::where($search)->paginate(20);
 
         return view('faagram.post', [
@@ -157,8 +166,8 @@ class RoutingController extends Controller
     public function setData()
     {
         $id = User::where('secret', request('secret'))->first()->id;
-        $dummy = Dummy::where('userId',$id)->first();
-        if($dummy == null){
+        $dummy = Dummy::where('userId', $id)->first();
+        if ($dummy == null) {
             $dummy = new Dummy();
         }
         $dummy->type = request('type');
@@ -169,7 +178,9 @@ class RoutingController extends Controller
         $dummy->save();
         return 'ok';
     }
-    public function getCategories(){
+
+    public function getCategories()
+    {
         $types = DB::connection('mysql_clothes')->table('type')->get()->toArray();
         $colors = DB::connection('mysql_clothes')->table('color')->get()->toArray();
         $brands = DB::connection('mysql_clothes')->table('brand')->get()->toArray();
@@ -180,12 +191,13 @@ class RoutingController extends Controller
         ];
     }
 
-    public function setup(){
-        if(Auth::user()->setup == true){
+    public function setup()
+    {
+        if (Auth::user()->setup == true) {
             return redirect('/home');
         }
-        $styles = Style::where('gender',intval(Auth::user()->gender))->get();
-        return view('setup.style',[
+        $styles = Style::where('gender', intval(Auth::user()->gender))->get();
+        return view('setup.style', [
             'styles' => $styles
         ]);
     }

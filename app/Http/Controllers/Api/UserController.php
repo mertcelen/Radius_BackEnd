@@ -48,7 +48,7 @@ class UserController extends Controller
      * @apiGroup User
      *
      * @apiParam {String} secret User' secret key.
-     * @apiParam {File} photo Photo file to be added.
+     * @apiParam {File} image Photo file to be added.
      *
      * @apiSuccess {String} avatarId Avatar id.
      * @apiSuccess {Array} success Success response with message and code.
@@ -61,7 +61,7 @@ class UserController extends Controller
             $avatarId = str_random(8);
         }
         if ($url == null) {
-            $image = Image::make(Input::file('photo'));
+            $image = Image::make(Input::file('image'));
         } else {
             $image = Image::make($url);
         }

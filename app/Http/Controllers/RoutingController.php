@@ -15,15 +15,16 @@ class RoutingController extends Controller
     public function home()
     {
         $result = Api\RecommendationController::main(Auth::id());
+        if($result == null){
+            return view('home');
+        }
         $products = array();
         foreach ($result as $item){
             $gender = (Auth::user()->gender == 1 ? "male" : "female");
             array_push($products,Product::where('type',$item["label"])
                 ->where('color',$item["color"])->where('gender',$gender)->select(['image','link'])->first());
         }
-        if ($result != null) {
-            shuffle($result);
-        }
+        shuffle($result);
         return view('home', [
             'recommendations' => $products,
         ]);

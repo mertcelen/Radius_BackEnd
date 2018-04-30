@@ -17,8 +17,9 @@ class RoutingController extends Controller
         $result = Api\RecommendationController::main(Auth::id());
         $products = array();
         foreach ($result as $item){
+            $gender = (strcmp(Auth::user()->gender,'male') == 0 ? 1 : 2);
             array_push($products,Product::where('type',$item["label"])
-                ->where('color',$item["color"])->where('gender',Auth::user()->gender)->select(['image','link'])->first());
+                ->where('color',$item["color"])->where('gender',$gender)->select(['image','link'])->first());
         }
         if ($result != null) {
             shuffle($result);

@@ -7,7 +7,7 @@
             <div class="photos">
                 @foreach($recommendations as $recommendation)
                     <div class='photoWrapper'>
-                        <a href="{{$recommendation["link"]}}">
+                        <a href="{{$recommendation["link"]}}" target="_blank">
                             <img src="/products/{{$recommendation["image"]}}.jpg"
                                  class='photo float-left'/>
                         </a>

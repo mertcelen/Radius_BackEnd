@@ -18,7 +18,7 @@ class RoutingController extends Controller
         $products = array();
         foreach ($result as $item){
             array_push($products,Product::where('type',$item["label"])
-                ->where('color',$item["color"])->select(['image','link'])->first());
+                ->where('color',$item["color"])->where('gender',Auth::user()->gender)->select(['image','link'])->first());
         }
         if ($result != null) {
             shuffle($result);

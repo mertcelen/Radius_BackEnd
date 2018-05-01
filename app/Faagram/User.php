@@ -29,13 +29,13 @@ class User extends Eloquent
 
     public static function getPosts($id)
     {
-        $posts = Post::where('userId', $id)->orderBy('like_count', 'desc')->limit(10)->get()->toArray();
+        $posts = Post::where('userId', $id)->select(['label','color','like_count'])->orderBy('like_count', 'desc')->limit(10)->get()->toArray();
         return $posts;
     }
 
     public static function getLikes($id)
     {
-        $posts = Post::where('likes', 'all', [$id])->orderBy('like_count', 'desc')->limit(20)->get()->toArray();
+        $posts = Post::where('likes', 'all', [$id])->select(['label','color','created_at'])->orderBy('like_count', 'desc')->limit(20)->get()->toArray();
         return array_random($posts,10);
     }
 

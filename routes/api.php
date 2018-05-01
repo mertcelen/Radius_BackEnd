@@ -22,7 +22,7 @@ Route::group(['middleware' => ['parameters:secret']], function () {
 
     //Recommendation Values Routes
     Route::get('user/values','Api\UserController@getValues');
-    Route::post('user/values','Api\UserController@values')->middleware('parameters:first,second,third');
+    Route::post('user/values','Api\UserController@values')->middleware('parameters:first,second');
 
     //Image Routes
     Route::get('image', 'Api\ImageController@get');

@@ -33,17 +33,13 @@ class User extends Authenticatable
         $user->setup = false;
         $user->verification = $verification;
         $user->status = 0;
-        $user->values = "50,25,25";
+        $user->values = "50,50";
         $secret = str_random(64);
         while (User::where('secret', $secret)->exists() == true) {
             $secret = str_random(64);
         }
         $user->secret = $secret;
         $user->avatar = "default_avatar";
-        //Sadly we have to write to retrieve _id value.
-        $user->save();
-
-        $user->faagramId = AssociateController::real($user->_id,$user->name);
         $user->save();
         return $user;
     }

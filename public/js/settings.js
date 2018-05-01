@@ -72,7 +72,7 @@ function magic() {
 }
 
 Dropzone.options.uploadPhoto = {
-    paramName: "photo",
+    paramName: "image",
     thumbnail: null,
     previewsContainer: false,
     processing: function () {
@@ -88,39 +88,68 @@ Dropzone.options.uploadPhoto = {
     }
 };
 
-function savePreferences(){
+function savePreferences(flag) {
     $(".modal-title").html("Please Wait");
     let loading = $(".loading").html();
     $(".modal-body").html(loading);
     $("#modalDialog").modal();
-    let first = $("#1").val().toString();
-    let second = $("#2").val().toString();
-    let third = $("#3").val().toString();
-    $.post({
-        url: "/api/user/values",
-        data: {
-            "secret": secret,
-            "first" : first,
-            "second" : second,
-            "third" : third
-        },
-        success: function (data) {
-            if(data.success){
-                $(".modal-title").html("Updated");
-                $(".modal-body").html(data.success.message);
-            }else{
-                $(".modal-title").html("Error");
-                $(".modal-body").html(data.error.message);
+    if (flag) {
+        $.post({
+            url: "/api/user/values",
+            data: {
+                "secret": secret,
+                "first": $("#1").val().toString(),
+                "second": $("#2").val().toString(),
+                "third": $("#3").val().toString()
+            },
+            success: function (data) {
+                if (data.success) {
+                    $(".modal-title").html("Updated");
+                    $(".modal-body").html(data.success.message);
+                } else {
+                    $(".modal-title").html("Error");
+                    $(".modal-body").html(data.error.message);
+                }
             }
-        }
-    });
+        });
+    } else {
+        $.post({
+            url: "/api/user/values",
+            data: {
+                "secret": secret,
+                "first": $("#uploadRange").val().toString(),
+                "second": $("#styleRange").val().toString()
+            },
+            success: function (data) {
+                if (data.success) {
+                    $(".modal-title").html("Updated");
+                    $(".modal-body").html(data.success.message);
+                } else {
+                    $(".modal-title").html("Error");
+                    $(".modal-body").html(data.error.message);
+                }
+            }
+        });
+    }
+
 }
-$(function(){
-    $(document).on('input change', 'input[type=range]', function() {
+
+$(function () {
+    $(document).on('input change', '.instagramSliders input[type=range]', function () {
         var current = parseInt($(this).attr('id'));
-        var next = (current == 3 ? 1 : current +1);
-        var before = (current == 1 ? 3 : current -1);
-        $("#" + next.toString()).val(50- $(this).val()/2);
-        $("#" + before.toString()).val(50 - $(this).val()/2);
+        var next = (current == 3 ? 1 : current + 1);
+        var before = (current == 1 ? 3 : current - 1);
+        $("#" + next.toString()).val(50 - $(this).val() / 2);
+        $("#" + before.toString()).val(50 - $(this).val() / 2);
+    });
+    $(document).on('input change', '.standardSliders input[type=range]', function () {
+        var first = $("#uploadRange");
+        var second = $("#styleRange");
+        if ($(this).attr('id') == first.attr('id')) {
+            second.val(100 - $(this).val());
+        } else {
+            first.val(100 - $(this).val());
+        }
+
     });
 });

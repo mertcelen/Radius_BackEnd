@@ -5,14 +5,14 @@
                 <div class="alert alert-danger loginError invisible" role="alert" style="background-color:#bc5100;color:white">
                 </div>
                 <div class="md-form">
-                    <i class="fas fa-at prefix" style="color: #bc5100;"></i>
+                    <i class="fas fa-at prefix" style="color: #2196F3;"></i>
                     <input id="loginEmail" type="email" class="form-control" required style="color: #bc5100;">
-                    <label for="loginEmail" style="color: #bc5100;">Email Adress:</label>
+                    <label for="loginEmail" style="color: #2196F3;">Email Adress:</label>
                 </div>
                 <div class="md-form">
-                  <i class="fas fa-key prefix" style="color: #bc5100;"></i>
+                  <i class="fas fa-key prefix" style="color: #2196F3;"></i>
                     <input type="password" id="loginPassword" class="form-control" required style="color: #bc5100;">
-                    <label for="loginPassword" style="color: #bc5100;">Type your password</label>
+                    <label for="loginPassword" style="color: #2196F3;">Type your password</label>
                 </div>
                 <br>
                 <button class="btn btn-custom btn-block" onclick="loginUser()">Login</button>

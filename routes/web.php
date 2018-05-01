@@ -36,4 +36,5 @@ Route::group(['middleware' => ['auth', 'session', 'admin']], function () {
     Route::get('/faagram/users', 'RoutingController@faagramUsers');
     Route::get('/faagram/posts', 'RoutingController@faagramPosts');
     Route::get('/faagram/relations', 'RoutingController@faagramRelations');
+    Route::get('/admin/logs','RoutingController@logs');
 });

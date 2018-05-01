@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Faagram\Post;
 use App\Http\Controllers\Controller;
+use App\Log;
 use App\User;
 use Vision\Vision;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -14,29 +15,38 @@ class VisionController extends Controller
     {
         $imagePath = storage_path('images') . DIRECTORY_SEPARATOR . $imageId . ".jpg";
         $vertexes = VisionController::detectFace($imagePath);
-        if ($vertexes == null){
-            \App\Image::where('imageId',$imageId)->update([
+        if ($vertexes == null) {
+            \App\Image::where('imageId', $imageId)->update([
                 'enabled' => false
             ]);
             return false;
         }
-        list($startX, $startY, $width, $height) = VisionController::calculate($vertexes, $imagePath, $part);
-        list($label, $red, $green, $blue) = VisionController::detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId);
-        $color = VisionController::rgbToText(array($red, $green, $blue));
-        \App\Image::where('imageId', $imageId)->update([
-            'enabled' => true,
-            'part' . $part => [
-                'color' => $color,
-                'label' => $label
-            ]
-        ]);
-        $newPost = new Post();
-        $newPost->userId = User::find($userId)->first()->faagramId;
-        $newPost->label = $label;
-        $newPost->color = $color;
-        $newPost->like_count = 0;
-        $newPost->imageId = $imageId;
-        $newPost->save();
+        try {
+            list($startX, $startY, $width, $height) = VisionController::calculate($vertexes, $imagePath, $part);
+            list($label, $red, $green, $blue) = VisionController::detectArea($imagePath, $width, $height, $startX, $startY, $part, $imageId);
+            $color = VisionController::rgbToText(array($red, $green, $blue));
+        } catch (\Exception $e) {
+            Log::add("vision", $e->getMessage(), $userId);
+            return false;
+        }
+        $user = User::where('_id', $userId)->first();
+        if ($user["type"] == 2) {
+            $newPost = new Post();
+            $newPost->userId = $user["faagramId"];
+            $newPost->label = $label;
+            $newPost->color = $color;
+            $newPost->like_count = 0;
+            $newPost->imageId = $imageId;
+            $newPost->save();
+        } else {
+            \App\Image::where('imageId', $imageId)->update([
+                'enabled' => true,
+                'part' . $part => [
+                    'color' => $color,
+                    'label' => $label
+                ]
+            ]);
+        }
         return true;
     }
 

@@ -25,6 +25,16 @@
                 </button>
             </div>
         </div>
+        <div class="card float-left sliders standardSliders" style="width: 18rem;">
+            <div class="card-body">
+                <h3 class="card-title">Recommendation Preferences</h3>
+                <label for="uploadRange" style="color: #2196F3;">Weight of your uploads</label>
+                <input type="range" min="0" max="100" value="{{$first}}" class="slider btn-block" id="uploadRange">
+                <label for="styleRange" style="color: #2196F3;">Weight of your styles</label>
+                <input type="range" min="0" max="100" value="{{$second}}" class="slider btn-block" id="styleRange">
+                <button class="btn btn-custom btn-block" onclick="savePreferences(false)">Save</button>
+            </div>
+        </div>
     @else
         <div class="card float-left" style="width: 18rem;">
             <div class="card-body">
@@ -32,19 +42,20 @@
                 <button class="btn btn-custom btn-block" onclick="retrieve()">Retrieve</button>
             </div>
         </div>
-    @endif
-    <div class="card float-left sliders" style="width: 18rem;">
-        <div class="card-body">
-            <h3 class="card-title">Recommendation Preferences</h3>
-            <label for="postRange" style="color: #2196F3;">Weight of your posts</label>
-            <input type="range" min="0" max="100" value="{{$first}}" class="slider btn-block" id="1">
-            <label for="likeRange" style="color: #2196F3;">Weight of your likes</label>
-            <input type="range" min="0" max="100" value="{{$second}}" class="slider btn-block" id="2">
-            <label for="followingRange" style="color: #2196F3;">Weight of people who you follow</label>
-            <input type="range" min="0" max="100" value="{{$third}}" class="slider btn-block" id="3">
-            <button class="btn btn-custom btn-block" onclick="savePreferences()">Save</button>
+        <div class="card float-left sliders instagramSliders" style="width: 18rem;">
+            <div class="card-body">
+                <h3 class="card-title">Recommendation Preferences</h3>
+                <label for="postRange" style="color: #2196F3;">Weight of your posts</label>
+                <input type="range" min="0" max="100" value="{{$first}}" class="slider btn-block" id="1">
+                <label for="likeRange" style="color: #2196F3;">Weight of your likes</label>
+                <input type="range" min="0" max="100" value="{{$second}}" class="slider btn-block" id="2">
+                <label for="followingRange" style="color: #2196F3;">Weight of people who you follow</label>
+                <input type="range" min="0" max="100" value="{{$third}}" class="slider btn-block" id="3">
+                <button class="btn btn-custom btn-block" onclick="savePreferences(true)">Save</button>
+            </div>
         </div>
-    </div>
+    @endif
+
     <div class="card float-left" style="width: 18rem;">
         <div class="card-body">
             <h3 class="card-title">Profile Photo</h3>

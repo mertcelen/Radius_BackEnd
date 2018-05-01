@@ -25,7 +25,7 @@ class ImageController extends Controller
     public static function get()
     {
         $images = \App\Image::where('userId', request('userId'))
-            ->where('enabled',true)->select('imageId')->orderBy('id','DESC')->get()->toArray();
+            ->where('enabled',true)->where('style',null)->select('imageId')->orderBy('created_at','ASC')->get()->toArray();
         return [
             'success' => [
                 "message" => 'Images retrieved.',

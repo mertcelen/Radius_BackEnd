@@ -52,7 +52,7 @@
         left: 0;
         width: 18px;
         height: 18px;
-        background: #bc5100;
+        background: #2196F3;
         -moz-box-shadow: inset 0 0 0 18px #fff;
         -webkit-box-shadow: inset 0 0 0 18px #fff;
         box-shadow: inset 0 0 0 18px #fff;
@@ -93,19 +93,19 @@
                 <div class="alert alert-danger registerError invisible" role="alert">
                 </div>
                 <div class="md-form">
-                    <i class="fas fa-user prefix" style="color: #bc5100;"></i>
+                    <i class="fas fa-user prefix" style="color: #2196F3;"></i>
                     <input type="text" id="registerName" class="form-control" style="color: #bc5100;">
-                    <label for="registerName" style="color: #bc5100;">Your Name</label>
+                    <label for="registerName" style="color: #2196F3;">Your Name</label>
                 </div>
                 <div class="md-form">
-                    <i class="fas fa-at prefix" style="color: #bc5100;"></i>
+                    <i class="fas fa-at prefix" style="color: #2196F3;"></i>
                     <input id="registerEmail" type="email" class="form-control" required style="color: #bc5100;">
-                    <label for="registerEmail" style="color: #bc5100;">Email Adress</label>
+                    <label for="registerEmail" style="color: #2196F3;">Email Adress</label>
                 </div>
                 <div class="md-form">
-                    <i class="fas fa-key prefix" style="color: #bc5100;"></i>
+                    <i class="fas fa-key prefix" style="color: #2196F3;"></i>
                     <input type="password" id="registerPassword" class="form-control" style="color: #bc5100;">
-                    <label for="registerPassword" style="color: #bc5100;">Password</label>
+                    <label for="registerPassword" style="color: #2196F3;">Password</label>
                 </div>
 
                 <div>

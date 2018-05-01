@@ -15,27 +15,12 @@ class RoutingController extends Controller
 {
     public function home()
     {
-        $result = Api\RecommendationController::main(Auth::id());
-        if ($result == null) {
-            return view('home');
+        if (Auth::user()->isComplete() == false) {
+            return redirect('/setup/style');
         }
-        $products = array();
-        foreach ($result as $item) {
-            $gender = (Auth::user()->gender == 1 ? "male" : "female");
-            $product = Product::where('type', $item["label"])
-                ->where('color', $item["color"])->where('gender', $gender)->select(['image', 'link'])->first();
-            if ($product == null) {
-                $recommendation = new Recommendation();
-                $recommendation->color = $item["color"];
-                $recommendation->type = $item["label"];
-                $recommendation->gender = $gender;
-                $recommendation->save();
-            }
-            array_push($products, $product);
-        }
-        shuffle($result);
+        $recommendations = Api\RecommendationController::main(Auth::id());
         return view('home', [
-            'recommendations' => $products,
+            'recommendations' => $recommendations,
         ]);
     }
 
@@ -67,12 +52,20 @@ class RoutingController extends Controller
     public function settings()
     {
         $array = explode(',', Auth::user()->values);
-        return view('settings', [
-            'secret' => Auth::user()->getAttribute('secret'),
-            'first' => (Integer)$array[0],
-            'second' => (Integer)$array[1],
-            'third' => (Integer)$array[2]
-        ]);
+        if (Auth::user()->type == 1) {
+            return view('settings', [
+                'secret' => Auth::user()->getAttribute('secret'),
+                'first' => (Integer)$array[0],
+                'second' => (Integer)$array[1]
+            ]);
+        } else {
+            return view('settings', [
+                'secret' => Auth::user()->getAttribute('secret'),
+                'first' => (Integer)$array[0],
+                'second' => (Integer)$array[1],
+                'third' => (Integer)$array[2]
+            ]);
+        }
     }
 
     public function instagram()
@@ -199,6 +192,13 @@ class RoutingController extends Controller
         $styles = Style::where('gender', intval(Auth::user()->gender))->get();
         return view('setup.style', [
             'styles' => $styles
+        ]);
+    }
+
+    public function logs(){
+        $logs = \App\Log::paginate(20);
+        return view('admin.log', [
+            "logs" => $logs
         ]);
     }
 }

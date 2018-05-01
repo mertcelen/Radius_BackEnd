@@ -165,7 +165,7 @@ class UserController extends Controller
      */
     public function register()
     {
-        $validator = \Validator::make(request()->all(),[
+        $validator = \Validator::make(request()->all(), [
             'name' => 'required|string|max:255|min:3',
             'email' => ['required', 'email',
                 function ($attribute, $value, $fail) {
@@ -247,7 +247,7 @@ class UserController extends Controller
                 ]
             ];
         }
-        if (strlen($new) == 0){
+        if (strlen($new) == 0) {
             return [
                 'error' => [
                     "message" => 'New password cannot blank.',
@@ -356,16 +356,18 @@ class UserController extends Controller
      *
      * @apiParam {String} secret User' secret key.
      * @apiParam {Array} selected User' selected image id array.
+     * @apiParam {Array} selected User' selected image id array.
      *
      *
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function setup(){
-        $user = User::where('_id',request('userId'))->first();
-        $selected = (is_array(request('selected')) ? request('selected') : explode(',',request('selected')));
+    public function setup()
+    {
+        $user = User::where('_id', request('userId'))->first();
+        $selected = (is_array(request('selected')) ? request('selected') : explode(',', request('selected')));
         $array = array();
-        if(count($selected) < 5){
+        if (count($selected) < 5) {
             return [
                 'error' => [
                     "message" => 'Please select at least 5 photos that you like.',
@@ -373,21 +375,23 @@ class UserController extends Controller
                 ]
             ];
         }
-        foreach ($selected as $item){
-            $style = Style::where('name',$item)->where('gender',intval($user->gender))->first();
-            $post = new Post();
-            $post->userId = $user->faagramId;
-            $post->label = $style->part1["type"];
-            $post->color = $style->part1["color"];
-            $post->save();
-            array_push($array,$post->_id);
-            if($style->part2 != null){
-                $post = new Post();
-                $post->userId = $user->faagramId;
-                $post->label = $style->part2["type"];
-                $post->color = $style->part2["color"];
-                $post->save();
-                array_push($array,$post->_id);
+        foreach ($selected as $item) {
+            $style = Style::where('name', $item)->where('gender', intval($user->gender))->first();
+            $image = new \App\Image();
+            $image->userId = $user->_id;
+            $image->enabled = true;
+            $image->style = true;
+            $image->label = $style->part1["type"];
+            $image->color = $style->part1["color"];
+            $image->save();
+            if ($style->part2 != null) {
+                $image = new \App\Image();
+                $image->userId = $user->_id;
+                $image->enabled = true;
+                $image->style = true;
+                $image->label = $style->part2["type"];
+                $image->color = $style->part2["color"];
+                $image->save();
             }
         }
         $user->setup = true;
@@ -396,8 +400,7 @@ class UserController extends Controller
             'success' => [
                 "message" => 'User style updated.',
                 "code" => 5
-            ],
-            'posts' => $array
+            ]
         ];
     }
 }

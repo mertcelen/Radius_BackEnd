@@ -356,7 +356,6 @@ class UserController extends Controller
      *
      * @apiParam {String} secret User' secret key.
      * @apiParam {Array} selected User' selected image id array.
-     * @apiParam {Array} selected User' selected image id array.
      *
      *
      * @apiSuccess {Array} success Success response with message and code.
@@ -375,6 +374,7 @@ class UserController extends Controller
                 ]
             ];
         }
+        \App\Image::where('userId',$user->_id)->where('style',true)->delete();
         foreach ($selected as $item) {
             $style = Style::where('name', $item)->where('gender', intval($user->gender))->first();
             $image = new \App\Image();

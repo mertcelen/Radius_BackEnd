@@ -35,14 +35,14 @@
                 <button class="btn btn-custom btn-block" onclick="savePreferences(true)">Save</button>
             </div>
         </div>
-    @endif
-    <div class="card float-left" style="width: 22rem;">
-        <div class="card-body">
-            <h3 class="card-title">Change Style</h3>
-            <h5>Click the button below to change your style.</h5><br>
-            <button class="btn btn-custom btn-block" onclick="window.location.href = '/setup/reset'">Update your style</button>
+        <div class="card float-left" style="width: 22rem;">
+            <div class="card-body">
+                <h3 class="card-title">Change Style</h3>
+                <h5>Click the button below to change your style.</h5><br>
+                <button class="btn btn-custom btn-block" onclick="window.location.href = '/setup/reset'">Update your style</button>
+            </div>
         </div>
-    </div>
+    @endif
     <div class="card float-left" style="width: 22rem;">
         <div class="card-body">
             <h3 class="card-title">Change Gender</h3>

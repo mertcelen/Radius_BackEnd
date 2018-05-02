@@ -409,7 +409,9 @@ class UserController extends Controller
         $gender = intval(request('gender'));
         $user = User::where('secret',request('secret'))->first();
         $user->gender = $gender;
-        $user->setup = false;
+        if($user->type = 1){
+            $user->setup = false;
+        }
         $user->save();
         return [
             'success' => [

@@ -20,6 +20,13 @@
                 <button class="btn btn-custom btn-block" onclick="savePreferences(false)">Save</button>
             </div>
         </div>
+        <div class="card float-left" style="width: 22rem;">
+            <div class="card-body">
+                <h3 class="card-title">Change Style</h3>
+                <h5>Click the button below to change your style.</h5><br>
+                <button class="btn btn-custom btn-block" onclick="window.location.href = '/setup/reset'">Update your style</button>
+            </div>
+        </div>
     @else
         <div class="card float-left sliders instagramSliders" style="width: 22rem;">
             <div class="card-body">
@@ -33,13 +40,6 @@
                 <label for="followingRange" style="color: #2196F3;">Weight of people who you follow</label>
                 <input type="range" min="0" max="100" value="{{$third}}" class="slider btn-block" id="3"><br>
                 <button class="btn btn-custom btn-block" onclick="savePreferences(true)">Save</button>
-            </div>
-        </div>
-        <div class="card float-left" style="width: 22rem;">
-            <div class="card-body">
-                <h3 class="card-title">Change Style</h3>
-                <h5>Click the button below to change your style.</h5><br>
-                <button class="btn btn-custom btn-block" onclick="window.location.href = '/setup/reset'">Update your style</button>
             </div>
         </div>
     @endif

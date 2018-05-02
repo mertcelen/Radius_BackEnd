@@ -24,6 +24,7 @@ class VerifyCsrfToken extends Middleware
         '/user/avatar',
         'photos/remove',
         'api/user/avatar/get',
-        'api/product'
+        'api/product',
+        'api/user/gender'
     ];
 }

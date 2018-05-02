@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Dummy;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ImageController;
 use App\Product;
 use App\Recommendation;
 use App\Style;
@@ -49,23 +51,27 @@ class RoutingController extends Controller
         ]);
     }
 
-    public function settings()
+    public function settingsStyle()
     {
         $array = explode(',', Auth::user()->values);
         if (Auth::user()->type == 1) {
-            return view('settings', [
+            return view('settings.style', [
                 'secret' => Auth::user()->getAttribute('secret'),
                 'first' => (Integer)$array[0],
                 'second' => (Integer)$array[1]
             ]);
         } else {
-            return view('settings', [
+            return view('settings.style', [
                 'secret' => Auth::user()->getAttribute('secret'),
                 'first' => (Integer)$array[0],
                 'second' => (Integer)$array[1],
                 'third' => (Integer)$array[2]
             ]);
         }
+    }
+
+    public function settingsAccount(){
+        return view('settings.account');
     }
 
     public function instagram()
@@ -150,44 +156,13 @@ class RoutingController extends Controller
         ]);
     }
 
-    public function getData()
-    {
-        $id = User::where('secret', request('secret'))->first()->id;
-        return Dummy::where('userId', $id)->first()->toArray();
-    }
-
-    public function setData()
-    {
-        $id = User::where('secret', request('secret'))->first()->id;
-        $dummy = Dummy::where('userId', $id)->first();
-        if ($dummy == null) {
-            $dummy = new Dummy();
-        }
-        $dummy->type = request('type');
-        $dummy->gender = request('gender');
-        $dummy->color = request('color');
-        $dummy->brand = request('brand');
-        $dummy->userId = $id;
-        $dummy->save();
-        return 'ok';
-    }
-
-    public function getCategories()
-    {
-        $types = DB::connection('mysql_clothes')->table('type')->get()->toArray();
-        $colors = DB::connection('mysql_clothes')->table('color')->get()->toArray();
-        $brands = DB::connection('mysql_clothes')->table('brand')->get()->toArray();
-        return [
-            'types' => $types,
-            'colors' => $colors,
-            'brands' => $brands
-        ];
-    }
-
     public function setup()
     {
         if (Auth::user()->setup == true) {
             return redirect('/home');
+        }
+        if( Auth::user()->gender == 0){
+            return redirect('/setup/gender');
         }
         $styles = Style::where('gender', intval(Auth::user()->gender))->get();
         return view('setup.style', [
@@ -200,5 +175,25 @@ class RoutingController extends Controller
         return view('admin.log', [
             "logs" => $logs
         ]);
+    }
+
+    public function gender(){
+        if(Auth::user()->gender != 0){
+            return redirect('/home');
+        }
+        return view('setup.gender');
+    }
+
+    public function favorites(){
+        $favorites = ImageController::getFavorites(Auth::user()->_id);
+        return view('favorites', [
+            "favorites" => $favorites["favoriteList"]
+        ]);
+    }
+
+    public function setupReset(){
+        $user = \App\User::where('_id',Auth::user()->_id)->first();
+        $user->setup = false;
+        return redirect('/setup/style');
     }
 }

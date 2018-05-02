@@ -24,9 +24,14 @@ class Post extends Eloquent
     {
         $post = new self();
         $post->userId = $userId;
-        $post->label = array_random(Post::$types, 1)[0]->name;
+        $label = array_random(Post::$types, 1)[0]->name;
+        $post->label = $label;
+        $targetGender = Post::$types[array_search($post->label,array_column(Post::$types,'name'))]->gender;
+        if($targetGender == 0) $targetGender = 1;
+        else if($targetGender == 1) $targetGender = 2;
+        else $targetGender = rand(1,2);
         $post->color = array_random(Post::$colors, 1)[0]->name;
-        $post->gender = $gender = Post::$types[array_search($post->label,array_column(Post::$types,'name'))]->gender;
+        $post->gender = $targetGender;
         $post->likes = array();
         $post->like_count = 0;
         $post->save();

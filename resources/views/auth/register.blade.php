@@ -94,28 +94,19 @@
                 </div>
                 <div class="md-form">
                     <i class="fas fa-user prefix" style="color: #2196F3;"></i>
-                    <input type="text" id="registerName" class="form-control" style="color: #bc5100;">
+                    <input type="text" id="registerName" class="form-control" style="color: #2196F3;">
                     <label for="registerName" style="color: #2196F3;">Your Name</label>
                 </div>
                 <div class="md-form">
                     <i class="fas fa-at prefix" style="color: #2196F3;"></i>
-                    <input id="registerEmail" type="email" class="form-control" required style="color: #bc5100;">
+                    <input id="registerEmail" type="email" class="form-control" required style="color: #2196F3;">
                     <label for="registerEmail" style="color: #2196F3;">Email Adress</label>
                 </div>
                 <div class="md-form">
                     <i class="fas fa-key prefix" style="color: #2196F3;"></i>
-                    <input type="password" id="registerPassword" class="form-control" style="color: #bc5100;">
+                    <input type="password" id="registerPassword" class="form-control" style="color: #2196F3;">
                     <label for="registerPassword" style="color: #2196F3;">Password</label>
                 </div>
-
-                <div>
-                    <input type="radio" id="radio1" name="radio-category" checked/ >
-                    <label for="radio1">Male</label>
-
-                    <input type="radio" id="radio2" name="radio-category" />
-                    <label for="radio2">Female</label>
-                </div>
-
                 <button class="btn btn-custom btn-block" onclick="registerUser()">Register</button>
                 <br>
                 <button class="btn btn-custom btn-block" onclick="action('login')">Go Back</button>

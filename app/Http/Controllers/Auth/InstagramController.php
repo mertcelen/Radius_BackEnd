@@ -38,7 +38,7 @@ class InstagramController extends Controller
             $user->status = 1;
             $user->type = 2;
             $user->setup = true;
-            $user->gender = 1;
+            $user->gender = 0;
             $user->avatar = \App\Http\Controllers\Api\UserController::userAvatar($instagramUser->user->profile_picture)['avatarId'];
             $user->instagram = [
                 'access_token' => $instagramUser->access_token,

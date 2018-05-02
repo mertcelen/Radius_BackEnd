@@ -20,8 +20,7 @@ function updatePassword() {
         },
         success: function (data) {
             if (data.success) {
-                $(".modal-title").html("Updated");
-                $(".modal-body").html("Password successfully updated.");
+                window.location.href = '/logout';
             } else {
                 $("#modalDialog").modal('toggle');
                 $(".passwordError").html(data.error.message).removeAttr('hidden');
@@ -132,6 +131,27 @@ function savePreferences(flag) {
         });
     }
 
+
+}
+
+function gender(type){
+    var loading = $(".loading").html();
+    $(".modal-body").html(loading);
+    $("#modalDialog").modal();
+    $.post({
+        url: "/api/user/gender",
+        data: {
+            "gender": type,
+            "secret" : secret
+        },
+        success: function (data) {
+            if (data.success) {
+                window.location.href = "/setup/style";
+            } else {
+                $(".modal-body").html(data.error.message);
+            }
+        }
+    });
 }
 
 $(function () {
@@ -150,6 +170,5 @@ $(function () {
         } else {
             first.val(100 - $(this).val());
         }
-
     });
 });

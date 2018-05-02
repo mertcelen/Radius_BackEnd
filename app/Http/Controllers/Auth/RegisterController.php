@@ -69,8 +69,7 @@ class RegisterController extends Controller
                             return $fail(ucfirst($attribute) . ' already exists.');
                     }
                 }],
-            'password' => 'required|string|min:6|max:255',
-            'gender' => 'required|string'
+            'password' => 'required|string|min:6|max:255'
         ]);
     }
 
@@ -82,9 +81,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $user = User::add($data["name"],
-            $data["email"], $data["password"],
-            (intval($data['gender'])));
+        $user = User::add($data["name"], $data["email"], $data["password"]);
         //Send Setup Email
         $email = new SendVerification($user->email, $user->verification);
         $this->dispatch($email);

@@ -46,14 +46,10 @@ Route::group(['middleware' => ['parameters:secret']], function () {
 
     //User Style Route
     Route::post('user/style','Api\UserController@setup')->middleware('parameters:selected');
+    Route::post('user/gender','Api\UserController@gender')->middleware('parameters:gender');
 });
 
 //Faagram Routes
 Route::post('faagram/user', 'Faagram\UserController@add');
 Route::get('faagram/user', 'Faagram\UserController@get');
 Route::delete('faagram/user', 'Faagram\UserController@remove');
-
-//Tampermonkey Routes
-Route::post('dummy/set','RoutingController@setData');
-Route::post('dummy/get','RoutingController@getData');
-Route::get('dummy/categories','RoutingController@getCategories');

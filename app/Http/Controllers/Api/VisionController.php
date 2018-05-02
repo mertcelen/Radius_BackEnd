@@ -118,16 +118,14 @@ class VisionController extends Controller
         $vision = new Vision(env('CLOUD_VISION_KEY'), [new \Vision\Feature(\Vision\Feature::IMAGE_PROPERTIES, 100),
             new \Vision\Feature(\Vision\Feature::LABEL_DETECTION, 100)]);
         $response = $vision->request(new \Vision\Request\Image\LocalImage($path));
-        unlink($path);
+//        unlink($path);
         $colors = $response->getImagePropertiesAnnotation()->getDominantColors();
         $red = $colors[0]->getColor()->getRed();
         $green = $colors[0]->getColor()->getGreen();
         $blue = $colors[0]->getColor()->getBlue();
         $labels = $response->getLabelAnnotations();
         $ignoredWords = [
-            "black", "fashion", "button", "outwear", "clothing", "design", "shoulder",
-            "neck", "joint", "sleeve", "formal wear", "collar", "fashion model",
-            "polka dot", "pattern", "white", "product", "footwear",
+            "footwear",
             "fashion model",
             "fashion",
             "sunglasses",
@@ -147,10 +145,8 @@ class VisionController extends Controller
             "road",
             "active",
             "knee",
-            "waist",
             "muscle",
             "abdomen",
-            "sportswear",
             "hip",
             "calf",
             "clothing",
@@ -159,9 +155,7 @@ class VisionController extends Controller
             "catwalk",
             "pattern",
             "red",
-            "jeans",
             "costume",
-            "blazer",
             "white",
             "sleeve",
             "neck",
@@ -171,7 +165,6 @@ class VisionController extends Controller
             "outerwear",
             "yellow",
             "trench",
-            "formal wear",
             "cocktail",
             "professional",
             "top",
@@ -191,7 +184,6 @@ class VisionController extends Controller
             "zipper",
             "sweatshirt",
             "puffer",
-            "overcoat",
             "woolen",
             "button",
             "green",
@@ -215,8 +207,6 @@ class VisionController extends Controller
             "angle",
             "collar",
             "magenta",
-            "miniskirt",
-            "shorts",
             "bermuda",
             "trunks",
             "swim",
@@ -226,7 +216,6 @@ class VisionController extends Controller
             "skort",
             "tuxedo",
             "gentleman",
-            "blouse",
             "sweater",
             "vision",
             "glasses",
@@ -351,13 +340,8 @@ class VisionController extends Controller
             "maroon",
             "fashion accessory",
             "active undergarment",
-            "fashion accessory",
-            "fashion model",
             "fashion design",
             "active undergarment",
-            "fashion design",
-            "formal wear",
-            "cocktail dress",
             "haute couture",
             "fashion show",
             "cobalt blue",
@@ -371,6 +355,7 @@ class VisionController extends Controller
             "little black dress",
             "active shirt",
             "long sleeved t shirt",
+            "long sleeve t shirt",
             "sports uniform",
             "product design",
             "bermuda shorts",
@@ -380,14 +365,68 @@ class VisionController extends Controller
             "swimsuit bottom",
             "dress shirt",
             "long hair",
-            "day dress",
             "vision care",
             "human hair color",
             "black hair",
             "brown hair",
             "hair coloring",
             "photo shoot",
-            "string instruments"
+            "string instruments",
+            "necktie",
+            "string instrument",
+            "clothing",
+            "t shirt",
+            "polo shirt",
+            "product",
+            "purple",
+            "outerwear",
+            "fashion",
+            "gentleman",
+            "cardigan",
+            "sweater",
+            "jersey",
+            "sportswear",
+            "long sleeved",
+            "joint",
+            "design",
+            "pattern",
+            "blouse",
+            "hoodie",
+            "scarf",
+            "headgear",
+            "beanie",
+            "cap",
+            "fur",
+            "hat",
+            "blue",
+            "trousers",
+            "businessperson",
+            "child",
+            "bridal party",
+            "flower girl",
+            "material",
+            "wool",
+            "black hair",
+            "long hair",
+            "brown hair",
+            "little black",
+            "car",
+            "fun",
+            "technology",
+            "professional",
+            "hair",
+            "glasses",
+            "person",
+            "man",
+            "facial hair",
+            "vision care",
+            "chin",
+            "eyewear",
+            "moustache",
+            "forehead",
+            "beard",
+            "smile",
+            "cool"
         ];
         $temp = "";
         foreach ($labels as $label) {
@@ -396,6 +435,41 @@ class VisionController extends Controller
                 break;
             }
         }
+        switch ($temp){
+            case "jeans":
+                $temp = "trousers";
+                break;
+            case "waist":
+            case "miniskirt":
+                $temp = "skirt";
+                break;
+            case "blouse":
+                $temp = "shirt";
+                break;
+            case "t shirt":
+            case "undershirt":
+                $temp = "t-shirt";
+                break;
+            case "shorts":
+                $temp = "short";
+                break;
+            case "blazer":
+                $temp = "jacket";
+                break;
+            case "trench coat":
+            case "overcoat":
+                $temp = "coat";
+                break;
+            case "day dress":
+            case "cocktail dress":
+                $temp = "dress";
+                break;
+            case "formal wear":
+                $temp = "suit";
+                break;
+            default:
+                break;
+        };
         return array($temp, $red, $green, $blue);
     }
 

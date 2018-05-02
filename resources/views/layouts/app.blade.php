@@ -25,7 +25,15 @@
 <body>
 <div>
     @auth
-        @if(Auth::user()->isComplete() == false)
+        @if(Auth::user()->gender == 0)
+            <?php
+            if (strcmp($_SERVER['REQUEST_URI'], '/setup/gender') != 0) {
+                header('Location: /setup/gender');
+                die();
+            }
+            ?>
+        @endif
+        @if(Auth::user()->gender > 0 && Auth::user()->isComplete() == false)
             <?php
             if (strcmp($_SERVER['REQUEST_URI'], '/setup/style') != 0) {
                 header('Location: /setup/style');
@@ -37,8 +45,6 @@
         <header>
             <nav class="navbar navbar-expand-lg navbar-custom">
                 <img src="logo_radius.png" alt="" width="35px" height="35px">
-                {{--<a class="navbar-brand"--}}
-                {{--href="/"><strong>Radius</strong></a>--}}
                 <button class="navbar-toggler" type="button" data-toggle="collapse"
                         data-target="#navbarSupportedContent"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,17 +53,27 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/home">Recommendations<span class="sr-only"></span></a>
+                            <a class="nav-link" href="/home">Recommendations <i class="fas fa-magic"></i><span class="sr-only"></span></a>
                         </li>
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link" href="/photos">My Photos <span class="sr-only"></span></a>
+                                <a class="nav-link" href="/photos">My Photos <i class="fas fa-camera"></i><span class="sr-only"></span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/settings">Settings<span class="sr-only"></span></a>
+                                <a class="nav-link" href="/favorites">My Favorites <i class="fas fa-heart"></i><span class="sr-only"></span></a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Settings <i class="fas fa-cogs"></i><span class="sr-only"></span>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="/settings/style">Style Settings</a>
+                                    <a class="dropdown-item" href="/settings/account">Account Settings</a>
+                                </div>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/privacy_policy.html" target="_blank">Privacy Policy<span
+                                <a class="nav-link" href="/privacy_policy.html" target="_blank">Privacy Policy <i class="fas fa-file-alt"></i><span
                                             class="sr-only"></span></a>
                             </li>
                             @if(Auth::user()->isAdmin())

@@ -20,6 +20,15 @@ class RecommendationController extends Controller
         }
     }
 
+    public static function in_array_r($needle, $haystack, $strict = false) {
+        foreach ($haystack as $item) {
+            if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && RecommendationController::in_array_r($needle, $item, $strict))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static function generateProducts($items, $genderInt)
     {
         $gender = ($genderInt == 1 ? 'male' : 'female');
@@ -28,21 +37,39 @@ class RecommendationController extends Controller
             $target = 20 - count($items);
             for ($i = 0; $i < $target; $i++) {
                 $random = array_random($items, 1);
-                array_push($items, ["label" => $random[0]["label"], "color" => $random[0]["color"]]);
+                array_push($items, [
+                    "label" => $random[0]["label"],
+                    "color" => $random[0]["color"],
+                    "source"=> $random[0]["source"]
+                ]);
             }
+        } else {
+            $items = array_slice($items, 0, 20);
         }
         foreach ($items as $item) {
             $type = $item["label"];
             $color = $item["color"];
-            $product = Product::where('type', $type)->where('color', $color)->where('gender', $gender)->first();
-            array_push($products, [
-                "type" => $product["type"],
-                "brand" => $product["brand"],
-                "color" => $product["color"],
-                "link" => $product["link"],
-                "image" => $product["image"],
-                "gender" => $product["gender"]
-            ]);
+            $source = $item["source"];
+            $resultArray = Product::where('type', $type)->where('color', $color)->where('gender', $gender)->get()->toArray();
+            if(count($resultArray) > 0){
+                $number = rand(0, count($resultArray) - 1);
+                $k = 0;
+                while(RecommendationController::in_array_r($resultArray[$number]["_id"],$products) == true && $k <3){
+                    $number = rand(0, count($resultArray) - 1);
+                    $k = $k + 1;
+                }
+                $product = $resultArray[$number];
+                array_push($products, [
+                    "id" => $product["_id"],
+                    "source" => $source,
+                    "gender" => $product["gender"],
+                    "type" => $product["type"],
+                    "brand" => $product["brand"],
+                    "color" => $product["color"],
+                    "image" => $product["image"],
+                    "link" => $product["link"]
+                ]);
+            }
         }
         return $products;
     }
@@ -76,41 +103,42 @@ class RecommendationController extends Controller
                 array_push($upload, $image);
             }
         }
-        $style = Image::where('userId', $user->_id)->where('enabled', true)->where('style', true)->get()->toArray();
+        $styles = Image::where('userId', $user->_id)->where('enabled', true)->where('style', true)->get()->toArray();
         $desiredUpload = (Integer)round($preferences[0] / 5);
-        if (count($upload) < $desiredUpload) {
+        if (count($upload) < $desiredUpload && $desiredUpload > 0) {
             foreach ($upload as $item) {
                 array_push($result, [
                     "label" => $item->label,
-                    "color" => $item->color
+                    "color" => $item->color,
+                    "source" => 1
                 ]);
             }
-        } else {
-            $temp = array();
+        } else if ($desiredUpload > 0) {
             for ($i = 0; $i < $desiredUpload; $i++) {
                 $random = array_random($upload, 1)[0];
-                while (in_array($random->_id, $temp)) {
-                    $random = array_random($upload, 1);
-                }
                 array_push($result, [
                     "label" => $random->label,
-                    "color" => $random->color
+                    "color" => $random->color,
+                    "source" => 1
                 ]);
             }
         }
-        $desiredStyle = 20 - count($result);
-        if (count($style) < $desiredStyle) {
-            $result = array_merge($result, $style);
+        $desiredStyle = (Integer)round($preferences[1] / 5);
+        if (count($styles) < $desiredStyle) {
+            foreach ($styles as $style) {
+                array_push($result, [
+                    "label" => $style["label"],
+                    "color" => $style["color"],
+                    "source" => 2
+                ]);
+            }
         } else {
-            $temp = array();
             for ($i = 0; $i < $desiredStyle; $i++) {
-                $random = array_random($style, 1);
-                while (in_array($random[0]["_id"], $temp)) {
-                    $random = array_random($style, 1);
-                }
+                $random = array_random($styles, 1);
                 array_push($result, [
                     "label" => $random[0]["label"],
-                    "color" => $random[0]["color"]
+                    "color" => $random[0]["color"],
+                    "source" => 2
                 ]);
             }
         }
@@ -124,21 +152,48 @@ class RecommendationController extends Controller
         $posts = User::getPosts($faagramId);
         $likes = User::getLikes($faagramId);
         $followingPosts = User::getFollowingPosts($faagramId);
-        $desiredPost = round($preferences[0] / 5);
-        $desiredLike = round($preferences[1] / 5);
-        $desiredFollowing = round($preferences[2] / 5);
+        $desiredPost = intval(round($preferences[0] / 5));
+        $desiredLike = intval(round($preferences[1] / 5));
+        $desiredFollowing = intval(round($preferences[2] / 5));
         $result = array();
-        $post_count = count($posts);
-        if ($post_count < $desiredPost) {
-            $result = array_merge($posts, $result);
-        } else {
-            $result = array_random($posts, $desiredPost);
-            $post_count = $desiredPost;
+        if (count($posts) < $desiredPost && $desiredPost > 0) {
+            foreach ($posts as $post) {
+                array_push($result, [
+                    "label" => $post["label"],
+                    "color" => $post["color"],
+                    "source" => 1
+                ]);
+            }
+        } else if ($desiredPost > 0) {
+            for ($i = 0; $i < $desiredPost; $i++) {
+                $random = array_random($posts, 1)[0];
+                array_push($result, [
+                    "label" => $random["label"],
+                    "color" => $random["color"],
+                    "source" => 1
+                ]);
+            }
         }
-        $likecount = round((20 - ($post_count)) / 2);
-        $result = array_merge(array_random($likes, $likecount), $result);
-        $followingCount = 20 - $post_count - $likecount;
-        $result = array_merge(array_random($followingPosts, $followingCount), $result);
+        if ($desiredLike != 0) {
+            for ($i = 0; $i < $desiredLike; $i++) {
+                $random = array_random($likes, 1)[0];
+                array_push($result, [
+                    "label" => $random["label"],
+                    "color" => $random["color"],
+                    "source" => 2
+                ]);
+            }
+        }
+        if ($desiredFollowing != 0) {
+            for ($i = 0; $i < $desiredFollowing; $i++) {
+                $random = array_random($followingPosts, 1)[0];
+                array_push($result, [
+                    "label" => $random["label"],
+                    "color" => $random["color"],
+                    "source" => 3
+                ]);
+            }
+        }
         return $result;
     }
 }

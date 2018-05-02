@@ -113,9 +113,12 @@ class ImageController extends Controller
      * @apiSuccess {Array} success Success response with message and code.
      * @apiError   {Array} error Error response with message and code.
      */
-    public function getFavorites()
+    public static function getFavorites($userId = null)
     {
-        $favoriteList = Favorite::where('userId', request('userId'))->get();
+        if($userId == null){
+            $userId = request('userId');
+        }
+        $favoriteList = Favorite::where('userId',$userId )->get();
         return [
             'success' => [
                 "message" => 'Favorite images retrieved.',

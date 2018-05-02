@@ -374,7 +374,8 @@ class UserController extends Controller
                 ]
             ];
         }
-        \App\Image::where('userId',$user->_id)->where('style',true)->delete();
+        $id = $user->_id;
+        \App\Image::where('userId',$id)->where('style',true)->delete();
         foreach ($selected as $item) {
             $style = Style::where('name', $item)->where('gender', intval($user->gender))->first();
             $image = new \App\Image();
@@ -399,6 +400,20 @@ class UserController extends Controller
         return [
             'success' => [
                 "message" => 'User style updated.',
+                "code" => 5
+            ]
+        ];
+    }
+
+    public function gender(){
+        $gender = intval(request('gender'));
+        $user = User::where('secret',request('secret'))->first();
+        $user->gender = $gender;
+        $user->setup = false;
+        $user->save();
+        return [
+            'success' => [
+                "message" => 'Gender updated.',
                 "code" => 5
             ]
         ];

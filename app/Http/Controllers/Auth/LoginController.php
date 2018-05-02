@@ -71,7 +71,7 @@ class LoginController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'errors' => [
-                    "message" => 'Wrong parameter(s).'
+                    "message" => 'Email or Password is wrong.'
                 ]
             ],422);
         }

@@ -18,13 +18,13 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public static function add($name, $email, $password, $gender)
+    public static function add($name, $email, $password)
     {
         $user = new self();
         $user->name = $name;
         $user->email = $email;
         $user->password = bcrypt($password);
-        $user->gender = $gender;
+        $user->gender = 0;
         $verification = str_random(64);
         while (User::where('verification', $verification)->exists() == true) {
             $verification = str_random(64);

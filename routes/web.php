@@ -21,12 +21,17 @@ Route::get('smyy', 'Faagram\AssociateController@fake');
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/home','RoutingController@home');
     Route::get('/photos', 'RoutingController@photos')->middleware('session');
+    Route::get('/favorites','RoutingController@favorites')->middleware('session');
     Route::post('/photos/upload', 'Api\ImageController@add')->middleware('session');
     Route::post('/photos/remove', 'Api\ImageController@remove')->middleware('session');
     Route::post('/user/avatar', 'Api\UserController@userAvatar')->middleware('session');
     Route::post('/photos/remove', 'Api\ImageController@remove')->middleware('session');
-    Route::get('/settings', 'RoutingController@settings');
+    Route::get('/settings/style', 'RoutingController@settingsStyle');
+    Route::get('/settings/account','RoutingController@settingsAccount');
     Route::get('/setup/style', 'RoutingController@setup');
+    Route::get('/setup/gender', 'RoutingController@gender');
+    Route::get('/setup/reset','RoutingController@setupReset');
+    Route::get('/logout', 'Auth\LoginController@logout');
 });
 
 Route::group(['middleware' => ['auth', 'session', 'admin']], function () {

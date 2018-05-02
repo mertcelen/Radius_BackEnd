@@ -29,7 +29,7 @@ class User extends Eloquent
 
     public static function getPosts($id)
     {
-        $posts = Post::where('userId', $id)->select(['label','color','like_count'])->orderBy('like_count', 'desc')->limit(10)->get()->toArray();
+        $posts = Post::where('userId', $id)->select(['label','color','like_count'])->orderBy('like_count', 'desc')->limit(20)->get()->toArray();
         return $posts;
     }
 

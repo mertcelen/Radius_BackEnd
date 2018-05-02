@@ -37,8 +37,8 @@ function retrieve() {
     let loading = $(".loading").html();
     $(".modal-body").html(loading);
     $("#modalDialog").modal();
-    $.post({
-        url: "/api/instagram/get",
+    $.get({
+        url: "/api/instagram",
         data: {"secret": secret},
         success: function (data) {
             window.location.href = "/photos";
